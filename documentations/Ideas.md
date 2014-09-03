@@ -23,3 +23,11 @@ delivering on time.</p>
 cellphone, that presents important notifications in a safe way. 
 To expand the scope of the app, several types of feedback can be 
 added to help the driver drive in a safer and more economic way.</p>
+
+<h2>Idea 3: Eco driver</h2>
+
+<p>The idea involves an app-device that is connected to the dock and gives the driver simple guidelines on how to drive the vehicle in such an efficient way as possible. The key function for it would be to constantly show the optimum speed to maintain for as low emission as possible. The app will take values such as total weight, speed limit and incline in account, and return the speed that would give the lowest fuel consumption per distance unit. This way the driver would always know on what speeds to use.</p>
+
+<p>A possible feature to this idea is to give the driver feedback on what distance to keep to the car ahead to minimizing starts and stops and therefore minimizing fuel consumptions. This could be really useful in traffic jams, red lights and other scenarios where short stop and goes are frequent.</p>
+
+
