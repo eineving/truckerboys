@@ -1,4 +1,6 @@
-## truckerboys ##
+## README ##
+
+#### Trucker Boys Project for DAT255 @ Chalmers University of Technology Fall 2014
 ===========
 
 ### Issue board
