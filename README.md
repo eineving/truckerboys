@@ -7,6 +7,8 @@
 https://waffle.io/eineving/truckerboys
 
 ### SDK
+https://developer.lindholmen.se/redmine/projects/aga
+
 Use version 1.1 snapshot.
 
 ##### Windows: http://developer.lindholmen.se/repo/SDK/Windows/SNAPSHOT/
