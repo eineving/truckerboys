@@ -15,7 +15,7 @@
 Optimized Time Tool Onroad</b>
 
 
-We aim to create a safe app for an automative grade android environment to help truck drivers with their daily work of route planning and displaying usefull feedback to ease the driving experience. </br>
+We aim to create a safe app for an automative grade android environment to help truck drivers with their daily work of route planning and displaying useful feedback to ease the driving experience. </br>
 
 Many drivers are frustrated with the complicated time regualtions in their daily work. They have a big responsability and need a safer work environment.</br>
 Today truck drivers report their shifts using a conventional tachograph <i>(sv: färdskrivare)</i> mounted inside the truck, but in this way the driver is not given any concrete feedback, especially while driving. They have to keep track of the time and regulations themselves. The app should do this for them in a safe way. This will furthermore be a step towards digitalizing the traditional tachograph.
