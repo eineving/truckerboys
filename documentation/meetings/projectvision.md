@@ -1,30 +1,24 @@
 ## Project vision
 
-#### What to mention:
-* For (target customer) <b>Truck drivers OK</b>
-* Who (statement of the need or opportunity) <b>Truck drivers has a big responsability and need a safe work environment/driving experience OK</b>
-* The (product name) is a (product category) <b>Logistics/navigation app - name: ??</b>
-* That (key benefit, compelling reason to buy) <b>Lower crash risk and ease the everyday work, productivity tool</b>
-* Unlike (primary competitive alternative) <b>There is no such app for trucks that we know of</b>
-* Our product (statement of primary differentiation) <b>Our app will differ from other navigation app in such a way that it will also keep track of the time the driver spends on the road, to avoid any violations of the regulations that truck drivers has to keep track of(e.g after x min of driving, the driver is required a y min break). We do also aim to digitalize a big part of the daily work environment for truck drivers, i.e less paper work in a safe manner</b>
+<b>OTTO - Onroad Time Tracking Optimizer</b>
 
-#### Vision
+We aim to create a safe app for an automotive grade android environment to help truck drivers with their daily work of route planning and displaying useful feedback to ease the driving experience.
 
-<b>OTTO - Onroad Time Tracking Optimizer
+Many drivers are frustrated with the complicated time regulations in their daily work. They have a big responsibility and need a safer work environment.
+Today truck drivers report their shifts using a conventional tachograph (sv: färdskrivare) mounted inside the truck, but in this way the driver is not given any concrete feedback, especially while driving. They have to keep track of the time and regulations themselves. The app should do this for them in a safe way. This will furthermore be a step towards digitalizing the traditional tachograph.
 
-Optimized Time Tool Onroad</b>
+The system is meant to be integrated into a GPS-navigation system within the same device and should in this way be able to plan the navigation route based on the time regulations, to avoid any violations. It should be able to optimize the time intervals between breaks for an overall higher work efficiency and lower delivery times.
 
+The app should continuously recalculate the route and break locations meanwhile the vehicle is moving. This way the driver would always be up to date on how to navigate as efficient as possible without violating any regulations. In later implementations, these recalculations could also take unexpected events into account, such as traffic or roadwork along the route. This would minimize the risk of running late to the target lay-by.
 
-We aim to create a safe app for an automative grade android environment to help truck drivers with their daily work of route planning and displaying useful feedback to ease the driving experience. </br>
+To make the interaction with our app as safe as possible, while driving, the app will present feedback in an efficient way to keep the drivers eyes on the road using the latest design conventions from Google's material design, as well as the directions given by SICS.
 
-Many drivers are frustrated with the complicated time regualtions in their daily work. They have a big responsability and need a safer work environment.</br>
-Today truck drivers report their shifts using a conventional tachograph <i>(sv: färdskrivare)</i> mounted inside the truck, but in this way the driver is not given any concrete feedback, especially while driving. They have to keep track of the time and regulations themselves. The app should do this for them in a safe way. This will furthermore be a step towards digitalizing the traditional tachograph.
+The interaction should in this way be as fluid and seamless as possible. The app shouldn’t require any unnecessary attention for a longer period of time from the driver, which would take the focus from the road to the device.
 
-The system is ment to be integrated into a GPS-navigation system within the same device and should in this way be able to plan the navigation route based on the time regulations, to avoid any violations. It should be able to optimize the time intervalls between breaks for an overall higher work efficiency and lower delivery times.</br>
+As a later implementation the interaction could be done using voice control in form of simple commands based on obvious sentences, such as “Plan route based on …”. This is not, however, a main feature that we will strive to implement before a solid base is done. This does also applies to some of the more secondary feedback feature, such as weather report, traffic jams, better optimized driving routes etc.
 
-To make the interaction with our app as safe as possible, while driving, the app will present feedback in a efficient way to keep the drivers eyes on the road using the latest design conventions from Google's material design, as well as the directions given by SICS.</br>
-Such feedback <b>could be</b> weather reports, traffic jams, incomming notifications for the drivers mobile phone (e.g sms, calls), better optimized driving routes etc.</br>
+The main feedback feature for the system is time left to destination, time spent driving and keeping track of the regulations. 
 
-The key benefits of using our app is to lower the crash risk and the everyday work load of the truck driver. It could also help decrease delivery times by optimizing routes and break intervalls.
+The key benefits of using our app is to lower the crash risk and the everyday work load of the truck driver. It could also help decrease delivery times and fuel consumptions by optimizing the driving routes and break intervals. 
 
-
+The driving experience will be greatly improved from a safety point of view due to less paperwork while driving. This because the driver will not need to read up on all the regulations when in doubt, as well as reading maps for what route to follow.
