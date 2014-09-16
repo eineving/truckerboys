@@ -26,10 +26,11 @@ Google Group: https://groups.google.com/forum/#!forum/cth-dat255-lp1-2014
 
 #### References
 
-SICS Crirerias: https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria
+##### Project criterias:
+SICS: https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria
 
-#### Trafikverket
+##### Trafikverket
 EU Regulations: https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf
 
-### Design model
+#### Design model
 MVP-pattern for Android - http://antonioleiva.com/mvp-android/
