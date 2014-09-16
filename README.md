@@ -32,5 +32,5 @@ SICS: https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criter
 ##### Trafikverket
 EU Regulations: https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf
 
-#### Design model
+##### Design model
 MVP-pattern for Android - http://antonioleiva.com/mvp-android/
