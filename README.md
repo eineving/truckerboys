@@ -24,7 +24,12 @@ Group contract: https://drive.google.com/file/d/0B3-HBeyIrR6eQnlfX0ZpRnZVYms/edi
 
 Google Group: https://groups.google.com/forum/#!forum/cth-dat255-lp1-2014
 
+#### References
+
 SICS Crirerias: https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria
 
 #### Trafikverket
 EU Regulations: https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf
+
+### Design model
+MVP-pattern for Android - http://antonioleiva.com/mvp-android/
