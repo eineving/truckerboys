@@ -34,3 +34,5 @@ EU Regulations: https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkes
 
 ##### Design model
 MVP-pattern for Android - http://antonioleiva.com/mvp-android/
+
+Domain-model/ UML-diagram: https://dashboard.genmymodel.com/projectProperties/_tNRVQDzhEeSn3ZXpVIPWYw
