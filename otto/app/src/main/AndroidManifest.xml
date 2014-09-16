@@ -6,6 +6,10 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme">
 
+        <!-- Goolge Maps API Key -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBZMlkOv4sj-M5JO9p6wksdax4TEjDVLgo" />
     </application>
 
 </manifest>
