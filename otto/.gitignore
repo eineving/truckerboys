@@ -31,8 +31,6 @@ hs_err_pid*
 # .idea/uiDesigner.xml
 
 # Gradle:
-# .idea/gradle.xml
-# .idea/libraries
 
 # Mongo Explorer plugin:
 # .idea/mongoSettings.xml
@@ -105,7 +103,6 @@ bin/
 gen/
 
 # Gradle files
-.gradle/
 build/
 
 # Local configuration file (sdk path, etc)
@@ -119,7 +116,6 @@ proguard/
 
 
 ### Gradle ###
-.gradle
 build/
 
 # Ignore Gradle GUI config
