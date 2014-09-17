@@ -44,6 +44,7 @@ proguard/
 
 ### Gradle ###
 build/
+.gradle
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -51,8 +52,9 @@ gradle-app.setting
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
-
+*.iml
 /*.iml
+workspace.xml
 
 # if you remove the above rule, at least ignore the follwing:
 
