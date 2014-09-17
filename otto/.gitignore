@@ -43,7 +43,6 @@ proguard/
 
 
 ### Gradle ###
-.gradle
 build/
 
 # Ignore Gradle GUI config
@@ -100,7 +99,6 @@ com_crashlytics_export_strings.xml
 ### Eclipse ###
 *.pydevproject
 .metadata
-.gradle
 bin/
 tmp/
 *.tmp
