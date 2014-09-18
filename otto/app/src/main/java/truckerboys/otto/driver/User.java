@@ -2,7 +2,8 @@ package truckerboys.otto.driver;
 
 import java.util.List;
 import java.util.ArrayList;
-import org.joda.time.*;
+
+import truckerboys.otto.data.TimeBank;
 
 /**
  * Created by Martin on 17/09/2014.
@@ -14,6 +15,14 @@ public class User {
 
     public User(){
 
+    }
+
+    /**
+     * Returns a list of past sessions.
+     * @return The list of the users past sessions.
+     */
+    public List<Session> getHistory(){
+        return history;
     }
 
 }
