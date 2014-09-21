@@ -114,4 +114,11 @@ public interface IMap {
      * @return Estimated Time of Arrival to target location
      */
     public Duration getETA(Location location);
+
+    /**
+     * Get the time it will take to drive to the final destination
+     *
+     * @return time it will take to drive to the final destination
+     */
+    public Duration getETAFinalDestination();
 }
