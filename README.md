@@ -46,6 +46,9 @@ Group contract: https://drive.google.com/file/d/0B3-HBeyIrR6eQnlfX0ZpRnZVYms/edi
 
 Google Group: https://groups.google.com/forum/#!forum/cth-dat255-lp1-2014
 
+Username: student_dat255ht14
+Password: jaglovarattvaraduktig
+
 #### References
 
 ##### Project criterias:
