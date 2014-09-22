@@ -148,4 +148,12 @@ public interface IRegulationHandler {
      */
     public TimeLeft getNextTwoWeekTL(List<Session> history);
     //End two week
+
+    /**
+     * The time left on your break and you are allowed to drive again.
+     *
+     * @param history All sessions from at least 30 days back
+     * @return The time left before you are allowed to drive again.
+     */
+    public TimeLeft getTimeLeftOnBreak(List<Session> history);
 }
