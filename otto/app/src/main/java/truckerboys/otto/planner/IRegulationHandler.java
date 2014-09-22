@@ -9,7 +9,6 @@ import truckerboys.otto.driver.Session;
  * Interface to make it possible to have multiple regulations setup but still the same trip planner
  */
 public interface IRegulationHandler {
-
     //Single Sessions
 
     /**
