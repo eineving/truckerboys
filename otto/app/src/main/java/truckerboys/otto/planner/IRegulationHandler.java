@@ -18,7 +18,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return Time left to drive this session
      */
-    public Duration getThisSessionTL(List<Session> history, Session activeSession);
+    public TimeLeft getThisSessionTL(List<Session> history, Session activeSession);
 
     /**
      * Maximum time to drive the next session
@@ -27,7 +27,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return maximum time to drive the next session
      */
-    public Duration getNextSessionTL(List<Session> history, Session activeSession);
+    public TimeLeft getNextSessionTL(List<Session> history, Session activeSession);
 
     /**
      * Maximum time to drive the next session
@@ -35,7 +35,7 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return maximum time to drive the next session
      */
-    public Duration getNextSessionTL(List<Session> history);
+    public TimeLeft getNextSessionTL(List<Session> history);
     //End Single Sessions
 
     //Day
@@ -47,7 +47,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return Time left to drive this day
      */
-    public Duration getThisDayTL(List<Session> history, Session activeSession);
+    public TimeLeft getThisDayTL(List<Session> history, Session activeSession);
 
     /**
      * Time left to drive this day
@@ -55,7 +55,7 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return Time left to drive this day
      */
-    public Duration getThisDayTL(List<Session> history);
+    public TimeLeft getThisDayTL(List<Session> history);
 
     /**
      * Maximum time to drive the next day
@@ -64,7 +64,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return maximum time to drive the next day
      */
-    public Duration getNextDayTL(List<Session> history, Session activeSession);
+    public TimeLeft getNextDayTL(List<Session> history, Session activeSession);
 
     /**
      * Maximum time to drive the next day
@@ -72,7 +72,7 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return maximum time to drive the next day
      */
-    public Duration getNextDayTL(List<Session> history);
+    public TimeLeft getNextDayTL(List<Session> history);
     //End Day
 
     //Week
@@ -84,7 +84,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return Time left to drive this week
      */
-    public Duration getThisWeekTL(List<Session> history, Session activeSession);
+    public TimeLeft getThisWeekTL(List<Session> history, Session activeSession);
 
     /**
      * Time left to drive this week
@@ -92,7 +92,7 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return Time left to drive this week
      */
-    public Duration getThisWeekTL(List<Session> history);
+    public TimeLeft getThisWeekTL(List<Session> history);
 
     /**
      * Maximum time to drive the next week
@@ -101,7 +101,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return maximum time to drive the next week
      */
-    public Duration getNextWeekTL(List<Session> history, Session activeSession);
+    public TimeLeft getNextWeekTL(List<Session> history, Session activeSession);
 
     /**
      * Maximum time to drive the next week
@@ -109,7 +109,7 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return maximum time to drive the next week
      */
-    public Duration getNextWeekTL(List<Session> history);
+    public TimeLeft getNextWeekTL(List<Session> history);
     //End week
 
     //Two week
@@ -121,7 +121,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return Time left to drive this two week period
      */
-    public Duration getThisTwoWeekTL(List<Session> history, Session activeSession);
+    public TimeLeft getThisTwoWeekTL(List<Session> history, Session activeSession);
 
     /**
      * Time left to drive this two week period
@@ -129,7 +129,7 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return Time left to drive this two week period
      */
-    public Duration getThisTwoWeekTL(List<Session> history);
+    public TimeLeft getThisTwoWeekTL(List<Session> history);
 
     /**
      * Maximum time to drive the next two week period after this week
@@ -138,7 +138,7 @@ public interface IRegulationHandler {
      * @param activeSession Current active driving session
      * @return maximum time to drive the next two week period after this week
      */
-    public Duration getNextTwoWeekTL(List<Session> history, Session activeSession);
+    public TimeLeft getNextTwoWeekTL(List<Session> history, Session activeSession);
 
     /**
      * Maximum time to drive the next two week period after this week
@@ -146,6 +146,6 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return maximum time to drive the next two week period after this week
      */
-    public Duration getNextTwoWeekTL(List<Session> history);
+    public TimeLeft getNextTwoWeekTL(List<Session> history);
     //End two week
 }
