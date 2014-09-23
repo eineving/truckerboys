@@ -1,5 +1,7 @@
 package truckerboys.otto.vehicle;
 
+import android.swedspot.automotiveapi.AutomotiveSignalId;
+
 import com.swedspot.automotiveapi.AutomotiveFactory;
 import com.swedspot.automotiveapi.AutomotiveManager;
 import com.swedspot.vil.policy.AutomotiveCertificate;
