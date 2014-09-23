@@ -17,8 +17,8 @@
         android:focusableInTouchMode="false"
         android:text="Until violation"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/basicblue_color"
-        android:textSize="40sp" />
+        android:textColor="@color/textLight"
+        android:textSize="45sp" />
 
     <TextView
         android:id="@+id/clockText"
@@ -26,12 +26,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_weight="2"
+        android:textColor="@color/textLight"
         android:text="01:32"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="100sp" />
+        android:textSize="112sp" />
+
 
     <TextView
         android:id="@+id/nextStopsTitle"
+        android:textColor="@color/textLight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -39,8 +42,7 @@
         android:paddingBottom="10dp"
         android:text="Next stops:"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="40sp"
-        android:textColor="@color/basicblue_color"
+        android:textSize="45sp"
         android:textAlignment="center"
         android:textIsSelectable="true" />
 
@@ -76,7 +78,10 @@
                 android:layout_height="wrap_content"
                 android:text="45 min"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp" />
+                android:textSize="34sp"
+                android:textColor="@color/textDark"
+                />
+
 
             <TextView
                 android:id="@+id/nameStop1"
@@ -84,7 +89,8 @@
                 android:layout_height="wrap_content"
                 android:text="McDonalds"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp" />
+                android:textSize="24sp"
+                android:textColor="@color/textDark" />
         </LinearLayout>
 
 
@@ -122,7 +128,8 @@
                 android:layout_height="wrap_content"
                 android:text="1 h 30 min"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp" />
+                android:textSize="34sp"
+                android:textColor="@color/textDark" />
 
             <TextView
                 android:id="@+id/nameStop2"
@@ -131,7 +138,8 @@
                 android:singleLine="true"
                 android:text="Anna's restaurant of awesome"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp" />
+                android:textSize="24sp"
+                android:textColor="@color/textDark" />
         </LinearLayout>
 
 
@@ -169,7 +177,8 @@
                 android:layout_height="wrap_content"
                 android:text="2 h 10 min"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp" />
+                android:textSize="34sp"
+                android:textColor="@color/textDark" />
 
             <TextView
                 android:id="@+id/nameStop3"
@@ -177,7 +186,8 @@
                 android:layout_height="wrap_content"
                 android:text="Grill place"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp" />
+                android:textSize="24sp"
+                android:textColor="@color/textDark" />
         </LinearLayout>
 
 
