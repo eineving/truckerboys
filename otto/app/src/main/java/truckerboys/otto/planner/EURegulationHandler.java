@@ -12,77 +12,83 @@ import truckerboys.otto.driver.Session;
 public class EURegulationHandler implements IRegulationHandler {
 
     @Override
-    public Duration getThisSessionTL(List<Session> history, Session activeSession) {
+    public TimeLeft getThisSessionTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getNextSessionTL(List<Session> history, Session activeSession) {
+    public TimeLeft getNextSessionTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getNextSessionTL(List<Session> history) {
+    public TimeLeft getNextSessionTL(List<Session> history) {
         return null;
     }
 
     @Override
-    public Duration getThisDayTL(List<Session> history, Session activeSession) {
+    public TimeLeft getThisDayTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getThisDayTL(List<Session> history) {
+    public TimeLeft getThisDayTL(List<Session> history) {
         return null;
     }
 
     @Override
-    public Duration getNextDayTL(List<Session> history, Session activeSession) {
+    public TimeLeft getNextDayTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getNextDayTL(List<Session> history) {
+    public TimeLeft getNextDayTL(List<Session> history) {
         return null;
     }
 
     @Override
-    public Duration getThisWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getThisWeekTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getThisWeekTL(List<Session> history) {
+    public TimeLeft getThisWeekTL(List<Session> history) {
         return null;
     }
 
     @Override
-    public Duration getNextWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getNextWeekTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getNextWeekTL(List<Session> history) {
+    public TimeLeft getNextWeekTL(List<Session> history) {
         return null;
     }
 
     @Override
-    public Duration getThisTwoWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getThisTwoWeekTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getThisTwoWeekTL(List<Session> history) {
+    public TimeLeft getThisTwoWeekTL(List<Session> history) {
         return null;
     }
 
     @Override
-    public Duration getNextTwoWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getNextTwoWeekTL(List<Session> history, Session activeSession) {
         return null;
     }
 
     @Override
-    public Duration getNextTwoWeekTL(List<Session> history) {
+    public TimeLeft getNextTwoWeekTL(List<Session> history) {
         return null;
     }
+
+    @Override
+    public TimeLeft getTimeLeftOnBreak(List<Session> history) {
+        return null;
+    }
+
 }
