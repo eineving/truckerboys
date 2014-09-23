@@ -35,10 +35,11 @@ public class TripPlanner {
 
         //TODO Eineving Move this check to another method
 
-        //if (regulationHandler.getNextSessionTL(user.getHistory()).isShorterThan(mapProvider.getETAFinalDestination())) {
-        //TODO Eineving implement adding a break location to the route
-        //}
-    }
+       // if (regulationHandler.getNextSessionTL(user.getHistory()).isShorterThan(mapProvider.getETAFinalDestination())) {
+        //TODO Eineving fix
+            //TODO Eineving implement adding a break location to the route
+        }
+    //}
 
     private void addFinalDestination(Location finalDestination) {
         this.finalDestination = finalDestination;
