@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="basicblue_color">#5677fc</color>
+    <color name="cleargreen_color">#9ccc65</color>
+    <color name="warningyellow_color">#fff176</color>
+    <color name="violationred_color">#f36c60</color>
+    <color name="background_color">#eeeeee</color>
+</resources>
