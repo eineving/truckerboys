@@ -18,7 +18,6 @@
         <activity
             android:name=".MainActivity">
 
-            <!-- UNCOMMENT BELLOW TO MAKE THIS LAUNCHER ACTIVITY -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
