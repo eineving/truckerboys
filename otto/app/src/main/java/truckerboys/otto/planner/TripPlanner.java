@@ -1,10 +1,7 @@
 package truckerboys.otto.planner;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.mapAPI.IMap;
 import truckerboys.otto.planner.positions.Location;
@@ -38,7 +35,7 @@ public class TripPlanner {
 
         //TODO Eineving Move this check to another method
         //if (regulationHandler.getNextSessionTL(user.getHistory()).isShorterThan(mapProvider.getETAFinalDestination())) {
-        //    //TODO Eineving implement adding a break location to the route
+        //TODO Eineving implement adding a break location to the route
         //}
     }
 
