@@ -6,14 +6,13 @@
     android:divider="@android:color/black">
 
     <TableRow
-        android:layout_marginTop="30dp"
         android:layout_marginLeft="10dp"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
         <ImageButton
-            android:layout_margin="20dp"
-            android:layout_width="125dp"
+            android:layout_margin="30dp"
+            android:layout_width="110dp"
             android:layout_height="110dp"
             android:id="@+id/newRouteButton"
             android:layout_column="6"
@@ -25,8 +24,8 @@
             android:layout_gravity="center_vertical" />
 
         <ImageButton
-            android:layout_margin="20dp"
-            android:layout_width="125dp"
+            android:layout_margin="30dp"
+            android:layout_width="110dp"
             android:layout_height="110dp"
             android:id="@+id/continueRouteButton"
             android:layout_column="21"
@@ -44,8 +43,8 @@
         android:layout_height="fill_parent">
 
         <ImageButton
-            android:layout_margin="20dp"
-            android:layout_width="125dp"
+            android:layout_margin="30dp"
+            android:layout_width="110dp"
             android:layout_height="110dp"
             android:id="@+id/mapsButton"
             android:layout_column="6"
@@ -55,8 +54,8 @@
             android:clickable="true" />
 
         <ImageButton
-            android:layout_margin="20dp"
-            android:layout_width="125dp"
+            android:layout_margin="30dp"
+            android:layout_width="110dp"
             android:layout_height="110dp"
             android:id="@+id/clockButton"
             android:layout_column="21"
@@ -73,8 +72,8 @@
         android:layout_height="fill_parent">
 
         <ImageButton
-            android:layout_margin="20dp"
-            android:layout_width="125dp"
+            android:layout_margin="30dp"
+            android:layout_width="110dp"
             android:layout_height="110dp"
             android:id="@+id/statsButton"
             android:layout_column="6"
@@ -84,8 +83,8 @@
             android:clickable="true" />
 
         <ImageButton
-            android:layout_margin="20dp"
-            android:layout_width="125dp"
+            android:layout_margin="30dp"
+            android:layout_width="110dp"
             android:layout_height="110dp"
             android:id="@+id/settingsButton"
             android:layout_column="21"

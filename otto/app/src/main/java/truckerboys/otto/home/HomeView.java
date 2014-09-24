@@ -25,6 +25,7 @@ public class HomeView extends FragmentView{
 
     public HomeView(){
         super("Home", R.layout.fragment_home);
+        presenter = new HomePresenter(this);
     }
 
     @Override
