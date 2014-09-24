@@ -21,6 +21,7 @@
             android:scaleType="fitXY"
             android:background="#00ffffff"
             android:clickable="true"
+            android:onClick="jumpToNewRoute"
             android:layout_gravity="center_vertical" />
 
         <ImageButton
