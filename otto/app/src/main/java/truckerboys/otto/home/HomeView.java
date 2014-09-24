@@ -15,6 +15,7 @@ import truckerboys.otto.R;
  */
 public class HomeView extends FragmentView{
     private View rootView;
+    private HomePresenter presenter;
     private ImageButton newRouteButton;
     private ImageButton continueRouteButton;
     private ImageButton mapsButton;
@@ -31,6 +32,12 @@ public class HomeView extends FragmentView{
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Defines the buttons to be clicked on at the home screen
+        defineButtons();
+
+        return rootView;
+    }
+
+    public void defineButtons() {
         newRouteButton = (ImageButton) rootView.findViewById(R.id.newRouteButton);
         continueRouteButton = (ImageButton) rootView.findViewById(R.id.continueRouteButton);
         mapsButton = (ImageButton) rootView.findViewById(R.id.mapsButton);
@@ -38,26 +45,50 @@ public class HomeView extends FragmentView{
         statsButton = (ImageButton) rootView.findViewById(R.id.statsButton);
         settingsButton = (ImageButton) rootView.findViewById(R.id.settingsButton);
 
-
-        // Add all the buttons to an array to loops through later
-        ImageButton[] buttonArray = {newRouteButton, continueRouteButton, mapsButton, clockButton, statsButton, settingsButton};
-
-
-        asignListeners((AbstractImageButton[]) buttonArray);
-
-        return rootView;
+        asignListeners();
     }
 
-
     /**
-     * Asigns listeners to the buttons in our array
-     * and pass on the activity.
-     * @param buttonArray
+     * Asigns listeners to the buttons and passes the actions to the presenter.
      */
-    public void asignListeners(AbstractImageButton[] buttonArray) {
-        for(ImageButton button : buttonArray) {
-            ((AbstractImageButton) button).setOnClickAction(getActivity());
-        }
+    public void asignListeners() {
+
+        newRouteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                presenter.newRouteButtonClicked(v);
+            }
+        });
+
+        continueRouteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                presenter.contiueRouteButtonClicked(v);
+            }
+        });
+
+        mapsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                presenter.mapButtonClicked(v);
+            }
+        });
+
+        clockButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                presenter.clockButtonClicked(v);
+            }
+        });
+
+        statsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                presenter.statsButtonClicked(v);
+            }
+        });
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                presenter.settingsButtonClicked(v);
+            }
+        });
+
     }
 
 
