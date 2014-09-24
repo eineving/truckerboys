@@ -22,6 +22,8 @@ public class MainActivity extends FragmentActivity {
         pagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
+
+
         //Use Googles 'SlidingTabLayout' to display tabs for all views.
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
         slidingTabLayout.setViewPager(viewPager);
