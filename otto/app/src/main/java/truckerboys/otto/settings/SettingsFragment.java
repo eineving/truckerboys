@@ -2,6 +2,7 @@ package truckerboys.otto.settings;
 
 import android.os.Bundle;
 import android.preference.*;
+import android.widget.ArrayAdapter;
 
 import truckerboys.otto.R;
 
@@ -15,7 +16,7 @@ public class SettingsFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Load external settings from an XML-file
-        addPreferencesFromResource(R.layout.fragment_settings);
     }
+
+
 }
