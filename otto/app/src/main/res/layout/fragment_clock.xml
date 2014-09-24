@@ -1,7 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    android:paddingTop="20dp"
+    android:background="@color/background_color">
 
+    <TextView
+        android:id="@+id/timeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:focusableInTouchMode="false"
+        android:text="Until violation"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/textLight"
+        android:textSize="45sp" />
+
+    <TextView
+        android:id="@+id/clockText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="2"
+        android:textColor="@color/textLight"
+        android:text="01:32"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="112sp" />
+
+
+    <TextView
+        android:id="@+id/nextStopsTitle"
+        android:textColor="@color/textLight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:paddingBottom="10dp"
+        android:text="Next stops:"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="45sp"
+        android:textAlignment="center"
+        android:textIsSelectable="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@color/cleargreen_color">
+
+        <ImageView
+            android:id="@+id/stopImage1"
+            android:layout_width="77dp"
+            android:layout_height="77dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/reststop" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@id/stopImage1"
+            android:layout_toRightOf="@id/stopImage1"
+            android:orientation="vertical"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/timeStop1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="45 min"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="34sp"
+                android:textColor="@color/textDark"
+                />
+
+
+            <TextView
+                android:id="@+id/nameStop1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="McDonalds"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="24sp"
+                android:textColor="@color/textDark" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@color/warningyellow_color">
+
+        <ImageView
+            android:id="@+id/stopImage2"
+            android:layout_width="77dp"
+            android:layout_height="77dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/reststop" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@id/stopImage2"
+            android:layout_toRightOf="@id/stopImage2"
+            android:orientation="vertical"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/timeStop2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 h 30 min"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="34sp"
+                android:textColor="@color/textDark" />
+
+            <TextView
+                android:id="@+id/nameStop2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="Anna's restaurant of awesome"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="24sp"
+                android:textColor="@color/textDark" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@color/violationred_color">
+
+        <ImageView
+            android:id="@+id/stopImage3"
+            android:layout_width="77dp"
+            android:layout_height="77dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/reststop" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@id/stopImage3"
+            android:layout_toRightOf="@id/stopImage3"
+            android:orientation="vertical"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/timeStop3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 h 10 min"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="34sp"
+                android:textColor="@color/textDark" />
+
+            <TextView
+                android:id="@+id/nameStop3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Grill place"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="24sp"
+                android:textColor="@color/textDark" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
 </LinearLayout>
