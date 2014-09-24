@@ -29,10 +29,11 @@ public class HomeView extends FragmentView{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_settings, container, false);
+        rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Defines the buttons to be clicked on at the home screen
         newRouteButton = (ImageButton) rootView.findViewById(R.id.newRouteButton);
+        System.out.println(newRouteButton);
         continueRouteButton = (ImageButton) rootView.findViewById(R.id.continueRouteButton);
         mapsButton = (ImageButton) rootView.findViewById(R.id.mapsButton);
         clockButton = (ImageButton) rootView.findViewById(R.id.clockButton);
@@ -58,25 +59,29 @@ public class HomeView extends FragmentView{
         });
 
         mapsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+            public void onClick(View view) {
                 ((ViewPager) getActivity().findViewById(R.id.pager)).setCurrentItem(2);
             }
         });
 
         clockButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+            public void onClick(View view) {
                 ((ViewPager) getActivity().findViewById(R.id.pager)).setCurrentItem(1);
             }
         });
 
         statsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+            public void onClick(View view) {
                 ((ViewPager) getActivity().findViewById(R.id.pager)).setCurrentItem(4);
             }
         });
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+            public void onClick(View view) {
                 ((ViewPager) getActivity().findViewById(R.id.pager)).setCurrentItem(5);
             }
         });
