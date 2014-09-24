@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_Preferences">com.truckerboys.otto.SETTINGS_FILE.xml</string>
+    <string name="stats_Preferences">com.truckerboys.otto.STATS_FILE.xml</string>
+
+</resources>
