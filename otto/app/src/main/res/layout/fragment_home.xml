@@ -11,9 +11,9 @@
         android:layout_height="fill_parent">
 
         <ImageButton
-            android:layout_margin="30dp"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_margin="35dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/newRouteButton"
             android:layout_column="6"
             android:src="@drawable/newroute"
@@ -24,9 +24,9 @@
             android:layout_gravity="center_vertical" />
 
         <ImageButton
-            android:layout_margin="30dp"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_margin="35dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/continueRouteButton"
             android:layout_column="21"
             android:src="@drawable/continueroute"
@@ -43,9 +43,9 @@
         android:layout_height="fill_parent">
 
         <ImageButton
-            android:layout_margin="30dp"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_margin="35dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/mapsButton"
             android:layout_column="6"
             android:src="@drawable/maps"
@@ -54,9 +54,9 @@
             android:clickable="true" />
 
         <ImageButton
-            android:layout_margin="30dp"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_margin="35dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/clockButton"
             android:layout_column="21"
             android:src="@drawable/clock"
@@ -72,9 +72,9 @@
         android:layout_height="fill_parent">
 
         <ImageButton
-            android:layout_margin="30dp"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_margin="35dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/statsButton"
             android:layout_column="6"
             android:src="@drawable/stats"
@@ -83,9 +83,9 @@
             android:clickable="true" />
 
         <ImageButton
-            android:layout_margin="30dp"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_margin="45dp"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
             android:id="@+id/settingsButton"
             android:layout_column="21"
             android:src="@drawable/settings"
