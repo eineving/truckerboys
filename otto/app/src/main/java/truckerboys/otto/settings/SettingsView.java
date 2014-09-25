@@ -36,7 +36,7 @@ public class SettingsView extends FragmentView {
     public void fillListView() {
 
         // Creates array of items to fill the list with
-        String[] myItems = {"Mute sounds","Keep display alive"};
+        String[] myItems = {"Sounds","Keep display alive"};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getActivity(), R.layout.list_item_switch, myItems);

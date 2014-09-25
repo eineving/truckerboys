@@ -19,6 +19,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         //Create standard view with a ViewPager and corresponding tabs.
         viewPager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new TabPagerAdapter(getSupportFragmentManager());

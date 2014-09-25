@@ -8,15 +8,15 @@
 
     <ListView
         android:id="@+id/settingsListView"
-        android:layout_width="fill_parent"
+        android:layout_width="360dp"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="5dp"
         android:background="@color/background_color"
         android:cacheColorHint="@android:color/transparent"
-        android:divider="#CCCCCC"
+        android:divider="@color/textLight"
         android:dividerHeight="1dp"
-        android:paddingLeft="2dp" >
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:theme="@style/AppTheme">
     </ListView>
 
 
