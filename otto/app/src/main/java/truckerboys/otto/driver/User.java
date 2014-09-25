@@ -10,7 +10,7 @@ import truckerboys.otto.data.TimeBank;
  */
 public class User {
 
-    private List history = new ArrayList<Session>();
+    private SessionHistory history = new SessionHistory();
     private Session currentSession;
 
     public User(){
@@ -18,10 +18,29 @@ public class User {
     }
 
     /**
-     * Returns a list of past sessions.
-     * @return The list of the users past sessions.
+     * Starts a new Session.
      */
-    public List<Session> getHistory(){
+    public void startNewSession(){
+        if(currentSession.isActive()){
+            endSession();
+        }
+        currentSession = new Session();
+        history.addSession(currentSession);
+    }
+
+    /**
+     * Ends the current session and adds the Session to the users history.
+     */
+    public void endSession(){
+        currentSession.end();
+    }
+
+
+    /**
+     * Returns the users history of sessions.
+     * @return The SessionHistory of the user.
+     */
+    public SessionHistory  getHistory(){
         return history;
     }
 

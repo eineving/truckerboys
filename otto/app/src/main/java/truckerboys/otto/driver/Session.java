@@ -74,6 +74,11 @@ public class Session {
     /**
      * Returns the end time of the session
      *
+     * This is actually extremely retarded, since it will return NULL when the session is active.
+     * A possible fix is to Split the class into a Session, without this method, and a
+     * PastSession extends session which adds this method, and takes a Session as a parameter to the constructor.
+     * Thoughts?
+     *
      * @return the end time of the session as an instant.
      */
     public Instant getEndTime() {
