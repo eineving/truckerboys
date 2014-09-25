@@ -34,6 +34,7 @@ public class TripPlanner {
         List<Location> restLocations = mapProvider.getRestLocationsAlongPlannedRoute();
 
         //TODO Eineving Move this check to another method
+
         //if (regulationHandler.getNextSessionTL(user.getHistory()).isShorterThan(mapProvider.getETAFinalDestination())) {
         //TODO Eineving implement adding a break location to the route
         //}
