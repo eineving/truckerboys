@@ -51,7 +51,7 @@ public class HomePresenter implements IPresenter {
      * @param v
      */
     public void statsButtonClicked(View v) {
-        ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(4);
+        ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(5);
 
     }
 
@@ -60,7 +60,7 @@ public class HomePresenter implements IPresenter {
      * @param v
      */
     public void settingsButtonClicked(View v) {
-        ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(5);
+        ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(4);
 
     }
 
@@ -69,7 +69,7 @@ public class HomePresenter implements IPresenter {
      * @param v
      */
     public void clockButtonClicked(View v) {
-        ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+        ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(3);
 
     }
 
