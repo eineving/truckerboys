@@ -22,4 +22,9 @@ public class StatsPresenter implements IPresenter {
         return view;
     }
 
+    @Override
+    public String getName() {
+        return "Statistics";
+    }
+
 }

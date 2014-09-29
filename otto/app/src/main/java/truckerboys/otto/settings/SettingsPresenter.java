@@ -108,4 +108,9 @@ public class SettingsPresenter implements IPresenter {
     public Fragment getView() {
         return view;
     }
+
+    @Override
+    public String getName() {
+        return "Settings";
+    }
 }

@@ -78,4 +78,9 @@ public class HomePresenter implements IPresenter {
         return view;
     }
 
+    @Override
+    public String getName() {
+        return "Home";
+    }
+
 }
