@@ -1,47 +1,70 @@
 package truckerboys.otto.planner;
 
-import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.LocalDate;
 
 import java.util.List;
 
 import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.SessionHistory;
 
 /**
  * Created by Daniel on 2014-09-17.
  */
 public class EURegulationHandler implements IRegulationHandler {
 
-    @Override
-    public TimeLeft getThisSessionTL(List<Session> history, Session activeSession) {
+    private final Duration ZERO_DURATION = new Duration(0);
 
-        //System.out.println(calculateHoursToday());
+    private final Duration MAX_SESSION_LENGTH = Duration.standardMinutes(270);
+
+    private final Duration MAX_EXTENDED_SESSION_LENGTH = Duration.standardMinutes(330);
+
+    private final Duration MAX_DAY_LENGTH = Duration.standardMinutes(540);
+
+    private final Duration STANDARD_DAILY_REST = Duration.standardMinutes(660);
+    private final Duration STANDARD_SESSION_BREAK = Duration.standardMinutes(45);
+
+    @Override
+    public TimeLeft getThisSessionTL(SessionHistory history) {
+        //TODO PEGELOW Fill out  the function to handle all edge-cases.
+        //TODO PEGELOW If you need to ask the history something, you create a method in the SessionHistory class.
+        //TODO in the style of the getActiveTimeSinceBreakLongerThan(Duration) method.
+
+        //Find the active time since the last valid break, expand to handle split breaks aswell...
+        Duration sinceLast45 = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_BREAK);
+
+        Duration TL = MAX_SESSION_LENGTH.minus(sinceLast45); // Calculate
+
+        Duration TLToday = getThisDayTL(history).getTimeLeft();
+
+        //Cap the TL to the time left of the day.
+        TL = (TL.isLongerThan(TLToday) ? TLToday : TL);
+
+        //I don't know how negative durations is handled in jodatime so the TL is so the minimum is set to zero.
+        return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, ZERO_DURATION) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
+    }
+
+    @Override
+    public TimeLeft getNextSessionTL(SessionHistory history) {
+        //TODO PEGELOW
         return null;
     }
 
     @Override
-    public TimeLeft getNextSessionTL(List<Session> history, Session activeSession) {
-        return null;
+    public TimeLeft getThisDayTL(SessionHistory history) {
+
+        Duration timeSinceDailyBreak = history.getActiveTimeSinceBreakLongerThan(STANDARD_DAILY_REST);
+
+        Duration TL = MAX_DAY_LENGTH.minus(timeSinceDailyBreak);
+
+        Duration TLThisWeek = getThisWeekTL(history).getTimeLeft();
+
+        TL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : TL);
+
+        return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, ZERO_DURATION) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }
 
     @Override
-    public TimeLeft getNextSessionTL(List<Session> history) {
-        return null;
-    }
-
-    @Override
-    public TimeLeft getThisDayTL(List<Session> history, Session activeSession) {
-        return null;
-    }
-
-    @Override
-    public TimeLeft getThisDayTL(List<Session> history) {
-        return null;
-    }
-
-    @Override
-    public TimeLeft getNextDayTL(List<Session> history, Session activeSession) {
+    public TimeLeft getNextDayTL(SessionHistory history) {
         return null;
     }
 
@@ -51,90 +74,28 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getThisWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getThisWeekTL(SessionHistory history) {
         return null;
     }
 
     @Override
-    public TimeLeft getThisWeekTL(List<Session> history) {
+    public TimeLeft getNextWeekTL(SessionHistory history) {
         return null;
     }
 
     @Override
-    public TimeLeft getNextWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getThisTwoWeekTL(SessionHistory history) {
         return null;
     }
 
     @Override
-    public TimeLeft getNextWeekTL(List<Session> history) {
+    public TimeLeft getNextTwoWeekTL(SessionHistory history) {
         return null;
     }
 
     @Override
-    public TimeLeft getThisTwoWeekTL(List<Session> history, Session activeSession) {
+    public TimeLeft getTimeLeftOnBreak(SessionHistory history) {
         return null;
     }
 
-    @Override
-    public TimeLeft getThisTwoWeekTL(List<Session> history) {
-        return null;
-    }
-
-    @Override
-    public TimeLeft getNextTwoWeekTL(List<Session> history, Session activeSession) {
-        return null;
-    }
-
-    @Override
-    public TimeLeft getNextTwoWeekTL(List<Session> history) {
-        return null;
-    }
-
-    @Override
-    public TimeLeft getTimeLeftOnBreak(List<Session> history) {
-        return null;
-    }
-
-    /**
-     * Returns the total driving time of this calender day.
-     *
-     * @param history All sessions from at least 30 days back
-     * @return Total time driven today
-     */
-    private Duration calculateDrivingHoursOfToday(List<Session> history) {
-        return calculateDrivingHoursOfToday(history, null);
-    }
-
-    /**
-     * Returns the total driving time of this calender day.
-     *
-     * @param history       All sessions from at least 30 days back
-     * @param activeSession Current active driving session
-     * @return Total time driven today
-     */
-    private Duration calculateDrivingHoursOfToday(List<Session> history, Session activeSession) {
-        Duration totalTime = new Duration(0);
-
-        DateTime now = new DateTime();
-
-        LocalDate today = now.toLocalDate();
-        LocalDate tomorrow = today.plusDays(1);
-
-        DateTime startOfToday = today.toDateTimeAtStartOfDay(now.getZone());
-        DateTime endOfToday = tomorrow.toDateTimeAtStartOfDay(now.getZone());
-
-        for (Session session : history) {
-            if (session.getStartTime().isAfter(startOfToday) && session.getStartTime().isBefore(endOfToday)) {
-                totalTime.plus(session.getDuration());
-            }
-        }
-        if (activeSession == null) {
-            return totalTime;
-        }
-        if (activeSession.getStartTime().isAfter(startOfToday) && activeSession.getStartTime().isBefore(endOfToday)) {
-            totalTime.plus(activeSession.getDuration());
-        }
-
-        return totalTime;
-    }
 }
