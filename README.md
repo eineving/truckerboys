@@ -2,8 +2,8 @@
 
 #### Trucker Boys Project for DAT255 @ Chalmers University of Technology Fall 2014
 ### Relevant links
-<a href="https://waffle.io/eineving/truckerboys">Issue board</a><br />
-<a href="https://dashboard.genmymodel.com/projectProperties/_tNRVQDzhEeSn3ZXpVIPWYw">UML Diagram</a>
+<a href="https://waffle.io/eineving/truckerboys" target="_blank">Issue board</a><br />
+<a href="https://dashboard.genmymodel.com/projectProperties/_tNRVQDzhEeSn3ZXpVIPWYw" target="_blank">UML Diagram</a>
 
 ## Development Instructions
 
@@ -12,7 +12,7 @@
 
 Feel free to use the standard Android SDK. There is one that comes with
 Android Studio, or you can download a seperate one from
-<a href="http://developer.android.com/sdk/installing/index.html"> here</a>
+<a href="http://developer.android.com/sdk/installing/index.html" target="_blank"> here</a>
 
 1. Select the folder where you have stored your SDK in Android Studio <i>(This is done automatically if you've choosen to go with android studios built in SDK)</i>
 2. Enter the SDK Manager and install the following: <br />
@@ -30,10 +30,18 @@ Android Studio, or you can download a seperate one from
 
 ### Setting up the jar-files
 
-Start by downloading the following jar-files from <a href="http://developer.lindholmen.se/repo/artifacts/">here</a>
+Start by downloading the following jar-files from <a href="http://developer.lindholmen.se/repo/artifacts/" target="_blank">here</a>
+the ones that are needed are the following:<br />
+<ul>
+    <li>Automotive API</li>
+    <li>SDP</li>
+    <li>VIL</li>
+</ul>
+
+When downloaded, put the jar-files in the "app/libs" folder.
 
 ### Writing JUnit tests
-<i>Check the <a href="https://github.com/eineving/truckerboys/blob/develop/otto/app/src/test/java/truckerboys/otto/TestTemplate.java">"src/test/java/truckerboys/otto/TestTemplate.java"</a> file when reading theese instructions to properly understand them!</i><br /><br />
+<i>Check the <a href="https://github.com/eineving/truckerboys/blob/develop/otto/app/src/test/java/truckerboys/otto/TestTemplate.java" target="_blank">"src/test/java/truckerboys/otto/TestTemplate.java"</a> file when reading theese instructions to properly understand them!</i><br /><br />
 The important parts when writing a test for Android is the fact that you append the<br />
 <i>@Config(emulateSdk = 18)</i> and <i>@RunWith(RobolectricTestRunner.class)</i> before the class definiton, this is <strong>NEEDED</strong> in order for Gradle to be able to
 compile and run the tests. Other than this, you write JUnit tests just like you normally would.
@@ -45,22 +53,22 @@ functionality in order to test android-elements.
 
 #### Supervision
 
-<a href="https://drive.google.com/file/d/0B3-HBeyIrR6eQnlfX0ZpRnZVYms/edit?usp=sharing">Group contract</a>
+<a href="https://drive.google.com/file/d/0B3-HBeyIrR6eQnlfX0ZpRnZVYms/edit?usp=sharing" target="_blank">Group contract</a>
 
-<a href="https://groups.google.com/forum/#!forum/cth-dat255-lp1-2014">Google Group</a>
+<a href="https://groups.google.com/forum/#!forum/cth-dat255-lp1-2014" target="_blank">Google Group</a>
 
 #### References
 
-<a href="https://developer.lindholmen.se/redmine/projects/aga">AGA Home</a>
+<a href="https://developer.lindholmen.se/redmine/projects/aga" target="_blank">AGA Home</a>
 
-<a href="https://se-div-c3s-1.ce.chalmers.se:7001/index.cgi">HMI and SDK Guidelines</a><br />
+<a href="https://se-div-c3s-1.ce.chalmers.se:7001/index.cgi" target="_blank">HMI and SDK Guidelines</a><br />
 <strong>Username:</strong> student_dat255ht14<br />
 <strong>Password:</strong> jaglovarattvaraduktig
 
 ##### Project criterias:
-<a href="https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria">SICS</a>
+<a href="https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria" target="_blank">SICS</a>
 
 ## Relevant Topics
 
-<a href="https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf">EU Truck Regulations</a> <br />
-<a href="http://antonioleiva.com/mvp-android/">MVP-pattern for Android</a>
+<a href="https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf" target="_blank">EU Truck Regulations</a> <br />
+<a href="http://antonioleiva.com/mvp-android/" target="_blank">MVP-pattern for Android</a>
