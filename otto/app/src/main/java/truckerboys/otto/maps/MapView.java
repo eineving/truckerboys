@@ -1,13 +1,12 @@
 package truckerboys.otto.maps;
 
-import truckerboys.otto.FragmentView;
-import truckerboys.otto.R;
+import com.google.android.gms.maps.SupportMapFragment;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends FragmentView {
+public class MapView extends SupportMapFragment {
     public MapView(){
-        super("Map", R.layout.fragment_map);
+
     }
 }
