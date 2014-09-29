@@ -2,7 +2,6 @@ package truckerboys.otto.settings;
 
 import android.os.Bundle;
 import android.preference.*;
-import android.widget.ArrayAdapter;
 
 import truckerboys.otto.R;
 

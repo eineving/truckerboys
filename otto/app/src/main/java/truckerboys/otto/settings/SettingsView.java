@@ -4,45 +4,72 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+
+import java.util.Observable;
 
 import truckerboys.otto.FragmentView;
+import truckerboys.otto.MainActivity;
 import truckerboys.otto.R;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * This view knows about its the presenter, which
+ * causes a cyclic dependency. This is typically
+ * a bad solution, but as for now it'll have to do,
+ * since android is build in a horrific way that mostly
+ * resemble a scene from the classic flick Nightmare on
+ * Elm street more than proper java coding.
  */
-public class SettingsView extends FragmentView {
+public class SettingsView extends FragmentView{
     private View rootView;
+    private Switch soundSwitch;
+    private Switch displaySwitch;
+    private SettingsPresenter presenter;
 
-    public SettingsView(){
+    public SettingsView() {
         super("Settings", R.layout.fragment_settings);
+    }
+
+    public void setPresenter(SettingsPresenter presenter) {
+        this.presenter = presenter;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        fillListView();
+        // Creates switches from the fragment
+        soundSwitch = (Switch) rootView.findViewById(R.id.soundSwitch);
+        displaySwitch = (Switch) rootView.findViewById(R.id.displaySwitch);
 
+        // Sets listeners in presenter
+        presenter.setListeners();
+
+        // Restores preferences for settings in presenter
+        presenter.restorePreferences();
 
         return rootView;
+
     }
 
+
     /**
-     * Fills the listview with items
+     * Update the switches with settings loaded from shared preference file
+     * @param sound on/off
+     * @param displayAlive on/off
      */
-    public void fillListView() {
+    public void update(boolean sound, boolean displayAlive) {
+        soundSwitch.setChecked(sound);
+        displaySwitch.setChecked(displayAlive);
+    }
 
-        // Creates array of items to fill the list with
-        String[] myItems = {"Sounds","Keep display alive"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getActivity(), R.layout.list_item_switch, myItems);
-
-        ListView listView = (ListView) rootView.findViewById(R.id.settingsListView);
-        listView.setAdapter(adapter);
-
+    public Switch getSoundSwitch() {
+        return soundSwitch;
+    }
+    public Switch getDisplaySwitch() {
+        return displaySwitch;
     }
 }

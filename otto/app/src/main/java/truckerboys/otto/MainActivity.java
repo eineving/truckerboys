@@ -36,8 +36,7 @@ public class MainActivity extends FragmentActivity {
     private IPresenter homePresenter, mapPresenter, clockPresenter, settingsPresenter, statsPresenter;
     private List<FragmentView> viewList = new LinkedList<FragmentView>();
     private List<IPresenter> presenterList = new LinkedList<IPresenter>();
-    private boolean mute;
-    private boolean dislayAlive;
+
 
     public static final String SETTINGS = "Settings_file";
     public static final String STATS = "Stats_file";
@@ -63,22 +62,15 @@ public class MainActivity extends FragmentActivity {
 
 
         // Restore preferences from last session
-        restorePreferences();
+        // restorePreferences();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        // Writes preferences to the settings and stats file
-        SharedPreferences settings = getSharedPreferences(SETTINGS, 0);
-        SharedPreferences.Editor settingsEditor = settings.edit();
-        settingsEditor.putBoolean("mute", mute);
-        settingsEditor.putBoolean("displayAlive", dislayAlive);
-
-        // Commit the changes
-        settingsEditor.commit();
     }
+
 
     private void makePresenters() {
 
@@ -91,7 +83,9 @@ public class MainActivity extends FragmentActivity {
         clockPresenter = new ClockPresenter(new ClockView(), new ClockModel());
         presenterList.add(clockPresenter);
 
+        // This coding is extremely hard coupled and creates cyclic dependencies
         settingsPresenter = new SettingsPresenter(new SettingsView(), new SettingsModel());
+        ((SettingsView)settingsPresenter.getView()).setPresenter((SettingsPresenter)settingsPresenter);
         presenterList.add(settingsPresenter);
 
         statsPresenter = new StatsPresenter(new StatsView(), new StatsModel());
@@ -113,25 +107,4 @@ public class MainActivity extends FragmentActivity {
 
     }
 
-    /**
-     * Method for restoring the saved preferences from
-     * the user statistics and the user settings
-     */
-    private void restorePreferences() {
-        SharedPreferences settings = getSharedPreferences(SETTINGS, 0);
-        SharedPreferences stats = getSharedPreferences(SETTINGS, 0);
-        boolean mute = settings.getBoolean("mute", false); // false is the value to be returned if no "mute"-value exists
-        boolean displayAlive = settings.getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
-
-        setMute(mute);
-        setDisplayAlive(displayAlive);
-    }
-
-    public void setMute(boolean mute) {
-        this.mute = mute;
-    }
-
-    public void setDisplayAlive(boolean displayAlive) {
-       this.dislayAlive = displayAlive;
-    }
 }

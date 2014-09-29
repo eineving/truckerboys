@@ -7,5 +7,21 @@ import truckerboys.otto.driver.User;
  */
 public class SettingsModel {
     private User user;
+    private boolean sound;
+    private boolean displayAlive;
+
+    public void setSettings(boolean sound, boolean displayAlive) {
+        this.sound = sound;
+        this.displayAlive = displayAlive;
+
+    }
+
+    public boolean getSound() {
+        return sound;
+    }
+
+    public boolean getDisplayAlive() {
+        return displayAlive;
+    }
 
 }
