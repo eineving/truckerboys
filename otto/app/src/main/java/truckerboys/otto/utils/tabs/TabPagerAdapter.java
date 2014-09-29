@@ -27,24 +27,31 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     //List with all views that are needed in the "main" view. (The one with tabs.)
     private List<FragmentView> viewList = new LinkedList<FragmentView>();
 
-    private final int numTabs = 6;
+    private final int numTabs;
 
-    public TabPagerAdapter(FragmentManager fragmentManager){
+    public TabPagerAdapter(FragmentManager fragmentManager, List<FragmentView> viewList){
         super(fragmentManager);
-        initializeAllViews();
+        //this.viewList = viewList;
+        initializeAllViews(viewList);
+        numTabs = viewList.size();
     }
 
     /**
      * Adds all fragments to the viewList so that the adapter
      * can retrieve what views we want to have in the ViewPager.
      */
-    private void initializeAllViews(){
-        viewList.add(new DebugView());
-        viewList.add(new ClockView());
-        viewList.add(new MapView());
-        viewList.add(new HomeView());
-        viewList.add(new StatsView());
-        viewList.add(new SettingsView());
+    private void initializeAllViews(List<FragmentView> viewList){
+
+        for(FragmentView view : viewList) {
+            this.viewList.add(view);
+        }
+
+       /*viewList.add(new DebugView());
+       viewList.add(new ClockView());
+       viewList.add(new MapView());
+       viewList.add(new HomeView());
+       viewList.add(new StatsView());
+       viewList.add(new SettingsView());*/
     }
 
     @Override

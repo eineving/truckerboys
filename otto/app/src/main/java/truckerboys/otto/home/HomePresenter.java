@@ -3,17 +3,20 @@ package truckerboys.otto.home;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import truckerboys.otto.FragmentView;
+import truckerboys.otto.IPresenter;
 import truckerboys.otto.R;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class HomePresenter{
+public class HomePresenter implements IPresenter {
     private HomeModel model;
     private HomeView view;
 
-    public HomePresenter(HomeView view){
+    public HomePresenter(HomeView view, HomeModel model){
         this.view = view;
+        this.model = model;
     }
 
     /**
@@ -68,6 +71,11 @@ public class HomePresenter{
     public void clockButtonClicked(View v) {
         ((ViewPager) view.getActivity().findViewById(R.id.pager)).setCurrentItem(1);
 
+    }
+
+    @Override
+    public FragmentView getView() {
+        return view;
     }
 
 }
