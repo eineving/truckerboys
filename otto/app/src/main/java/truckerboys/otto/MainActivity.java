@@ -80,7 +80,7 @@ public class MainActivity extends FragmentActivity {
         mapPresenter = new MapPresenter(new MapView(), new MapModel());
         presenterList.add(mapPresenter);
 
-        clockPresenter = new ClockPresenter(new ClockView(), new ClockModel());
+        clockPresenter = new ClockPresenter(new ClockView(), new ClockModel(null, null));
         presenterList.add(clockPresenter);
 
         // This coding is extremely hard coupled and creates cyclic dependencies
