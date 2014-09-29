@@ -3,7 +3,7 @@ package truckerboys.otto.planner.positions;
 /**
  * Created by Daniel on 2014-09-18.
  */
-public abstract class Location {
+public class Location {
     private double longitude;
     private double latitude;
 

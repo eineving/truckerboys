@@ -1,31 +1,40 @@
 package truckerboys.otto.directionsAPI;
 
-import android.net.http.AndroidHttpClient;
+import android.os.AsyncTask;
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
-import org.apache.http.client.methods.HttpGet;
+
 import org.joda.time.Duration;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 import truckerboys.otto.planner.positions.Location;
 
 
 public class GoogleDirections implements IDirections {
-    private AndroidHttpClient httpClient;
+    private DirectionsRequesterHandler requesterHandler;
+    private String response;
 
     //TODO Eineving hardcoded or read from class or .txt?
-    private static final String DIRECTIONS_URL = "http://maps.googleapis.com/maps/api/directions/";
+    private static final String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/";
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
-
-    public GoogleDirections() {
-        //TODO Eineving check if userAgent "truckerboys" are valid or what should replace it
-        httpClient = AndroidHttpClient.newInstance("truckerboys");
-    }
 
     @Override
     public Route getRoute(LatLng currentPosition, Location finalDestination, RoutePreferences preferences,
                           Location... checkpoint) throws Exception {
-        return new Route(httpClient.execute(new HttpGet(DIRECTIONS_URL + jsonStringCreator(currentPosition,
-                finalDestination, preferences, checkpoint))));
+        Log.w("Status", "We're in!");
+
+        response = new DirectionsRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+
+        Log.w("Directions", "?" + response);
+        return new Route(response);
     }
 
     @Override
@@ -63,17 +72,22 @@ public class GoogleDirections implements IDirections {
         String returnValue = "json?origin=" + currentPosition.latitude + "," + currentPosition.longitude +
                 "&destination=" + finalDestination.getLongitude() + "," + finalDestination.getLatitude();
 
-        if(checkpoint != null ) {
+        if (checkpoint != null) {
             returnValue += "&waypoints=";
             for (int i = 0; i < checkpoint.length; i++) {
                 returnValue += checkpoint[i].getLatitude() + "," + checkpoint[i].getLongitude();
-                if(i!= checkpoint.length-1){
+                if (i != checkpoint.length - 1) {
                     returnValue += "|";
                 }
             }
         }
         returnValue += "&key=" + GOOGLE_KEY;
+        Log.w("GoogleDirections", returnValue);
+        //return returnValue;
 
-        return returnValue;
+        //TODO Eineving remove hardcoding
+        return "json?origin=Gothenburg&destination=Stockholm&key=AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
     }
+
+
 }

@@ -9,7 +9,7 @@ public class Route {
     private boolean optimizeCheckpoints;
     private boolean avoidTolls, avoidHighways, avoidFerries;
 
-    public Route(HttpResponse response){
+    public Route(String response){
 
     }
 }
