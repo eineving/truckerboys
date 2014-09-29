@@ -1,18 +1,11 @@
 package truckerboys.otto.directionsAPI;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 import truckerboys.otto.planner.positions.Location;
@@ -20,9 +13,7 @@ import truckerboys.otto.planner.positions.Location;
 
 public class GoogleDirections implements IDirections {
     private DirectionsRequesterHandler requesterHandler;
-    private String response;
 
-    //TODO Eineving hardcoded or read from class or .txt?
     private static final String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/";
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
 
@@ -31,10 +22,10 @@ public class GoogleDirections implements IDirections {
                           Location... checkpoint) throws Exception {
         Log.w("Status", "We're in!");
 
-        response = new DirectionsRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
-
+        String response = new DirectionsRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
         Log.w("Directions", "?" + response);
-        return new Route(response);
+
+        return GoogleJSONDecoder.stringToRoute(response);
     }
 
     @Override
@@ -69,6 +60,8 @@ public class GoogleDirections implements IDirections {
 
     private String jsonStringCreator(LatLng currentPosition, Location finalDestination,
                                      RoutePreferences preferences, Location[] checkpoint) {
+
+        //TODO Eineving redo method
         String returnValue = "json?origin=" + currentPosition.latitude + "," + currentPosition.longitude +
                 "&destination=" + finalDestination.getLongitude() + "," + finalDestination.getLatitude();
 
@@ -85,7 +78,7 @@ public class GoogleDirections implements IDirections {
         Log.w("GoogleDirections", returnValue);
         //return returnValue;
 
-        //TODO Eineving remove hardcoding
+        //TODO Eineving remove test hard coding
         return "json?origin=Gothenburg&destination=Stockholm&key=AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
     }
 

@@ -15,14 +15,25 @@ public class DirectionsRequesterHandler extends AsyncTask<String, Void, String> 
     @Override
     protected String doInBackground(String... strings) {
         try {
-            return getJSON(strings[0]);
+            return getJSONResponse(strings[0]);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private String getJSON(String strUrl) throws IOException {
+    /**
+     * Get JSON response from target URI
+     *
+     * Based on example from
+     * http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-locations-using-google-directions-in-google-map-android-api-v2/
+     * Written by George Mathew
+     *
+     * @param strUrl - target URI
+     * @return JSON response as String
+     * @throws IOException
+     */
+    private String getJSONResponse(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
