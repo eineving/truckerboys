@@ -1,6 +1,6 @@
 package truckerboys.otto.vehicle;
 
-import android.swedspot.automotiveapi.AutomotiveSignalId;
+import  android.swedspot.automotiveapi.AutomotiveSignalId;
 
 /**
  * A list of signal IDs.
@@ -23,5 +23,4 @@ public class VehicleSignalID {
 
 
     public static final int WHEEL_BASED_SPEED = AutomotiveSignalId.FMS_WHEEL_BASED_SPEED;
-
 }
