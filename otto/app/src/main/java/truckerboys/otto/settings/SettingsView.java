@@ -1,16 +1,12 @@
 package truckerboys.otto.settings;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import java.util.Observable;
-
-import truckerboys.otto.FragmentView;
-import truckerboys.otto.MainActivity;
 import truckerboys.otto.R;
 
 /**
@@ -22,14 +18,15 @@ import truckerboys.otto.R;
  * resemble a scene from the classic flick Nightmare on
  * Elm street more than proper java coding.
  */
-public class SettingsView extends FragmentView{
+
+public class SettingsView extends Fragment {
     private View rootView;
     private Switch soundSwitch;
     private Switch displaySwitch;
     private SettingsPresenter presenter;
 
-    public SettingsView() {
-        super("Settings", R.layout.fragment_settings);
+    public SettingsView(){
+
     }
 
     public void setPresenter(SettingsPresenter presenter) {

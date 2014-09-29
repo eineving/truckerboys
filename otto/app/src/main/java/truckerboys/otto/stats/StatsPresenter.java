@@ -1,9 +1,8 @@
 package truckerboys.otto.stats;
 
-import truckerboys.otto.FragmentView;
+import android.support.v4.app.Fragment;
+
 import truckerboys.otto.IPresenter;
-import truckerboys.otto.settings.SettingsModel;
-import truckerboys.otto.settings.SettingsView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -19,7 +18,7 @@ public class StatsPresenter implements IPresenter {
 
 
     @Override
-    public FragmentView getView() {
+    public Fragment getView() {
         return view;
     }
 

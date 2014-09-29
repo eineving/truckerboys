@@ -1,10 +1,10 @@
 package truckerboys.otto.settings;
 
-import android.app.Activity;
+
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 import android.widget.CompoundButton;
 
-import truckerboys.otto.FragmentView;
 import truckerboys.otto.IPresenter;
 
 /**
@@ -105,7 +105,7 @@ public class SettingsPresenter implements IPresenter {
     }
 
     @Override
-    public FragmentView getView() {
+    public Fragment getView() {
         return view;
     }
 }

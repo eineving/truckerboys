@@ -1,6 +1,7 @@
 package truckerboys.otto.clock;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
-import truckerboys.otto.FragmentView;
 import truckerboys.otto.R;
 
 /**
@@ -22,13 +22,13 @@ import truckerboys.otto.R;
  *
  * The viewclass for the clock that handles the UI.
  */
-public class ClockView extends FragmentView {
+public class ClockView extends Fragment {
     View rootView;
     TextView timeLeft, stopTL1, stopTL2, stopTL3, stopN1, stopN2, stopN3;
     ArrayDeque<RestStop> stops = new ArrayDeque<RestStop>();
 
     public ClockView(){
-        super("Clock", R.layout.fragment_clock);
+
     }
 
 

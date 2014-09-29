@@ -1,16 +1,16 @@
 package truckerboys.otto;
 
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
-import com.google.android.gms.maps.GoogleMap;
-
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import truckerboys.otto.clock.ClockModel;
 import truckerboys.otto.clock.ClockPresenter;
@@ -27,14 +27,14 @@ import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.stats.StatsModel;
 import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.stats.StatsView;
-import truckerboys.otto.utils.tabs.TabPagerAdapter;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
+import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
 public class MainActivity extends FragmentActivity {
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
     private IPresenter homePresenter, mapPresenter, clockPresenter, settingsPresenter, statsPresenter;
-    private List<FragmentView> viewList = new LinkedList<FragmentView>();
+    private Map<Fragment, String> viewMap = new LinkedHashMap<Fragment, String>();
     private List<IPresenter> presenterList = new LinkedList<IPresenter>();
 
 
@@ -48,12 +48,12 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         makePresenters();
+        createViewList();
 
         //Create standard view with a ViewPager and corresponding tabs.
         viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), viewList);
+        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), viewMap);
         viewPager.setAdapter(pagerAdapter);
-
 
 
         //Use Googles 'SlidingTabLayout' to display tabs for all views.
@@ -90,21 +90,17 @@ public class MainActivity extends FragmentActivity {
 
         statsPresenter = new StatsPresenter(new StatsView(), new StatsModel());
         presenterList.add(statsPresenter);
-
-        createViewList();
     }
 
     private void createViewList() {
-
         // debug view
-        viewList.add(new DebugView());
+        viewMap.put(new DebugView(), "Debug");
 
-        for(IPresenter presenter : presenterList) {
-            viewList.add(presenter.getView());
-        }
-
-
-
+        viewMap.put(homePresenter.getView(), "Home");
+        viewMap.put(mapPresenter.getView(), "Map");
+        viewMap.put(clockPresenter.getView(), "Clock");
+        viewMap.put(settingsPresenter.getView(), "Settings");
+        viewMap.put(statsPresenter.getView(), "Stats");
     }
 
 }

@@ -1,19 +1,18 @@
 package truckerboys.otto.home;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import truckerboys.otto.FragmentView;
 import truckerboys.otto.R;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class HomeView extends FragmentView{
+public class HomeView extends Fragment {
     private View rootView;
     private HomePresenter presenter;
     private ImageButton newRouteButton;
@@ -24,7 +23,6 @@ public class HomeView extends FragmentView{
     private ImageButton settingsButton;
 
     public HomeView(){
-        super("Home", R.layout.fragment_home);
         presenter = new HomePresenter(this, new HomeModel());
     }
 

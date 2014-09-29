@@ -1,9 +1,8 @@
 package truckerboys.otto.clock;
 
-import truckerboys.otto.FragmentView;
+import android.support.v4.app.Fragment;
+
 import truckerboys.otto.IPresenter;
-import truckerboys.otto.home.HomeModel;
-import truckerboys.otto.home.HomeView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -18,7 +17,7 @@ public class ClockPresenter implements IPresenter{
     }
 
     @Override
-    public FragmentView getView() {
+    public Fragment getView() {
         return view;
     }
 }

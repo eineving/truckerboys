@@ -1,9 +1,9 @@
 package truckerboys.otto.home;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
-import truckerboys.otto.FragmentView;
 import truckerboys.otto.IPresenter;
 import truckerboys.otto.R;
 
@@ -74,7 +74,7 @@ public class HomePresenter implements IPresenter {
     }
 
     @Override
-    public FragmentView getView() {
+    public Fragment getView() {
         return view;
     }
 
