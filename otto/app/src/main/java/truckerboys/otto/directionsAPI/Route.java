@@ -30,7 +30,7 @@ public class Route {
      * @param detailedPolyline
      * @param distance distance to final destination in meters
      */
-    public Route(Location finalLocation, Duration eta, ArrayList<LatLng> overviewPolyline, ArrayList<LatLng> detailedPolyline, int distance) {
+    public Route(Location finalLocation, Duration eta, int distance, ArrayList<LatLng> overviewPolyline, ArrayList<LatLng> detailedPolyline) {
         this.finalLocation = finalLocation;
         this.eta = eta;
         this.overviewPolyline = overviewPolyline;

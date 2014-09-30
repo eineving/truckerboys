@@ -74,12 +74,12 @@ public class GoogleDirections implements IDirections {
 
         //TODO Eineving redo method
         String returnValue = "json?origin=" + currentPosition.latitude + "," + currentPosition.longitude +
-                "&destination=" + finalDestination.getLongitude() + "," + finalDestination.getLatitude();
+                "&destination=" + finalDestination.getLatLng().latitude + "," + finalDestination.getLatLng().longitude;
 
         if (checkpoint != null) {
             returnValue += "&waypoints=";
             for (int i = 0; i < checkpoint.length; i++) {
-                returnValue += checkpoint[i].getLatitude() + "," + checkpoint[i].getLongitude();
+                returnValue += checkpoint[i].getLatLng().latitude + "," + checkpoint[i].getLatLng().longitude;
                 if (i != checkpoint.length - 1) {
                     returnValue += "|";
                 }

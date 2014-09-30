@@ -21,8 +21,9 @@ public class GoogleJSONDecoder {
     public static Route stringToRoute(String response) {
         Location finalDestination;
         Duration eta;
+        int distance = 0;
         String overviewPolyline = "";
-        int nbrOfLegs;
+        String detailedPolyline = "";
 
         ArrayList<Location> checkpoints = new ArrayList<Location>();
         //ArrayList<LatLng> tempPositions = new ArrayList<LatLng>();
@@ -55,16 +56,37 @@ public class GoogleJSONDecoder {
 
 
         //Creating the final destination
-        LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size()-1);
-        LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>)lastLeg.get("end_location")).get("lat"),
-                ((LinkedTreeMap<String, Double>)lastLeg.get("end_location")).get("lng"));
+        LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
+        LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
+                ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
         finalDestination = new Location(coordinate);
-        finalDestination.setAddress((String)lastLeg.get("end_address"));
+        finalDestination.setAddress((String) lastLeg.get("end_address"));
 
-        //TODO Creating ETA
-        
-        //return new Route(finalDestination, )
-        return null;
+        //Creating ETA and distance
+        int etaSeconds = 0;
+        for (LinkedTreeMap<String, Object> leg : allLegs) {
+            //Some shady typecasting here, take care when changing
+            etaSeconds +=  ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
+            distance +=  ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
+        }
+        eta = new Duration(etaSeconds * 1000);
+
+        //Creating big polyline String
+        for (LinkedTreeMap<String, Object> step : allSteps) {
+            detailedPolyline += ((LinkedTreeMap<String, String>) step.get("polyline")).get("points");
+        }
+
+        //Getting the overview polyline
+        overviewPolyline = ((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points");
+
+        Log.w("finalDestination", finalDestination.getAddress());
+        Log.w("ETA", eta.toStandardSeconds().getSeconds() + "");
+        Log.w("distance", distance + "");
+        Log.w("overviewPolyline", overviewPolyline);
+        Log.w("detailedPolyline", detailedPolyline);
+
+
+        return new Route(finalDestination, eta, distance, polylineDecoder(overviewPolyline), polylineDecoder(detailedPolyline));
     }
 
     private static ArrayList<LatLng> polylineDecoder(String polyline) {
