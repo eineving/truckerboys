@@ -89,6 +89,7 @@ public class MainActivity extends FragmentActivity {
         presenterList.add(settingsPresenter);
 
         statsPresenter = new StatsPresenter(new StatsView(), new StatsModel());
+        ((StatsView)statsPresenter.getView()).setPresenter((StatsPresenter)statsPresenter);
         presenterList.add(statsPresenter);
     }
 

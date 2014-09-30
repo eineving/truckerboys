@@ -85,6 +85,12 @@ public class SettingsPresenter implements IPresenter {
         setSettings(sound, displayAlive);
     }
 
+    /**
+     * Method for setting the restored settings in the
+     * model and updating the view
+     * @param sound on/off
+     * @param displayAlive on/off
+     */
     public void setSettings(boolean sound, boolean displayAlive) {
         model.setSettings(sound, displayAlive);
         updateView();

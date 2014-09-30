@@ -317,7 +317,7 @@
         android:background="@color/textLighter"/>
 
     <TextView
-        android:id="@+id/violations"
+        android:id="@+id/numberOfViolations"
         android:textColor="@color/textLight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
