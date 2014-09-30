@@ -17,8 +17,8 @@
             android:layout_height="90dp"
             android:id="@+id/newRouteButton"
             android:layout_column="6"
-            android:src="@drawable/newroute"
-            android:scaleType="fitXY"
+            android:src="@drawable/newroute2"
+            android:scaleType="centerInside"
             android:background="#00ffffff"
             android:clickable="true"
             android:onClick="jumpToNewRoute"
@@ -30,8 +30,8 @@
             android:layout_height="90dp"
             android:id="@+id/continueRouteButton"
             android:layout_column="21"
-            android:src="@drawable/continueroute"
-            android:scaleType="fitXY"
+            android:src="@drawable/continueroute2"
+            android:scaleType="centerInside"
             android:background="#00ffffff"
             android:clickable="true"
             android:layout_gravity="center_vertical" />
@@ -50,8 +50,8 @@
             android:layout_height="90dp"
             android:id="@+id/mapsButton"
             android:layout_column="6"
-            android:src="@drawable/maps"
-            android:scaleType="fitXY"
+            android:src="@drawable/maps2"
+            android:scaleType="centerInside"
             android:background="#00ffffff"
             android:clickable="true" />
 
@@ -61,8 +61,8 @@
             android:layout_height="90dp"
             android:id="@+id/clockButton"
             android:layout_column="21"
-            android:src="@drawable/clock"
-            android:scaleType="fitXY"
+            android:src="@drawable/clock2"
+            android:scaleType="centerInside"
             android:background="#00ffffff"
             android:clickable="true" />
 
@@ -80,19 +80,19 @@
             android:layout_height="90dp"
             android:id="@+id/statsButton"
             android:layout_column="6"
-            android:src="@drawable/stats"
-            android:scaleType="fitXY"
+            android:src="@drawable/stats2"
+            android:scaleType="centerInside"
             android:background="#00ffffff"
             android:clickable="true" />
 
         <ImageButton
             android:layout_margin="40dp"
-            android:layout_width="80dp"
-            android:layout_height="100dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
             android:id="@+id/settingsButton"
             android:layout_column="21"
-            android:src="@drawable/settings"
-            android:scaleType="fitXY"
+            android:src="@drawable/settings2"
+            android:scaleType="centerInside"
             android:focusable="true"
             android:background="#00ffffff"
             android:clickable="true" />
