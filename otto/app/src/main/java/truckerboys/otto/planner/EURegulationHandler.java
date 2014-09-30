@@ -19,27 +19,29 @@ public class EURegulationHandler implements IRegulationHandler {
     private final Duration MAX_EXTENDED_SESSION_LENGTH = Duration.standardMinutes(330);
 
     private final Duration MAX_DAY_LENGTH = Duration.standardMinutes(540);
+    private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardMinutes(600);
+
+    private final Duration STANDARD_DAY_EXTENSION = Duration.standardMinutes(60);
 
     private final Duration STANDARD_DAILY_REST = Duration.standardMinutes(660);
+    private final Duration REDUCED_DAILY_REST = Duration.standardMinutes(540);
     private final Duration STANDARD_SESSION_BREAK = Duration.standardMinutes(45);
 
     @Override
     public TimeLeft getThisSessionTL(SessionHistory history) {
-        //TODO PEGELOW Fill out  the function to handle all edge-cases.
-        //TODO PEGELOW If you need to ask the history something, you create a method in the SessionHistory class.
-        //TODO in the style of the getActiveTimeSinceBreakLongerThan(Duration) method.
 
         //Find the active time since the last valid break, expand to handle split breaks aswell...
         Duration sinceLast45 = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_BREAK);
 
         Duration TL = MAX_SESSION_LENGTH.minus(sinceLast45); // Calculate
 
-        Duration TLToday = getThisDayTL(history).getTimeLeft();
+        Duration TLToday = getThisDayTL(history).getTimeLeft().plus(getThisDayTL(history).getExtendedTimeLeft());
 
         //Cap the TL to the time left of the day.
         TL = (TL.isLongerThan(TLToday) ? TLToday : TL);
 
         //I don't know how negative durations is handled in jodatime so the TL is so the minimum is set to zero.
+
         return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, ZERO_DURATION) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }
 
@@ -52,15 +54,33 @@ public class EURegulationHandler implements IRegulationHandler {
     @Override
     public TimeLeft getThisDayTL(SessionHistory history) {
 
-        Duration timeSinceDailyBreak = history.getActiveTimeSinceBreakLongerThan(STANDARD_DAILY_REST);
+        //TODO Take different dailybreaks to account
 
-        Duration TL = MAX_DAY_LENGTH.minus(timeSinceDailyBreak);
-
+        Duration timeSinceDailyBreak = history.getActiveTimeSinceBreakLongerThan(REDUCED_DAILY_REST);
+        Duration TL;
+        Duration extendedTL = new Duration(ZERO_DURATION);
         Duration TLThisWeek = getThisWeekTL(history).getTimeLeft();
 
+
+        TL = MAX_DAY_LENGTH.minus(timeSinceDailyBreak);
+
+        //Avoid negative timeLeft
+        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
+
+        //Cap week
         TL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : TL);
 
-        return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, ZERO_DURATION) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
+        //The same thing as above but do it as the max day is 10 hours and calculate the difference.
+        if (history.getNumberOfExtendedDaysThisWeek() < 2) {
+            //If you are allowed to take an extended day.
+            extendedTL = MAX_DAY_LENGTH_EXTENDED.minus(timeSinceDailyBreak);
+            extendedTL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : extendedTL);
+
+            //Calculate the difference of the TL and the extendedTL which will be the net extended time.
+            extendedTL = extendedTL.minus(TL);
+        }
+
+        return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, extendedTL) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }
 
     @Override

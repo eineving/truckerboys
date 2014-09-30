@@ -16,6 +16,7 @@ public class TimeLeft {
 
     /**
      * Returns the remaining time in a normal scenario.
+     *
      * @return The remaining time.
      */
     public Duration getTimeLeft() {
@@ -25,9 +26,10 @@ public class TimeLeft {
     /**
      * Returns the remaining time of the extended time.
      * This is applied when regulations allow to extend a driving session.
+     *
      * @return The remaining extended time.
      */
-    public Duration getExtendedTime() {
+    public Duration getExtendedTimeLeft() {
         return extendedTime;
     }
 }
