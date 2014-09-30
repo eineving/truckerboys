@@ -6,5 +6,6 @@
     <color name="violationred_color">#f36c60</color>
     <color name="background_color">#eeeeee</color>
     <color name="textLight">#9e9e9e</color>
+    <color name="textLighter">#bdbdbd</color>
     <color name="textDark">#424242</color>
 </resources>
