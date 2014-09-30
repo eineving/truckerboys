@@ -3,13 +3,13 @@ package truckerboys.otto.directionsAPI;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.joda.time.Duration;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import truckerboys.otto.planner.positions.Location;
 
@@ -20,45 +20,24 @@ public class GoogleJSONDecoder {
     public static Route stringToRoute(String response) {
         Location finalLocation;
         Duration eta;
-        String polyline = "";
+        String overviewPolyline = "";
+
         ArrayList<Location> checkpoints = new ArrayList<Location>();
         //ArrayList<LatLng> tempPositions = new ArrayList<LatLng>();
 
-        final String ORIGINAL_RESPONSE = response;
-        //Creating JSONObject from string
-        JSONArray json = null;
-        try {
-            json = new JSONArray(response);
+        //Creating a HashMap from from the whole response
+        HashMap<String, Object> mapResponse = (HashMap<String, Object>)new Gson().fromJson(response, HashMap.class);
+
+        //Making all routes into HashMaps
+        ArrayList<Object> routes = new Gson().fromJson((String)mapResponse.get("routes"), ArrayList.class);
 
 
-        for (int i = 0; i < json.length(); i++) {
-            JSONArray jsonRoute = json.getJSONArray(i);
-            //TODO specific route stuff here
 
-            for (int j = 0; j < jsonRoute.length(); j++) {
-                JSONArray jsonLegs = jsonRoute.getJSONArray(j);
-                //eta = new Duration(Integer.getInteger(jsonLegs.getJSONObject("duration").getString("value"))*1000);
-                for (int k = 0; k < jsonLegs.length(); k++) {
-                    JSONArray jsonSteps = jsonLegs.getJSONArray(k);
+        Log.w("HashMap", routes.get(0).toString());
+        return null;
+    }
 
-                    for (int l = 0; l < jsonSteps.length(); l++) {
-                        JSONObject step = jsonSteps.getJSONObject(l);
-
-                        JSONObject start = step.getJSONObject("start_location");
-
-                        // tempPositions.add(new LatLng(start.getDouble("lat"), start.getDouble("lng")));
-
-                        polyline += step.getJSONObject("polyline").getString("points");
-                    }
-                }
-            }
-        }
-
-        } catch (JSONException e) {
-            Log.w("Decoder", e.getMessage());
-            e.printStackTrace();
-        }
-        Log.w("polyline", polyline);
+    public static LatLng[] polylineDecoder(String polyline){
         return null;
     }
 }

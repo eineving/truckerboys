@@ -23,7 +23,18 @@ public class GoogleDirections implements IDirections {
         Log.w("Status", "We're in!");
 
         String response = new DirectionsRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
-        Log.w("Directions", "?" + response);
+        /*
+        response = response.replace(" ", "");
+        int i=0;
+        while (true) {
+            if(3001+3000*i > response.length()){
+                Log.w("Directions", response.substring(3000 * i, response.length()-1));
+                break;
+            }
+            Log.w("Directions", response.substring(3000 * i, 3001 + 3000 * i));
+            i++;
+        }
+*/
 
         return GoogleJSONDecoder.stringToRoute(response);
     }
