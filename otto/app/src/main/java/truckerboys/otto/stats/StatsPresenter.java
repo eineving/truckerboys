@@ -29,10 +29,10 @@ public class StatsPresenter implements IPresenter {
         SharedPreferences stats = getView().getActivity().getSharedPreferences(STATS, 0);
 
         // Gets today stats
-        double timeToday = stats.getFloat("timeToday", 0);
-        double distanceToday = stats.getFloat("distanceToday", 0);
-        double fuelToday = stats.getFloat("fuelToday", 0);
-        double fuelByDistanceToday = stats.getFloat("fuelByDistanceToday", 0);
+        double timeToday = stats.getFloat("timeToday", 5);
+        double distanceToday = stats.getFloat("distanceToday", 5);
+        double fuelToday = stats.getFloat("fuelToday", 5);
+        double fuelByDistanceToday = stats.getFloat("fuelByDistanceToday", 5);
 
         // Gets total stats
         double timeTotal = stats.getFloat("timeTotal", 0);
@@ -46,7 +46,8 @@ public class StatsPresenter implements IPresenter {
         double[] statsToday = {timeToday, distanceToday, fuelToday, fuelByDistanceToday};
         double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal};
 
-        setStats(statsToday, statsTotal,violation);
+        setStats(statsToday, statsTotal, violation);
+
     }
 
     /**
@@ -62,12 +63,18 @@ public class StatsPresenter implements IPresenter {
 
     /**
      * Method for setting the units in the model.
+     * Calls this method when changing between units by:
+     * presenter.setUnits("imperial").
      * @param system metric/imperial - defaults to metric.
      */
     public void setUnits(String system) {
         model.setUnits(system);
         view.updateUnits(system);
 
+        double[] statsToday = {model.getTimeToday(), model.getDistanceToday(), model.getFuelToday(), model.getfuelByDistanceToday()};
+        double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};
+
+        updateView(statsToday,statsTotal, model.getViolations());
         // TODO: Sets view fuel, distance etc based on new values in model
     }
 
@@ -79,7 +86,7 @@ public class StatsPresenter implements IPresenter {
      * @param violations violations all-time
      */
     public void updateView(double[] statsToday, double[] statsTotal, int violations) {
-        view.update(statsToday, statsToday, violations);
+        view.update(statsToday, statsTotal, violations);
     }
 
 

@@ -9,7 +9,7 @@ public class StatsModel {
     private User user;
     private double timeToday, distanceToday, fuelToday, fuelByDistanceToday;
     private double timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal;
-    private double violations;
+    private int violations;
 
     private String fuelUnit = "L";
     private String distanceUnit = "Km";
@@ -20,7 +20,7 @@ public class StatsModel {
      * @param statsTotal all-time stats
      * @param violations all-time violations
      */
-    public void setStats(double[] statsToday, double[] statsTotal, double violations) {
+    public void setStats(double[] statsToday, double[] statsTotal, int violations) {
 
         timeToday = statsToday[0];
         distanceToday = statsToday[1];
@@ -35,9 +35,13 @@ public class StatsModel {
         this.violations = violations;
     }
 
+
+    /**
+     * Convert units based on system
+     * @param system metric/imperial
+     */
     public void setUnits(String system) {
         if(system.equals("imperial")) {
-            // TODO convert ints to Gallons and Miles
             fuelUnit = "Gallon";
             distanceUnit = "Miles";
 
@@ -60,5 +64,42 @@ public class StatsModel {
             fuelByDistanceToday = fuelByDistanceToday / 0.264172052 * 0.621371192;
             fuelByDistanceTotal = fuelByDistanceTotal / 0.264172052 * 0.621371192;
         }
+    }
+
+    public double getTimeToday() {
+        return timeToday;
+    }
+
+    public double getDistanceToday() {
+        return distanceToday;
+    }
+
+    public double getFuelToday() {
+        return fuelToday;
+    }
+
+    public double getfuelByDistanceToday() {
+        return fuelByDistanceToday;
+    }
+
+    public double getFuelTotal() {
+        return fuelTotal;
+    }
+
+
+    public double getDistanceTotal() {
+        return timeTotal;
+    }
+
+    public double getfuelByDistanceTotal() {
+        return fuelByDistanceTotal;
+    }
+
+    public double getTimeTotal() {
+        return timeTotal;
+    }
+
+    public int getViolations() {
+        return violations;
     }
 }

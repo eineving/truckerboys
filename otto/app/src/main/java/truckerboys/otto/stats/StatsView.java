@@ -66,6 +66,7 @@ public class StatsView extends Fragment {
         // Restores preferences for settings in presenter
         presenter.restorePreferences();
 
+
         return rootView;
     }
 
