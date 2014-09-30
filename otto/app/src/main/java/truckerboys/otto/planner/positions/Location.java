@@ -1,49 +1,29 @@
 package truckerboys.otto.planner.positions;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by Daniel on 2014-09-18.
  */
 public class Location {
-    private double longitude;
-    private double latitude;
+    private LatLng latLng;
 
     //Address
-    private String country;
-    private String city;
-    private String zipCode;
-    private String street;
-    private String streetNumber;
+    private String address = "";
 
-    public Location(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
+    public Location(LatLng latLng) {
+        this.latLng = latLng;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public LatLng getLatLng() {
+        return latLng;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public String getAddress() {
+        return address;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public String getStreetNumber() {
-        return streetNumber;
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
