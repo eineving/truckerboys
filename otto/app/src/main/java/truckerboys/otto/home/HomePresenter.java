@@ -14,9 +14,10 @@ public class HomePresenter implements IPresenter {
     private HomeModel model;
     private HomeView view;
 
-    public HomePresenter(HomeView view, HomeModel model){
-        this.view = view;
-        this.model = model;
+    public HomePresenter(){
+        this.view = new HomeView();
+        view.setPresenter(this);
+        this.model = new HomeModel();
     }
 
     /**

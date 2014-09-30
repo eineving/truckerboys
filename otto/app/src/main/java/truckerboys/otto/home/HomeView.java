@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import truckerboys.otto.IPresenter;
 import truckerboys.otto.R;
 
 /**
@@ -23,7 +24,10 @@ public class HomeView extends Fragment {
     private ImageButton settingsButton;
 
     public HomeView(){
-        presenter = new HomePresenter(this, new HomeModel());
+    }
+
+    public void setPresenter(HomePresenter p){
+        this.presenter = p;
     }
 
     @Override

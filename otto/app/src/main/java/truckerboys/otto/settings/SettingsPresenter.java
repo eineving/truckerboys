@@ -19,9 +19,12 @@ public class SettingsPresenter implements IPresenter {
 
 
 
-    public SettingsPresenter(SettingsView view, SettingsModel model){
-        this.view = view;
-        this.model = model;
+    public SettingsPresenter(){
+        this.view = new SettingsView();
+        this.model = new SettingsModel();
+
+        //TODO Petersson Fix this since it's so retardedly FUBAR that it's not even funny.
+        view.setPresenter(this);
 
     }
 

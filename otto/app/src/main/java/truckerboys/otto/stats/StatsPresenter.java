@@ -11,9 +11,9 @@ public class StatsPresenter implements IPresenter {
     private StatsModel model;
     private StatsView view;
 
-    public StatsPresenter(StatsView view, StatsModel model){
-        this.view = view;
-        this.model = model;
+    public StatsPresenter(){
+        this.view = new StatsView();
+        this.model = new StatsModel();
     }
 
 

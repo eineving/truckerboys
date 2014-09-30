@@ -15,6 +15,7 @@ import truckerboys.otto.maps.MapPresenter;
 import truckerboys.otto.maps.MapView;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
+import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.settings.SettingsModel;
 import truckerboys.otto.settings.SettingsPresenter;
 import truckerboys.otto.settings.SettingsView;
@@ -30,34 +31,33 @@ public class OTTO {
 
     private List<IPresenter> presenters = new ArrayList<IPresenter>();
 
+    private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
 
     private User user;
 
 
     public OTTO(){
-
         regulationHandler = new EURegulationHandler();
         user = new User();
+        tripPlanner = new TripPlanner(regulationHandler,null,user);
 
 
         createPresenters();
     }
 
     private void createPresenters(){
-        presenters.add(new HomePresenter(new HomeView(), new HomeModel()));
+        presenters.add(new HomePresenter());
 
-        presenters.add(new MapPresenter(new MapView(), new MapModel()));
+        presenters.add(new MapPresenter());
 
-        presenters.add(new ClockPresenter(new ClockView(), new ClockModel(user, regulationHandler)));
+        presenters.add(new ClockPresenter(tripPlanner));
 
-        //TODO SIMON P Fix this since it's so retardedly FUBAR that it's not even funny.
-        SettingsPresenter sp = new SettingsPresenter(new SettingsView(), new SettingsModel());
-        ((SettingsView)sp.getView()).setPresenter((SettingsPresenter)sp);
-        presenters.add(sp);
+        presenters.add(new SettingsPresenter());
 
-        presenters.add(new StatsPresenter(new StatsView(), new StatsModel()));
+        presenters.add(new StatsPresenter());
     }
+
 
     public List<IPresenter> getPresenters(){
         return presenters;

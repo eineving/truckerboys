@@ -11,9 +11,9 @@ public class MapPresenter implements IPresenter{
     private MapModel model;
     private MapView view;
 
-    public MapPresenter(MapView view, MapModel model){
-        this.view = view;
-        this.model = model;
+    public MapPresenter(){
+        this.view = new MapView();
+        this.model = new MapModel();
     }
 
     @Override
