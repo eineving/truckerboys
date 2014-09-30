@@ -7,8 +7,6 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class Location {
     private LatLng latLng;
-
-    //Address
     private String address = "";
 
     public Location(LatLng latLng) {
