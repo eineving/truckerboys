@@ -18,13 +18,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import truckerboys.otto.R;
+import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  *
  * The viewclass for the clock that handles the UI.
  */
-public class ClockView extends Fragment {
+public class ClockView extends Fragment implements IView{
     View rootView;
     TextView timeLeft, stopTL1, stopTL2, stopTL3, stopN1, stopN2, stopN3;
     //ArrayDeque<RestStop> stops = new ArrayDeque<RestStop>();
@@ -32,8 +33,10 @@ public class ClockView extends Fragment {
     Boolean variablesSet = false;
     String timeL;
 
-    public ClockView(){
+    ClockPresenter presenter;
 
+    public ClockView(){
+        presenter = new ClockPresenter(this);
     }
 
 
@@ -154,5 +157,15 @@ public class ClockView extends Fragment {
                 .toFormatter();
         String result = minutesAndSeconds.print(period);
         return result;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this;
+    }
+
+    @Override
+    public String getName() {
+        return "Clock";
     }
 }

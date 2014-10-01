@@ -5,19 +5,20 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import truckerboys.otto.R;
-import truckerboys.otto.settings.SettingsPresenter;
+import utils.IView;
+
+
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  * Class for displaying statistics for the user.
  */
-public class StatsView extends Fragment {
+
+public class StatsView extends Fragment implements IView {
+
     private View rootView;
     private StatsPresenter presenter;
 
@@ -40,8 +41,10 @@ public class StatsView extends Fragment {
     private String fuelUnit = "L";
 
 
-    public StatsView(){
 
+
+    public StatsView(){
+        presenter = new StatsPresenter(this);
     }
 
     @Override
@@ -82,9 +85,6 @@ public class StatsView extends Fragment {
 
     }
 
-    public void setPresenter(StatsPresenter presenter) {
-        this.presenter = presenter;
-    }
 
     /**
      * Update the switches with settings loaded from shared preference file
@@ -109,4 +109,13 @@ public class StatsView extends Fragment {
         this.violations.setText("" + violations);
     }
 
+    @Override
+    public Fragment getFragment() {
+        return this;
+    }
+
+    @Override
+    public String getName() {
+        return "Statistics";
+    }
 }

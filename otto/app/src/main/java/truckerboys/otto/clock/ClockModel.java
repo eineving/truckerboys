@@ -3,11 +3,8 @@ package truckerboys.otto.clock;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-import truckerboys.otto.driver.User;
-import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TimeLeft;
 
 /**
@@ -15,9 +12,6 @@ import truckerboys.otto.planner.TimeLeft;
  * The model class for the clock that handles the logic.
  */
 public class ClockModel {
-
-    private User user;
-    private IRegulationHandler regulations;
 
     private Instant violationStart, lastTimeUpdate, timeNow;
 
@@ -27,9 +21,7 @@ public class ClockModel {
     private long timeDifference;
     private ArrayList<RestStop> restStops = new ArrayList<RestStop>();
 
-    public ClockModel(User user, IRegulationHandler reg) {
-        this.user = user;
-        this.regulations = reg;
+    public ClockModel() {
         lastTimeUpdate = new Instant();
         timeLeftDuration = new Duration(120 * 60 * 1000);
 

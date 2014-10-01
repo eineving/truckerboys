@@ -8,4 +8,6 @@ import android.support.v4.app.Fragment;
  */
 public interface IPresenter {
     public Fragment getView();
+
+    public String getName();
 }

@@ -4,21 +4,23 @@ import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 
 import truckerboys.otto.IPresenter;
+import truckerboys.otto.settings.SettingsView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class StatsPresenter implements IPresenter {
+public class StatsPresenter{
     private StatsModel model;
+
     private StatsView view;
     private String distanceUnit = "km";
     private String fuelUnit = "L";
 
     public static final String STATS = "Stats_file";
 
-    public StatsPresenter(StatsView view, StatsModel model){
+    public StatsPresenter(StatsView view){
         this.view = view;
-        this.model = model;
+        this.model = new StatsModel();
     }
 
     /**
@@ -26,7 +28,7 @@ public class StatsPresenter implements IPresenter {
      * the user statistics
      */
     public void restorePreferences() {
-        SharedPreferences stats = getView().getActivity().getSharedPreferences(STATS, 0);
+        SharedPreferences stats = view.getActivity().getSharedPreferences(STATS, 0);
 
         // Gets today stats
         double timeToday = stats.getFloat("timeToday", 5);
@@ -89,10 +91,5 @@ public class StatsPresenter implements IPresenter {
         view.update(statsToday, statsTotal, violations);
     }
 
-
-    @Override
-    public Fragment getView() {
-        return view;
-    }
 
 }
