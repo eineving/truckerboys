@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/map"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:name="com.google.android.gms.maps.MapFragment"/>
+    android:layout_height="match_parent">
+
+    <view
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        class="truckerboys.otto.utils.tabs.SlidingTabLayout"
+        android:id="@+id/tab_slider" />
+
+    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v4.view.ViewPager>
+
+</LinearLayout>

@@ -20,10 +20,11 @@ public class Session {
 
     /**
      * Starts a session with a specified start time.
+     *
      * @param start The start time, the Instant must have occured, no future Instants allowed.
      */
-    public Session(Instant start){
-        if(start.isBefore(new Instant())){
+    public Session(Instant start) {
+        if (start.isBefore(new Instant())) {
             this.start = start;
         }else{
             start = new Instant();
@@ -41,10 +42,11 @@ public class Session {
 
     /**
      * Returns the elapsed time from the start time until now.
+     *
      * @return The elapsed time.
      */
-    public Duration getDuration(){
-        if(active){
+    public Duration getDuration() {
+        if (active) {
             return new Duration(start, new Instant());
         }else{
             return new Duration(start, end);
@@ -53,10 +55,33 @@ public class Session {
 
     /**
      * Returns the status of the session.
+     *
      * @return true if the session is in progress, false if the session has stopped.
      */
     public boolean isActive(){
         return active;
     }
 
+    /**
+     * Returns the start time of the session
+     *
+     * @return the start time of the session as an instant.
+     */
+    public Instant getStartTime() {
+        return start;
+    }
+
+    /**
+     * Returns the end time of the session
+     *
+     * This is actually extremely retarded, since it will return NULL when the session is active.
+     * A possible fix is to Split the class into a Session, without this method, and a
+     * PastSession extends session which adds this method, and takes a Session as a parameter to the constructor.
+     * Thoughts?
+     *
+     * @return the end time of the session as an instant.
+     */
+    public Instant getEndTime() {
+        return end;
+    }
 }

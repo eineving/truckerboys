@@ -5,5 +5,9 @@ package truckerboys.otto.home;
  */
 public class HomePresenter {
     private HomeModel model;
-    private HomeView view;
+
+    public HomePresenter(){
+        this.model = new HomeModel();
+    }
+
 }

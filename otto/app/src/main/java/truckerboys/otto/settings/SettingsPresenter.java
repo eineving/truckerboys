@@ -1,9 +1,105 @@
 package truckerboys.otto.settings;
 
+
+import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+
+import truckerboys.otto.IPresenter;
+
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * Presenter handling logic between settingsView and settingsModel
  */
-public class SettingsPresenter {
+public class SettingsPresenter{
     private SettingsModel model;
-    private SettingsView view;
+
+    private SharedPreferences settings;
+
+    public SettingsPresenter( SharedPreferences settings){
+        this.model = new SettingsModel();
+        this.settings = settings;
+    }
+
+    public void setListeners(Switch sound, Switch display) {
+
+        sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                soundChanged(b);
+            }
+        });
+
+        display.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                displayChanged(b);
+            }
+        });
+    }
+
+    /**
+     * Method to run when sound switched is changed
+     * @param b on/off
+     */
+    public void displayChanged(boolean b) {
+        // Writes preferences to the settings and stats file
+        SharedPreferences.Editor settingsEditor = settings.edit();
+
+        settingsEditor.putBoolean("displayAlive", b);
+
+        // Commit the changes
+        settingsEditor.commit();
+
+    }
+
+    /**
+     * Method to run when sound switched is changed
+     * @param b on/off
+     */
+    public void soundChanged(boolean b) {
+
+        // Writes preferences to the settings and stats file
+        SharedPreferences.Editor settingsEditor = settings.edit();
+
+        settingsEditor.putBoolean("sound", b);
+
+        // Commit the changes
+        settingsEditor.commit();
+    }
+
+    /**
+     * Method for restoring the saved preferences from
+     * the user statistics and the user settings
+     */
+    public void restorePreferences() {
+        boolean sound = settings.getBoolean("sound", true); // true is the value to be returned if no "sound"-value exists
+        boolean displayAlive = settings.getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
+
+        setSettings(sound, displayAlive);
+    }
+
+    /**
+     * Method for setting the restored settings in the
+     * model and updating the view
+     * @param sound on/off
+     * @param displayAlive on/off
+     */
+    public void setSettings(boolean sound, boolean displayAlive) {
+        model.setSettings(sound, displayAlive);
+    }
+
+    public boolean isSoundOn(){
+        return model.getSound();
+    }
+
+    public boolean isDisplayActive(){
+        return model.getDisplayAlive();
+    }
+
+    public SettingsModel getModel() {
+        return model;
+    }
+
 }

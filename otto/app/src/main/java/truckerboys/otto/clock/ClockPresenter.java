@@ -1,9 +1,32 @@
 package truckerboys.otto.clock;
 
+import org.joda.time.Duration;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * The presenter class of the clock that acts as a bridge between the view and model.
  */
-public class ClockPresenter {
+public class ClockPresenter{
     private ClockModel model;
-    private ClockView view;
+
+    public ClockPresenter(){
+        this.model = new ClockModel();
+    }
+    /**
+     * Updates the model and view.
+     */
+    public void update() {
+        model.update();
+    }
+
+    public Duration getTimeLeft(){
+        return model.getTimeLeft();
+    }
+
+    public ArrayList<RestStop> getRestStops(){
+        return model.getRestStops();
+    }
 }
