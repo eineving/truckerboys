@@ -1,5 +1,7 @@
 package truckerboys.otto.planner;
 
+import android.util.Log;
+
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.directionsAPI.IDirections;
