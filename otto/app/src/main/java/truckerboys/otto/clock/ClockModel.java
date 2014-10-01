@@ -34,15 +34,15 @@ public class ClockModel {
         restStops.add(stop3);
 
         //TODO: Add when regulations and user is implemented
-        //timeLeft = reg.getThisSessionTL(user.getHistory());
+        //timeLeft = tripPlanner.getTimeleft;
     }
 
 
     public void update() {
         timeNow = new Instant();
         timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
-        //TODO: Add when regulations and user is implemented
-        //timeLeft.getTimeLeft().minus(timeDifference);
+        //TODO: Add when TripPlanner is implemented
+        //timeLeft = timeLeft.getTimeLeft().minus(timeDifference);
         timeLeftDuration = timeLeftDuration.minus(timeDifference);
         stop1.setTimeLeft(stop1.getTimeLeft().minus(timeDifference));
         stop2.setTimeLeft(stop2.getTimeLeft().minus(timeDifference));
@@ -59,7 +59,7 @@ public class ClockModel {
     }
 
     public Duration getTimeLeft() {
-        //TODO: Add when regulations and user is implemented
+        //TODO: Add when TripPlanner is implemented
         //return timeLeft.getTimeLeft();
         return timeLeftDuration;
     }

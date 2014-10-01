@@ -16,6 +16,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import truckerboys.otto.R;
 import utils.IView;
@@ -24,11 +27,11 @@ import utils.IView;
  * Created by Mikael Malmqvist on 2014-09-18.
  *
  * The viewclass for the clock that handles the UI.
+ * It also runs the timer for the clock.
  */
 public class ClockView extends Fragment implements IView{
     View rootView;
     TextView timeLeft, stopTL1, stopTL2, stopTL3, stopN1, stopN2, stopN3;
-    //ArrayDeque<RestStop> stops = new ArrayDeque<RestStop>();
     ArrayList<RestStop> stops = new ArrayList<RestStop>();
     Boolean variablesSet = false;
     String timeL;
@@ -36,7 +39,22 @@ public class ClockView extends Fragment implements IView{
     ClockPresenter presenter;
 
     public ClockView(){
-        presenter = new ClockPresenter(this);
+        presenter = new ClockPresenter();
+
+        setRestStops(presenter.getRestStops());
+
+        ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor)
+                Executors.newScheduledThreadPool(1);
+
+        Runnable update = new Runnable(){
+            public void run(){
+                presenter.update();
+                setTimeLeft(presenter.getTimeLeft());
+                updateUI();
+            }
+        };
+        sch.scheduleWithFixedDelay(update, 5, 5, TimeUnit.SECONDS); // The timer
+
     }
 
 
@@ -73,21 +91,6 @@ public class ClockView extends Fragment implements IView{
         if(variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft);
         }
-    }
-
-    /**
-     * Adds a new reststop to the bottom of the list. If the list is longer than three it removes the closest reststop.
-     * @param newRestStop The new reststop
-     */
-    public void addNewRestStop(RestStop newRestStop){
-
-        stops.add(newRestStop);
-        if(stops.size()>3){
-            stops.remove(stops.size() - 1);
-        }
-
-        setLabels();
-
     }
 
     /**
