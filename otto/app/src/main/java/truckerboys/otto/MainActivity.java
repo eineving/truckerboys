@@ -27,7 +27,7 @@ public class MainActivity extends FragmentActivity {
 
         //Create standard view with a ViewPager and corresponding tabs.
         viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), otto.getPresenters());
+        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), otto.getViews());
         viewPager.setAdapter(pagerAdapter);
 
 

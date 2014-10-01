@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Switch;
 
 import truckerboys.otto.R;
+import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -19,35 +20,34 @@ import truckerboys.otto.R;
  * Elm street more than proper java coding.
  */
 
-public class SettingsView extends Fragment {
+public class SettingsView extends Fragment implements IView {
     private View rootView;
     private Switch soundSwitch;
     private Switch displaySwitch;
     private SettingsPresenter presenter;
 
-    public SettingsView(){
+    public static final String SETTINGS = "Settings_file";
 
-    }
+    public SettingsView(){ }
 
-    public void setPresenter(SettingsPresenter presenter) {
-        this.presenter = presenter;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         rootView = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        presenter = new SettingsPresenter(getActivity().getSharedPreferences(SETTINGS, 0));
 
         // Creates switches from the fragment
         soundSwitch = (Switch) rootView.findViewById(R.id.soundSwitch);
         displaySwitch = (Switch) rootView.findViewById(R.id.displaySwitch);
 
         // Sets listeners in presenter
-        presenter.setListeners();
+        presenter.setListeners(soundSwitch, displaySwitch);
 
         // Restores preferences for settings in presenter
         presenter.restorePreferences();
 
+        update(presenter.isSoundOn(), presenter.isDisplayActive());
         return rootView;
 
     }
@@ -63,10 +63,13 @@ public class SettingsView extends Fragment {
         displaySwitch.setChecked(displayAlive);
     }
 
-    public Switch getSoundSwitch() {
-        return soundSwitch;
+    @Override
+    public Fragment getFragment(){
+        return this;
     }
-    public Switch getDisplaySwitch() {
-        return displaySwitch;
+
+    @Override
+    public String getName() {
+        return "Settings";
     }
 }

@@ -2,6 +2,7 @@ package truckerboys.otto.home;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +10,12 @@ import android.widget.ImageButton;
 
 import truckerboys.otto.IPresenter;
 import truckerboys.otto.R;
+import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class HomeView extends Fragment {
+public class HomeView extends Fragment implements IView {
     private View rootView;
     private HomePresenter presenter;
     private ImageButton newRouteButton;
@@ -24,11 +26,9 @@ public class HomeView extends Fragment {
     private ImageButton settingsButton;
 
     public HomeView(){
+        presenter = new HomePresenter();
     }
 
-    public void setPresenter(HomePresenter p){
-        this.presenter = p;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,41 +58,55 @@ public class HomeView extends Fragment {
 
         newRouteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                presenter.newRouteButtonClicked(v);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(2);
             }
         });
 
         continueRouteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                presenter.contiueRouteButtonClicked(v);
+                //presenter.contiueRouteButtonClicked(v);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(2);
             }
         });
 
         mapsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                presenter.mapButtonClicked(v);
+                //presenter.contiueRouteButtonClicked(v);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(2);
             }
         });
 
         clockButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                presenter.clockButtonClicked(v);
+                //presenter.contiueRouteButtonClicked(v);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(3);
             }
         });
 
         statsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                presenter.statsButtonClicked(v);
+                //presenter.contiueRouteButtonClicked(v);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(4);
             }
         });
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                presenter.settingsButtonClicked(v);
+                //presenter.contiueRouteButtonClicked(v);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(5);
             }
         });
 
     }
 
 
+    @Override
+    public Fragment getFragment() {
+        return this;
+    }
+
+    @Override
+    public String getName() {
+        return "Home";
+    }
 }

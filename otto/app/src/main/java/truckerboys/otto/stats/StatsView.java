@@ -7,13 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import truckerboys.otto.R;
+import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class StatsView extends Fragment {
+public class StatsView extends Fragment implements IView {
 
     private View rootView;
+
+
 
     public StatsView(){
 
@@ -24,5 +27,15 @@ public class StatsView extends Fragment {
         rootView  = inflater.inflate(R.layout.fragment_stats, container, false);
 
         return rootView;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return this;
+    }
+
+    @Override
+    public String getName() {
+        return "Statistics";
     }
 }

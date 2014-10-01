@@ -22,6 +22,7 @@ import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.stats.StatsModel;
 import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.stats.StatsView;
+import utils.IView;
 
 /**
  * The root class of the program.
@@ -29,7 +30,7 @@ import truckerboys.otto.stats.StatsView;
  */
 public class OTTO {
 
-    private List<IPresenter> presenters = new ArrayList<IPresenter>();
+    private List<IView> views = new ArrayList<IView>();
 
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
@@ -47,20 +48,20 @@ public class OTTO {
     }
 
     private void createPresenters(){
-        presenters.add(new HomePresenter());
+        views.add(new HomeView());
 
-        presenters.add(new MapPresenter());
+        //view.add(new MapView());
 
-        presenters.add(new ClockPresenter(tripPlanner));
+        //view.add(new ClockView(tripPlanner));
 
-        presenters.add(new SettingsPresenter());
+        views.add(new SettingsView());
 
-        presenters.add(new StatsPresenter());
+        views.add(new StatsView());
     }
 
 
-    public List<IPresenter> getPresenters(){
-        return presenters;
+    public List<IView> getViews(){
+        return views;
     }
 
 
