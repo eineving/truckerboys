@@ -21,6 +21,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import truckerboys.otto.R;
+import truckerboys.otto.planner.TimeLeft;
 import utils.IView;
 
 /**
@@ -31,10 +32,10 @@ import utils.IView;
  */
 public class ClockView extends Fragment implements IView{
     View rootView;
-    TextView timeLeft, stopTL1, stopTL2, stopTL3, stopN1, stopN2, stopN3;
+    TextView timeLeft, timeLeftExtended, stopTL1, stopTL2, stopTL3, stopN1, stopN2, stopN3;
     ArrayList<RestStop> stops = new ArrayList<RestStop>();
     Boolean variablesSet = false;
-    String timeL;
+    String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
     ClockPresenter presenter;
 
@@ -73,6 +74,7 @@ public class ClockView extends Fragment implements IView{
     private void initiateVariables(){
         timeLeft = (TextView) rootView.findViewById(R.id.clockText);
         timeLeft.setText("04:22");
+        timeLeftExtended = (TextView) rootView.findViewById(R.id.clockExtendedText);
         stopTL1 = (TextView) rootView.findViewById(R.id.timeStop1);
         stopTL2 = (TextView) rootView.findViewById(R.id.timeStop2);
         stopTL3 = (TextView) rootView.findViewById(R.id.timeStop3);
@@ -87,9 +89,10 @@ public class ClockView extends Fragment implements IView{
      * Set the time remaining until regulations are broken.
      * @param timeLeft The remaining time
      */
-    public void setTimeLeft(Duration timeLeft){
+    public void setTimeLeft(TimeLeft timeLeft){
         if(variablesSet) {
-            timeL = getTimeAsFormattedString(timeLeft);
+            timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
+            timeLE = timeLEPrefix + getTimeAsFormattedString(timeLeft.getExtendedTimeLeft());
         }
     }
 
@@ -122,6 +125,7 @@ public class ClockView extends Fragment implements IView{
     private void setLabels(){
         try {
             timeLeft.setText(timeL);
+            timeLeftExtended.setText(timeLE);
         }catch (Exception e){
             System.out.println("Exception " + e.getMessage());
         }

@@ -15,7 +15,7 @@ public class ClockModel {
 
     private Instant violationStart, lastTimeUpdate, timeNow;
 
-    private Duration timeLeftDuration;
+    private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
     private RestStop stop1, stop2, stop3;
     private long timeDifference;
@@ -24,6 +24,8 @@ public class ClockModel {
     public ClockModel() {
         lastTimeUpdate = new Instant();
         timeLeftDuration = new Duration(120 * 60 * 1000);
+        timeLeftExtendedDuration = new Duration(180 * 60 * 1000);
+        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
 
         //Placeholders until TripPlanner is fully implemented
         stop1 = new RestStop(new Duration(45 * 60 * 1000), "Name of first stop");
@@ -34,16 +36,15 @@ public class ClockModel {
         restStops.add(stop3);
 
         //TODO: Add when regulations and user is implemented
-        //timeLeft = tripPlanner.getTimeleft;
+        //timeLeft = tripPlanner.getTimeleft();
     }
 
 
     public void update() {
         timeNow = new Instant();
         timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
-        //TODO: Add when TripPlanner is implemented
-        //timeLeft = timeLeft.getTimeLeft().minus(timeDifference);
         timeLeftDuration = timeLeftDuration.minus(timeDifference);
+        timeLeftExtendedDuration = timeLeftDuration.minus(timeDifference);
         stop1.setTimeLeft(stop1.getTimeLeft().minus(timeDifference));
         stop2.setTimeLeft(stop2.getTimeLeft().minus(timeDifference));
         stop3.setTimeLeft(stop3.getTimeLeft().minus(timeDifference));
@@ -58,9 +59,9 @@ public class ClockModel {
         return restStops;
     }
 
-    public Duration getTimeLeft() {
+    public TimeLeft getTimeLeft() {
         //TODO: Add when TripPlanner is implemented
         //return timeLeft.getTimeLeft();
-        return timeLeftDuration;
+        return new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
     }
 }

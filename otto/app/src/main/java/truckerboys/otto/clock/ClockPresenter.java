@@ -5,6 +5,8 @@ import org.joda.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import truckerboys.otto.planner.TimeLeft;
+
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  * The presenter class of the clock that acts as a bridge between the view and model.
@@ -22,7 +24,7 @@ public class ClockPresenter{
         model.update();
     }
 
-    public Duration getTimeLeft(){
+    public TimeLeft getTimeLeft(){
         return model.getTimeLeft();
     }
 
