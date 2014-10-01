@@ -7,7 +7,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
+import truckerboys.otto.IPresenter;
+import utils.IView;
 
 /**
  * Created by Simon Petersson on 2014-09-18.
@@ -23,10 +27,15 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
 
     private final int numTabs;
 
-    public TabPagerAdapter(FragmentManager fragmentManager, Map<Fragment, String> viewMap){
+    public TabPagerAdapter(FragmentManager fragmentManager, List<IView> views){
         super(fragmentManager);
         //this.viewList = viewList;
-        this.viewMap.putAll(viewMap);
+
+        for(IView v : views){
+            this.viewMap.put(v.getFragment(), v.getName());
+        }
+
+
         numTabs = viewMap.size();
     }
 

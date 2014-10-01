@@ -4,6 +4,7 @@ package truckerboys.otto.settings;
 import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import truckerboys.otto.IPresenter;
 
@@ -11,30 +12,26 @@ import truckerboys.otto.IPresenter;
  * Created by Mikael Malmqvist on 2014-09-18.
  * Presenter handling logic between settingsView and settingsModel
  */
-public class SettingsPresenter implements IPresenter {
+public class SettingsPresenter{
     private SettingsModel model;
-    private SettingsView view;
 
-    public static final String SETTINGS = "Settings_file";
+    private SharedPreferences settings;
 
-
-
-    public SettingsPresenter(SettingsView view, SettingsModel model){
-        this.view = view;
-        this.model = model;
-
+    public SettingsPresenter( SharedPreferences settings){
+        this.model = new SettingsModel();
+        this.settings = settings;
     }
 
-    public void setListeners() {
+    public void setListeners(Switch sound, Switch display) {
 
-        view.getSoundSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 soundChanged(b);
             }
         });
 
-        view.getDisplaySwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        display.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 displayChanged(b);
@@ -48,7 +45,6 @@ public class SettingsPresenter implements IPresenter {
      */
     public void displayChanged(boolean b) {
         // Writes preferences to the settings and stats file
-        SharedPreferences settings = getView().getActivity().getSharedPreferences(SETTINGS, 0);
         SharedPreferences.Editor settingsEditor = settings.edit();
 
         settingsEditor.putBoolean("displayAlive", b);
@@ -63,8 +59,8 @@ public class SettingsPresenter implements IPresenter {
      * @param b on/off
      */
     public void soundChanged(boolean b) {
+
         // Writes preferences to the settings and stats file
-        SharedPreferences settings = getView().getActivity().getSharedPreferences(SETTINGS, 0);
         SharedPreferences.Editor settingsEditor = settings.edit();
 
         settingsEditor.putBoolean("sound", b);
@@ -78,34 +74,32 @@ public class SettingsPresenter implements IPresenter {
      * the user statistics and the user settings
      */
     public void restorePreferences() {
-        SharedPreferences settings = getView().getActivity().getSharedPreferences(SETTINGS, 0);
         boolean sound = settings.getBoolean("sound", true); // true is the value to be returned if no "sound"-value exists
         boolean displayAlive = settings.getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
 
         setSettings(sound, displayAlive);
     }
 
+    /**
+     * Method for setting the restored settings in the
+     * model and updating the view
+     * @param sound on/off
+     * @param displayAlive on/off
+     */
     public void setSettings(boolean sound, boolean displayAlive) {
         model.setSettings(sound, displayAlive);
-        updateView();
     }
 
-    /**
-     * Updates view with settings data from model
-     */
-    public void updateView() {
-        boolean sound = model.getSound();
-        boolean displayAlive = model.getDisplayAlive();
+    public boolean isSoundOn(){
+        return model.getSound();
+    }
 
-        view.update(sound, displayAlive);
+    public boolean isDisplayActive(){
+        return model.getDisplayAlive();
     }
 
     public SettingsModel getModel() {
         return model;
     }
 
-    @Override
-    public Fragment getView() {
-        return view;
-    }
 }
