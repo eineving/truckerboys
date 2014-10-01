@@ -6,6 +6,7 @@ import java.util.List;
 import truckerboys.otto.clock.ClockModel;
 import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.clock.ClockView;
+import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.home.HomeModel;
 import truckerboys.otto.home.HomePresenter;
@@ -41,7 +42,7 @@ public class OTTO {
     public OTTO(){
         regulationHandler = new EURegulationHandler();
         user = new User();
-        tripPlanner = new TripPlanner(regulationHandler,null,user);
+        tripPlanner = new TripPlanner(regulationHandler,new GoogleDirections(),user);
 
 
         createPresenters();
