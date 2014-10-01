@@ -44,14 +44,15 @@ public class OTTO {
         user = new User();
         tripPlanner = new TripPlanner(regulationHandler,new GoogleDirections(),user);
 
-
         createPresenters();
     }
 
     private void createPresenters(){
         views.add(new HomeView());
 
-        //view.add(new MapView());
+        MapView mapView = new MapView();
+        mapView.setTripPlanner(tripPlanner);
+        views.add(mapView);
 
         views.add(new ClockView());
 
