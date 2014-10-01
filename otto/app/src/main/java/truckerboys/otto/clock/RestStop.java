@@ -18,6 +18,10 @@ public class RestStop {
         return timeLeft;
     }
 
+    public void setTimeLeft(Duration nTL){
+        timeLeft = nTL;
+    }
+
     public String getName() {
         return name;
     }
