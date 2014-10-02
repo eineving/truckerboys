@@ -7,13 +7,24 @@ import truckerboys.otto.data.TimeBank;
 
 /**
  * Created by Martin on 17/09/2014.
+ * This class is singleton.
  */
 public class User {
 
+    private static User instance;
     private SessionHistory history = new SessionHistory();
     private Session currentSession;
 
-    public User(){
+    private User(){
+    }
+
+
+    public User getInstance() {
+        if(instance == null) {
+            instance = new User();
+        }
+
+        return instance;
 
     }
 
