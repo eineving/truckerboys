@@ -11,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -32,6 +33,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private View rootView;
     private GoogleMap googleMap;
     private MapPresenter mapPresenter;
+    private CameraPosition cameraPosition = new CameraPosition(new LatLng(0, 0), 16f, 50, 0);
 
     private TripPlanner tripPlanner;
 
@@ -44,14 +46,16 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         rootView = super.onCreateView(inflater, container, savedInstanceState);
 
         googleMap = getMap();
-        MapsInitializer.initialize(getActivity());
+        //MapsInitializer.initialize(getActivity());
 
         if(googleMap != null){ //Map is not null, modify freely.
             googleMap.getUiSettings().setAllGesturesEnabled(false);
             googleMap.getUiSettings().setZoomControlsEnabled(true);
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             googleMap.setMyLocationEnabled(true);
-            googleMap.animateCamera(CameraUpdateFactory.zoomBy(15));
+
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
         }
 
         mapPresenter = new MapPresenter(getActivity(), this.googleMap, this.tripPlanner);
@@ -61,13 +65,18 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     }
 
     /**
-     * Centers the map at a position in the world.
-     * @param latitude Latitude to center the map at.
-     * @param longitude Longitude to center the map at.
+     * Center and rotates the camera accordingly to longitude, latitude and bearing of location.
+     * @param location The location to adjust accordingly to.
      */
-    public void centerAtPosition(double latitude, double longitude){
+    public void centerAtPosition(Location location){
         if(googleMap != null) {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude)));
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                    new CameraPosition(
+                            new LatLng(location.getLatitude(), location.getLongitude()),
+                            googleMap.getCameraPosition().zoom,
+                            cameraPosition.tilt,
+                            location.getBearing()
+                    )));
         }
     }
 
@@ -96,12 +105,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     @Override
     public void performEvent(Event event) {
-        System.out.println("performEvent");
         if(event.isType(LocationChangedEvent.class)){
-            System.out.println("locationChangedEvent");
-            LocationChangedEvent locationEvent = (LocationChangedEvent) event;
-            Location newLocation = locationEvent.getNewPosition();
-            centerAtPosition(newLocation.getLatitude(), newLocation.getLongitude());
+            centerAtPosition(((LocationChangedEvent) event).getNewPosition());
         }
         if(event.isType(NewRouteEvent.class)){
             NewRouteEvent routeEvent = (NewRouteEvent) event;
