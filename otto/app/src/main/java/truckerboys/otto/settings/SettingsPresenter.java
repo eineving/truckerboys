@@ -51,6 +51,7 @@ public class SettingsPresenter{
 
         settingsEditor.putBoolean("displayAlive", b);
 
+
         // if b == true call view.getActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // if b == false call view.getActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

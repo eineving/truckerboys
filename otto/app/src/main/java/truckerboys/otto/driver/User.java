@@ -19,7 +19,7 @@ public class User {
     }
 
 
-    public User getInstance() {
+    public static User getInstance() {
         if(instance == null) {
             instance = new User();
         }

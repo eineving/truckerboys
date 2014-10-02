@@ -41,7 +41,7 @@ public class OTTO {
 
     public OTTO(){
         regulationHandler = new EURegulationHandler();
-        user = new User();
+        user = User.getInstance();
         tripPlanner = new TripPlanner(regulationHandler,new GoogleDirections(),user);
 
         createPresenters();
