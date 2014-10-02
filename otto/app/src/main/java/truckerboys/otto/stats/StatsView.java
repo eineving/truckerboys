@@ -132,16 +132,10 @@ public class StatsView extends Fragment implements IView, IEventListener{
             fuelByDistanceTotal.setText(Math.floor(statsTotal[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
         }
 
-       /* fuelToday = Math.floor(fuelToday * 100)/100;
-        fuelTotal = Math.floor(fuelTotal * 100)/100;
-        distanceToday = Math.floor(distanceToday * 100)/100;
-        distanceTotal = Math.floor(distanceTotal * 100)/100;
-        fuelByDistanceToday = Math.floor(fuelByDistanceToday * 100)/100;
-        fuelByDistanceTotal = Math.floor(fuelByDistanceTotal * 100)/100;*/
-
-
         // Sets violations
-        this.violations.setText("" + violations);
+        if(this.violations != null) {
+            this.violations.setText("" + violations);
+        }
     }
 
     @Override
