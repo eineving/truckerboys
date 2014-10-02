@@ -16,6 +16,9 @@ import java.beans.PropertyChangeSupport;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -27,8 +30,7 @@ public class MapModel implements GooglePlayServicesClient.OnConnectionFailedList
     private LocationClient locationClient;
     private TripPlanner tripPlanner;
     private Route currentRoute;
-
-    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private EventTruck eventTruck = EventTruck.getInstance();
 
     private Location truckPosition;
 
@@ -50,7 +52,7 @@ public class MapModel implements GooglePlayServicesClient.OnConnectionFailedList
         //TODO Add a timer listener that does this every X second, if outside route. Calc new.
         this.currentRoute = tripPlanner.getNewRouteTo(null);
         //TODO Send old/new route instead of null
-        propertyChangeSupport.firePropertyChange("newRoute", null, this.currentRoute);
+        eventTruck.newEvent(new NewRouteEvent(null, this.currentRoute));
     }
 
     @Override
@@ -65,7 +67,7 @@ public class MapModel implements GooglePlayServicesClient.OnConnectionFailedList
 
     @Override
     public void onLocationChanged(Location location) {
-        propertyChangeSupport.firePropertyChange("locationUpdate", getTruckPosition(), location);
+        eventTruck.newEvent(new LocationChangedEvent(location, getTruckPosition()));
         setTruckPosition(location);
     }
 
@@ -75,13 +77,5 @@ public class MapModel implements GooglePlayServicesClient.OnConnectionFailedList
 
     public void setTruckPosition(Location truckPosition) {
         this.truckPosition = truckPosition;
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener){
-        this.propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener){
-        this.propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
     }
 }

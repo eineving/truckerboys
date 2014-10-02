@@ -15,17 +15,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.List;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
 import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends SupportMapFragment implements IView, PropertyChangeListener{
+public class MapView extends SupportMapFragment implements IView, IEventListener{
     private View rootView;
     private GoogleMap googleMap;
     private MapPresenter mapPresenter;
@@ -52,7 +55,7 @@ public class MapView extends SupportMapFragment implements IView, PropertyChange
         }
 
         mapPresenter = new MapPresenter(getActivity(), this.googleMap, this.tripPlanner);
-        mapPresenter.addListenerToModel(this);
+        EventTruck.getInstance().subscribe(this);
 
         return rootView;
     }
@@ -92,13 +95,17 @@ public class MapView extends SupportMapFragment implements IView, PropertyChange
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        if(propertyChangeEvent.getPropertyName().equals("locationUpdate")){
-            Location newLocation = (Location) propertyChangeEvent.getNewValue();
+    public void performEvent(Event event) {
+        System.out.println("performEvent");
+        if(event.isType(LocationChangedEvent.class)){
+            System.out.println("locationChangedEvent");
+            LocationChangedEvent locationEvent = (LocationChangedEvent) event;
+            Location newLocation = locationEvent.getNewPosition();
             centerAtPosition(newLocation.getLatitude(), newLocation.getLongitude());
         }
-        else if (propertyChangeEvent.getPropertyName().equals("newRoute")) {
-            paintRoute((Route)propertyChangeEvent.getNewValue());
+        if(event.isType(NewRouteEvent.class)){
+            NewRouteEvent routeEvent = (NewRouteEvent) event;
+            paintRoute(routeEvent.getNewRoute());
         }
     }
 }

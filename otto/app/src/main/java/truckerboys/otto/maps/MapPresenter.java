@@ -17,15 +17,10 @@ public class MapPresenter implements PropertyChangeListener {
 
     public MapPresenter(Context context, GoogleMap googleMap, TripPlanner tripPlanner){
         this.mapModel = new MapModel(context, googleMap, tripPlanner);
-        this.mapModel.addPropertyChangeListener(this);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
 
-    }
-
-    public void addListenerToModel(PropertyChangeListener propertyChangeListener){
-        this.mapModel.addPropertyChangeListener(propertyChangeListener);
     }
 }
