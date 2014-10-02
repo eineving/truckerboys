@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Switch;
 
 import truckerboys.otto.R;
@@ -43,6 +44,7 @@ public class SettingsView extends Fragment implements IView {
 
         // Sets listeners in presenter
         presenter.setListeners(soundSwitch, displaySwitch);
+
 
         // Restores preferences for settings in presenter
         presenter.restorePreferences();

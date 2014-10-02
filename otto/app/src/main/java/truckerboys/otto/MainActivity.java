@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.WindowManager;
 
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
@@ -11,7 +12,6 @@ import truckerboys.otto.utils.tabs.TabPagerAdapter;
 public class MainActivity extends FragmentActivity {
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
-
     private OTTO otto;
 
     public static final String SETTINGS = "Settings_file";
@@ -34,6 +34,13 @@ public class MainActivity extends FragmentActivity {
         //Use Googles 'SlidingTabLayout' to display tabs for all views.
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
         slidingTabLayout.setViewPager(viewPager);
+
+
+        if(getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true)) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
 
 
         // Restore preferences from last session

@@ -7,6 +7,8 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import truckerboys.otto.IPresenter;
+import truckerboys.otto.MainActivity;
+import truckerboys.otto.R;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -48,6 +50,9 @@ public class SettingsPresenter{
         SharedPreferences.Editor settingsEditor = settings.edit();
 
         settingsEditor.putBoolean("displayAlive", b);
+
+        // if b == true call view.getActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // if b == false call view.getActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Commit the changes
         settingsEditor.commit();
