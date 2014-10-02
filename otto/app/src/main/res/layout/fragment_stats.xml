@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/dailyStats"
-        android:textColor="@color/textLight"
+        android:textColor="@color/textLightest"
         android:textSize="14dp"
         android:textStyle="bold"
         android:layout_width="wrap_content"
@@ -161,7 +161,7 @@
 
     <TextView
         android:id="@+id/totalStats"
-        android:textColor="@color/textLight"
+        android:textColor="@color/textLightest"
         android:textSize="14dp"
         android:textStyle="bold"
         android:layout_width="wrap_content"
@@ -296,7 +296,7 @@
 
     <TextView
         android:id="@+id/violationsTitle"
-        android:textColor="@color/textLight"
+        android:textColor="@color/textLightest"
         android:textSize="14dp"
         android:textStyle="bold"
         android:layout_width="wrap_content"
