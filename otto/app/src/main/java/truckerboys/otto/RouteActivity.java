@@ -3,7 +3,6 @@ package truckerboys.otto;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.SearchView;
 
 /**
  * Created by Mikael Malmqvist on 2014-10-02.
@@ -19,9 +18,6 @@ public class RouteActivity extends Activity {
 
         loadHistory();
     }
-
-
-
     public void loadHistory() {
         SharedPreferences history = getSharedPreferences(HISTORY,0);
     }
