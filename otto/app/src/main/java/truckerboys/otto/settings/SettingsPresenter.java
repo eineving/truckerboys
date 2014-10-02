@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import truckerboys.otto.IPresenter;
 import truckerboys.otto.MainActivity;
@@ -26,7 +27,14 @@ public class SettingsPresenter{
         this.settings = settings;
     }
 
-    public void setListeners(Switch sound, Switch display) {
+    public void setListeners(Switch sound, Switch display, Switch unit) {
+
+        unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                unitsChanged(b);
+            }
+        });
 
         sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -65,6 +73,32 @@ public class SettingsPresenter{
     }
 
     /**
+     * Method to run when units switched is changed
+     * @param b on/off
+     */
+    public void unitsChanged(boolean b) {
+
+        // Writes preferences to the settings and stats file
+        SharedPreferences.Editor settingsEditor = settings.edit();
+
+        String system = (b ? "metric" : "imperial");
+
+        System.out.println("***********" + system + "*****************");
+
+        if(b) {
+            settingsEditor.putString("system", system);
+        } else {
+            settingsEditor.putString("system", system);
+        }
+
+        // Commit the changes
+        settingsEditor.commit();
+
+        // Read new value metric/imperial from parameters
+        EventTruck.getInstance().newEvent(new SettingsChangedEvent(system));
+    }
+
+    /**
      * Method to run when sound switched is changed
      * @param b on/off
      */
@@ -82,6 +116,7 @@ public class SettingsPresenter{
         // Commit the changes
         settingsEditor.commit();
 
+        // Read new value metric/imperial from parameters
         EventTruck.getInstance().newEvent(new SettingsChangedEvent());
     }
 

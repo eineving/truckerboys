@@ -52,7 +52,8 @@ public class SettingsView extends Fragment implements IView, IEventListener {
         displaySwitch = (Switch) rootView.findViewById(R.id.displaySwitch);
 
         // Sets listeners in presenter
-        presenter.setListeners(soundSwitch, displaySwitch);
+        // TODO Remove unit switch in final design
+        presenter.setListeners(soundSwitch, displaySwitch, (Switch) rootView.findViewById(R.id.unitSwitch));
 
 
         // Restores preferences for settings in presenter

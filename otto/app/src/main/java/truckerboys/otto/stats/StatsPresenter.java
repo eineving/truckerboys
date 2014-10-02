@@ -44,10 +44,10 @@ public class StatsPresenter implements IEventListener {
         double fuelByDistanceToday = stats.getFloat("fuelByDistanceToday", 5);
 
         // Gets total stats
-        double timeTotal = stats.getFloat("timeTotal", 0);
-        double distanceTotal = stats.getFloat("distanceTotal", 0);
-        double fuelTotal = stats.getFloat("fuelTotal", 0);
-        double fuelByDistanceTotal = stats.getFloat("fuelByDistanceTotal", 0);
+        double timeTotal = stats.getFloat("timeTotal", 5);
+        double distanceTotal = stats.getFloat("distanceTotal", 5);
+        double fuelTotal = stats.getFloat("fuelTotal", 5);
+        double fuelByDistanceTotal = stats.getFloat("fuelByDistanceTotal", 5);
 
         // Gets total stats
         int violation = stats.getInt("violation", 0);
@@ -83,7 +83,7 @@ public class StatsPresenter implements IEventListener {
         double[] statsToday = {model.getTimeToday(), model.getDistanceToday(), model.getFuelToday(), model.getfuelByDistanceToday()};
         double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};
 
-        updateView(statsToday,statsTotal, model.getViolations());
+        updateView(statsToday, statsTotal, model.getViolations());
         // TODO: Sets view fuel, distance etc based on new values in model
     }
 
@@ -102,7 +102,10 @@ public class StatsPresenter implements IEventListener {
     @Override
     public void performEvent(Event event) {
         if(event.isType(SettingsChangedEvent.class)) {
-            //setUnits(view.getActivity().getSharedPreferences(SETTINGS, 0).getString("system", "metric"));
+
+            // read from file and set String called system based on that
+
+            setUnits(((SettingsChangedEvent)event).getSystem());
 
         }
     }

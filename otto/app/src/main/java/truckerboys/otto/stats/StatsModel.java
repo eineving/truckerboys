@@ -1,5 +1,7 @@
 package truckerboys.otto.stats;
 
+import java.text.DecimalFormat;
+
 import truckerboys.otto.driver.User;
 
 /**
@@ -47,8 +49,10 @@ public class StatsModel {
 
             fuelToday = fuelToday * 0.264172052;
             fuelTotal = fuelTotal * 0.264172052;
+
             distanceToday = distanceToday * 0.621371192;
             distanceTotal = distanceTotal * 0.621371192;
+
             fuelByDistanceToday = fuelByDistanceToday * 0.264172052 / 0.621371192;
             fuelByDistanceTotal = fuelByDistanceTotal * 0.264172052 / 0.621371192;
 
@@ -59,11 +63,15 @@ public class StatsModel {
 
             fuelTotal = fuelTotal / 0.264172052;
             fuelToday = fuelToday / 0.264172052;
+
+
             distanceToday = distanceToday / 0.621371192;
             distanceTotal = distanceTotal / 0.621371192;
             fuelByDistanceToday = fuelByDistanceToday / 0.264172052 * 0.621371192;
             fuelByDistanceTotal = fuelByDistanceTotal / 0.264172052 * 0.621371192;
         }
+
+
     }
 
     public double getTimeToday() {
@@ -88,7 +96,7 @@ public class StatsModel {
 
 
     public double getDistanceTotal() {
-        return timeTotal;
+        return distanceTotal;
     }
 
     public double getfuelByDistanceTotal() {

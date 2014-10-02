@@ -1,5 +1,6 @@
 package truckerboys.otto.stats;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import truckerboys.otto.R;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import utils.IView;
 
 
@@ -23,6 +25,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
     private View rootView;
     private StatsPresenter presenter;
+    private static final String SETTINGS = "Settings_file";
 
     // Todays stats
     private TextView timeToday;
@@ -96,16 +99,24 @@ public class StatsView extends Fragment implements IView, IEventListener{
      */
     public void update(double[] statsToday, double[] statsTotal, int violations) {
         // Sets todays stats
-        timeToday.setText(statsToday[0] + " min");
-        distanceToday.setText(statsToday[1] + " " + distanceUnit);
-        fuelToday.setText(statsToday[2] + " " + fuelUnit);
-        fuelByDistanceToday.setText(statsToday[3] + " " + fuelUnit + "/" + distanceUnit);
+        timeToday.setText(Math.floor(statsToday[0]*100)/100 + " min");
+        distanceToday.setText(Math.floor(statsToday[1]*100)/100 + " " + distanceUnit);
+        fuelToday.setText(Math.floor(statsToday[2]*100)/100 + " " + fuelUnit);
+        fuelByDistanceToday.setText(Math.floor(statsToday[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
 
         // Sets all.time stats
-        timeTotal.setText(statsTotal[0] + " min");
-        distanceTotal.setText(statsTotal[1] + " " + distanceUnit);
-        fuelTotal.setText(statsTotal[2] + " " + fuelUnit);
-        fuelByDistanceTotal.setText(statsTotal[3] + " " + fuelUnit + "/" + distanceUnit);
+        timeTotal.setText(Math.floor(statsTotal[0]*100)/100 + " min");
+        distanceTotal.setText(Math.floor(statsTotal[1]*100)/100 + " " + distanceUnit);
+        fuelTotal.setText(Math.floor(statsTotal[2]*100)/100 + " " + fuelUnit);
+        fuelByDistanceTotal.setText(Math.floor(statsTotal[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
+
+       /* fuelToday = Math.floor(fuelToday * 100)/100;
+        fuelTotal = Math.floor(fuelTotal * 100)/100;
+        distanceToday = Math.floor(distanceToday * 100)/100;
+        distanceTotal = Math.floor(distanceTotal * 100)/100;
+        fuelByDistanceToday = Math.floor(fuelByDistanceToday * 100)/100;
+        fuelByDistanceTotal = Math.floor(fuelByDistanceTotal * 100)/100;*/
+
 
         // Sets violations
         this.violations.setText("" + violations);
@@ -121,8 +132,16 @@ public class StatsView extends Fragment implements IView, IEventListener{
         return "Statistics";
     }
 
+
     @Override
     public void performEvent(Event event) {
-        //setUnits(view.getActivity().getSharedPreferences(SETTINGS, 0).getString("system", "metric"));
+        if(event.isType(SettingsChangedEvent.class)) {
+
+            // read from file and set String called system based on that
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(SETTINGS, 0).edit();
+
+            editor.putString("system", ((SettingsChangedEvent) event).getSystem());
+
+        }
     }
 }
