@@ -9,6 +9,7 @@
     android:background="@color/background_color"
     android:padding="15dp">
 
+
     <ScrollView
         android:id="@+id/ScrollView"
         android:scrollbars="none"

@@ -98,17 +98,39 @@ public class StatsView extends Fragment implements IView, IEventListener{
      * @param violations violations all-time
      */
     public void update(double[] statsToday, double[] statsTotal, int violations) {
-        // Sets todays stats
-        timeToday.setText(Math.floor(statsToday[0]*100)/100 + " min");
-        distanceToday.setText(Math.floor(statsToday[1]*100)/100 + " " + distanceUnit);
-        fuelToday.setText(Math.floor(statsToday[2]*100)/100 + " " + fuelUnit);
-        fuelByDistanceToday.setText(Math.floor(statsToday[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
 
-        // Sets all.time stats
-        timeTotal.setText(Math.floor(statsTotal[0]*100)/100 + " min");
-        distanceTotal.setText(Math.floor(statsTotal[1]*100)/100 + " " + distanceUnit);
-        fuelTotal.setText(Math.floor(statsTotal[2]*100)/100 + " " + fuelUnit);
-        fuelByDistanceTotal.setText(Math.floor(statsTotal[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
+        // Checks so TextViews isn't null when setting texts
+        if(timeToday != null) {
+            timeToday.setText(Math.floor(statsToday[0]*100)/100 + " min");
+        }
+
+        if(distanceToday != null) {
+            distanceToday.setText(Math.floor(statsToday[1]*100)/100 + " " + distanceUnit);
+        }
+
+        if(fuelToday != null) {
+            fuelToday.setText(Math.floor(statsToday[2]*100)/100 + " " + fuelUnit);
+        }
+
+        if(fuelByDistanceToday != null) {
+            fuelByDistanceToday.setText(Math.floor(statsToday[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
+        }
+
+        if(timeTotal != null) {
+            timeTotal.setText(Math.floor(statsTotal[0]*100)/100 + " min");
+        }
+
+        if(distanceTotal != null ){
+            distanceTotal.setText(Math.floor(statsTotal[1]*100)/100 + " " + distanceUnit);
+        }
+
+        if(fuelTotal != null) {
+            fuelTotal.setText(Math.floor(statsTotal[2]*100)/100 + " " + fuelUnit);
+        }
+
+        if(fuelByDistanceTotal != null) {
+            fuelByDistanceTotal.setText(Math.floor(statsTotal[3]*100)/100 + " " + fuelUnit + "/" + distanceUnit);
+        }
 
        /* fuelToday = Math.floor(fuelToday * 100)/100;
         fuelTotal = Math.floor(fuelTotal * 100)/100;
