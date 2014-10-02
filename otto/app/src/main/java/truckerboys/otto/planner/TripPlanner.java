@@ -1,10 +1,8 @@
 package truckerboys.otto.planner;
 
-import android.util.Log;
-
+import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.planner.positions.Location;
 
 public class TripPlanner {
@@ -26,10 +24,9 @@ public class TripPlanner {
      * @param finalDestination target location to drive to
      * @required the truck needs to be standing still
      */
-    public Route getNewRouteTo(Location finalDestination) {
-        //TODO Eineving remove hardcoding
+    public Route calculateRoute(Location startLocation, Location endLocation) {
         try {
-            return directionsProvider.getRoute(null, null);
+            return directionsProvider.getRoute(startLocation.getLatLng(), endLocation);
         } catch (Exception e) {
             e.printStackTrace();
         }

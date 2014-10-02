@@ -10,9 +10,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import com.google.android.gms.maps.model.LatLng;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
@@ -50,7 +48,9 @@ public class MapModel implements GooglePlayServicesClient.OnConnectionFailedList
         locationClient.requestLocationUpdates(locationRequest, this);
 
         //TODO Add a timer listener that does this every X second, if outside route. Calc new.
-        this.currentRoute = tripPlanner.getNewRouteTo(null);
+        this.currentRoute = tripPlanner.calculateRoute(
+                new truckerboys.otto.planner.positions.Location(new LatLng(57.688333, 11.979233)),
+                new truckerboys.otto.planner.positions.Location(new LatLng(58.009763, 11.817320)));
         //TODO Send old/new route instead of null
         eventTruck.newEvent(new NewRouteEvent(null, this.currentRoute));
     }
