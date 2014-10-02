@@ -17,7 +17,7 @@ public class Route {
     private int distance;
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
-    //private List<Location> checkpoints;
+    private ArrayList<Location> checkpoints;
 
     /**
      *
@@ -27,12 +27,14 @@ public class Route {
      * @param detailedPolyline polyline details (mush larger than overview)
      * @param distance distance to final destination in meters
      */
-    public Route(Location finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline, ArrayList<LatLng> detailedPolyline) {
+    public Route(Location finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
+                 ArrayList<LatLng> detailedPolyline, ArrayList<Location> checkpoints) {
         this.finalDestination = finalDestination;
         this.eta = eta;
         this.overviewPolyline = overviewPolyline;
         this.detailedPolyline = detailedPolyline;
         this.distance = distance;
+        this.checkpoints = checkpoints;
     }
 
     /**
@@ -73,5 +75,13 @@ public class Route {
      */
     public int getDistance() {
         return distance;
+    }
+
+    /**
+     * Get checkpoints for the route
+     * @return route checkpoints
+     */
+    public ArrayList<Location> getCheckpoints() {
+        return checkpoints;
     }
 }

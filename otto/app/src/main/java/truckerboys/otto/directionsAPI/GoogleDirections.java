@@ -58,7 +58,6 @@ public class GoogleDirections implements IDirections {
                                      RoutePreferences preferences, Location[] checkpoint) {
 
         //TODO Eineving redo method
-        /*
         String returnValue = "json?origin=" + currentPosition.latitude + "," + currentPosition.longitude +
                 "&destination=" + finalDestination.getLatLng().latitude + "," + finalDestination.getLatLng().longitude;
 
@@ -73,10 +72,10 @@ public class GoogleDirections implements IDirections {
         }
         returnValue += "&key=" + GOOGLE_KEY;
         Log.w("GoogleDirections", returnValue);
-        //return returnValue;
-*/
+        return returnValue;
+
         //TODO Eineving remove test hard coding
-        return "json?origin=Gothenburg&destination=Stockholm&key=AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
+        //return "json?origin=Gothenburg&destination=Stockholm&key=AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
     }
 
 

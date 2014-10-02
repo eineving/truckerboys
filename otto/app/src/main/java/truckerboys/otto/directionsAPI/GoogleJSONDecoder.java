@@ -14,7 +14,6 @@ import truckerboys.otto.planner.positions.Location;
  * @author Daniel Eineving
  */
 public class GoogleJSONDecoder {
-
     /**
      * Creates a route from a Google Direction JSON response
      *
@@ -28,11 +27,9 @@ public class GoogleJSONDecoder {
         Location finalDestination;
         Duration eta;
         int distance = 0;
-        String overviewPolyline = "";
-        String detailedPolyline = "";
-
-        ArrayList<Location> checkpoints = new ArrayList<Location>();
-        //ArrayList<LatLng> tempPositions = new ArrayList<LatLng>();
+        ArrayList<LatLng> overviewPolyline;
+        ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
+        ArrayList<Location> checkPoints = new ArrayList<Location>();
 
         //Creating a HashMap from from the whole response
         HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
@@ -77,23 +74,34 @@ public class GoogleJSONDecoder {
         }
         eta = new Duration(etaSeconds * 1000);
 
-        //Creating big polyline String
+        //Creating big polyline
         for (LinkedTreeMap<String, Object> step : allSteps) {
-            detailedPolyline += ((LinkedTreeMap<String, String>) step.get("polyline")).get("points");
+            for (LatLng temp : polylineDecoder(((LinkedTreeMap<String, String>) step.get("polyline")).get("points"))){
+                detailedPolyline.add(temp);
+            }
+        }
+        //Getting the overview polyline
+        overviewPolyline = polylineDecoder(((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points"));
+
+        //Getting checkpoints if there are any
+        if(allLegs.size() > 1){
+            for(LinkedTreeMap<String, Object> leg : allLegs){
+                LinkedTreeMap<String, Double> startLocation =
+                        (LinkedTreeMap<String, Double>) leg.get("start_location");
+                checkPoints.add(new Location(new LatLng(
+                        startLocation.get("lat"),startLocation.get("lng"))));
+            }
         }
 
-        //Getting the overview polyline
-        overviewPolyline = ((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points");
 
         //TODO remove printouts
         Log.w("finalDestination", finalDestination.getAddress());
         Log.w("ETA", eta.toStandardSeconds().getSeconds() + "");
-        Log.w("distance", distance + "");
-        Log.w("overviewPolyline", overviewPolyline);
-        Log.w("detailedPolyline", detailedPolyline);
+        Log.w("Distance", distance + "");
+        Log.w("CheckPoints", checkPoints.size() + "");
 
 
-        return new Route(finalDestination, eta, distance, polylineDecoder(overviewPolyline), polylineDecoder(detailedPolyline));
+        return new Route(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkPoints);
     }
 
     /**
