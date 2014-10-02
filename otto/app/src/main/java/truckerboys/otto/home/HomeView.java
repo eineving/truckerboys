@@ -1,5 +1,6 @@
 package truckerboys.otto.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import truckerboys.otto.R;
+import truckerboys.otto.RouteActivity;
 import utils.IView;
 
 /**
@@ -57,7 +59,10 @@ public class HomeView extends Fragment implements IView {
 
         newRouteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                //((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
+                getActivity().startActivity(newRouteIntent);
+
             }
         });
 
