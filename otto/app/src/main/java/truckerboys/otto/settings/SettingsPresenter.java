@@ -71,6 +71,10 @@ public class SettingsPresenter{
 
         settingsEditor.putBoolean("sound", b);
 
+        // if b == true call ((AudioManager)view.getActivity().this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        // if b == false call ((AudioManager)view.getActivity().this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
+
+
         // Commit the changes
         settingsEditor.commit();
     }

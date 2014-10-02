@@ -39,12 +39,14 @@ public class MainActivity extends FragmentActivity {
         slidingTabLayout.setViewPager(viewPager);
 
 
+        // Turns display properties (alive on/off) based on saved settings file
         if(getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
+        // Turns system sound on/off based on saved settings file
         if(getSharedPreferences(SETTINGS, 0).getBoolean("sound", true)) {
             ((AudioManager)this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         } else {
