@@ -5,11 +5,15 @@ import android.support.v4.app.Fragment;
 
 import truckerboys.otto.IPresenter;
 import truckerboys.otto.settings.SettingsView;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class StatsPresenter{
+public class StatsPresenter implements IEventListener {
     private StatsModel model;
 
     private StatsView view;
@@ -17,10 +21,13 @@ public class StatsPresenter{
     private String fuelUnit = "L";
 
     public static final String STATS = "Stats_file";
+    public static final String SETTINGS = "Settings_file";
 
     public StatsPresenter(StatsView view){
         this.view = view;
         this.model = new StatsModel();
+
+        EventTruck.getInstance().subscribe(this);
     }
 
     /**
@@ -92,4 +99,11 @@ public class StatsPresenter{
     }
 
 
+    @Override
+    public void performEvent(Event event) {
+        if(event.isType(SettingsChangedEvent.class)) {
+            //setUnits(view.getActivity().getSharedPreferences(SETTINGS, 0).getString("system", "metric"));
+
+        }
+    }
 }

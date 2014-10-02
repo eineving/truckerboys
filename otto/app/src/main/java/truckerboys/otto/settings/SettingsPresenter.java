@@ -9,6 +9,8 @@ import android.widget.Switch;
 import truckerboys.otto.IPresenter;
 import truckerboys.otto.MainActivity;
 import truckerboys.otto.R;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -58,6 +60,8 @@ public class SettingsPresenter{
         // Commit the changes
         settingsEditor.commit();
 
+        EventTruck.getInstance().newEvent(new SettingsChangedEvent());
+
     }
 
     /**
@@ -77,6 +81,8 @@ public class SettingsPresenter{
 
         // Commit the changes
         settingsEditor.commit();
+
+        EventTruck.getInstance().newEvent(new SettingsChangedEvent());
     }
 
     /**

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import truckerboys.otto.R;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
 import utils.IView;
 
 
@@ -17,7 +19,7 @@ import utils.IView;
  * Class for displaying statistics for the user.
  */
 
-public class StatsView extends Fragment implements IView {
+public class StatsView extends Fragment implements IView, IEventListener{
 
     private View rootView;
     private StatsPresenter presenter;
@@ -117,5 +119,10 @@ public class StatsView extends Fragment implements IView {
     @Override
     public String getName() {
         return "Statistics";
+    }
+
+    @Override
+    public void performEvent(Event event) {
+        //setUnits(view.getActivity().getSharedPreferences(SETTINGS, 0).getString("system", "metric"));
     }
 }
