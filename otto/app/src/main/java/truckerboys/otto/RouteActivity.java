@@ -2,7 +2,6 @@ package truckerboys.otto;
 
 import android.app.Activity;
 import android.content.ContentProvider;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -53,6 +51,7 @@ public class RouteActivity extends Activity implements IEventListener{
         EventTruck.getInstance().subscribe(this);
 
 
+        // Sets ui components
         resultsBox = (LinearLayout) findViewById(R.id.results_box);
         historyBox = (LinearLayout) findViewById(R.id.history_box);
         searchBox = (LinearLayout) findViewById(R.id.search_box);
@@ -76,8 +75,8 @@ public class RouteActivity extends Activity implements IEventListener{
         ArrayAdapter adapter = new ArrayAdapter
                 (this, android.R.layout.simple_list_item_1, array);
 
-        search.setAdapter(adapter);
 
+        search.setAdapter(adapter);
 
 
         // When the user selects an item from the drop-down menu
@@ -102,6 +101,7 @@ public class RouteActivity extends Activity implements IEventListener{
             public void onClick(View view) {
 
                 // TODO: Call Google Places API to get the destinations longitude and latitude
+                // TODO: send location for planning
                 System.out.println("*********DESTINATION: " + history1Text.getText() + "***********");
 
                 EventTruck.getInstance().newEvent(new NewDestination());
@@ -114,6 +114,7 @@ public class RouteActivity extends Activity implements IEventListener{
             public void onClick(View view) {
 
                 // TODO: Call Google Places API to get the destinations longitude and latitude
+                // TODO: send location for planning
                 System.out.println("*********DESTINATION: " + history2Text.getText() + "***********");
 
                 EventTruck.getInstance().newEvent(new NewDestination());
@@ -126,6 +127,7 @@ public class RouteActivity extends Activity implements IEventListener{
             public void onClick(View view) {
 
                 // TODO: Call Google Places API to get the destinations longitude and latitude
+                // TODO: send location for planning
                 System.out.println("*********DESTINATION: " + history3Text.getText() + "***********");
 
                 EventTruck.getInstance().newEvent(new NewDestination());
@@ -138,6 +140,7 @@ public class RouteActivity extends Activity implements IEventListener{
             public void onClick(View view) {
 
                 // TODO: Call Google Places API to get the destinations longitude and latitude
+                // TODO: send location for planning
                 System.out.println("*********DESTINATION: " + result.getText() + "***********");
 
                 EventTruck.getInstance().newEvent(new NewDestination());
@@ -147,6 +150,9 @@ public class RouteActivity extends Activity implements IEventListener{
         loadHistory();
     }
 
+    /**
+     * Method for loading latest destinations.
+     */
     public void loadHistory() {
         SharedPreferences history = getSharedPreferences(HISTORY,0);
     }
@@ -155,9 +161,9 @@ public class RouteActivity extends Activity implements IEventListener{
     public void performEvent(Event event) {
         if(event.isType(NewDestination.class)) {
 
-            // Sends user back to MainActivity after have chosen his destination
-            // Intent mainActivity = new Intent(this, MainActivity.class);
-            // startActivity(mainActivity);
+            // Sends user back to MainActivity after have chosen the destination
+            finish();
+
         }
     }
 }
