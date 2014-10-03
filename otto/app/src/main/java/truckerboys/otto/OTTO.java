@@ -3,25 +3,15 @@ package truckerboys.otto;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.clock.ClockModel;
-import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.clock.ClockView;
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.home.HomeModel;
-import truckerboys.otto.home.HomePresenter;
 import truckerboys.otto.home.HomeView;
-import truckerboys.otto.maps.MapModel;
-import truckerboys.otto.maps.MapPresenter;
 import truckerboys.otto.maps.MapView;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
-import truckerboys.otto.settings.SettingsModel;
-import truckerboys.otto.settings.SettingsPresenter;
 import truckerboys.otto.settings.SettingsView;
-import truckerboys.otto.stats.StatsModel;
-import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.stats.StatsView;
 import utils.IView;
 

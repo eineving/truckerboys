@@ -8,11 +8,12 @@ import org.joda.time.Duration;
 
 import java.util.List;
 
+import truckerboys.otto.utils.GoogleRequesterHandler;
 import truckerboys.otto.planner.positions.Location;
 
 
 public class GoogleDirections implements IDirections {
-    private DirectionsRequesterHandler requesterHandler;
+    private GoogleRequesterHandler requesterHandler;
 
     private static final String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/";
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
@@ -20,8 +21,8 @@ public class GoogleDirections implements IDirections {
     @Override
     public Route getRoute(LatLng currentPosition, Location finalDestination, RoutePreferences preferences,
                           Location... checkpoint) throws Exception {
-        String response = new DirectionsRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
-        return GoogleJSONDecoder.stringToRoute(response);
+        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+        return GoogleDirectionsJSONDecoder.stringToRoute(response);
     }
 
     @Override

@@ -13,7 +13,7 @@ import truckerboys.otto.planner.positions.Location;
  * Help class to decode a Google Direction JSON response
  * @author Daniel Eineving
  */
-public class GoogleJSONDecoder {
+public class GoogleDirectionsJSONDecoder {
     /**
      * Creates a route from a Google Direction JSON response
      *
