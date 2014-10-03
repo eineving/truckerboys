@@ -1,7 +1,9 @@
 package truckerboys.otto.settings;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.support.v4.app.Fragment;
 import android.widget.CompoundButton;
 import android.widget.Switch;
