@@ -3,7 +3,7 @@ package truckerboys.otto.planner;
 import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.Location;
 
 public class TripPlanner {
     private User user;

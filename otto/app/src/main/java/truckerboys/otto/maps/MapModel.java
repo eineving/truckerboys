@@ -4,12 +4,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
-import truckerboys.otto.planner.positions.Location;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.positions.Location;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.

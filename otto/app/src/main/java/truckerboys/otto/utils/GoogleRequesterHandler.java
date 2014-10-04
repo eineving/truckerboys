@@ -1,4 +1,4 @@
-package truckerboys.otto.directionsAPI;
+package truckerboys.otto.utils;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class DirectionsRequesterHandler extends AsyncTask<String, Void, String> {
+public class GoogleRequesterHandler extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {

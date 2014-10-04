@@ -4,9 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
 
-import java.util.List;
-
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.Location;
 
 /**
  * Interface to make project work with multiple mapAPIs
@@ -53,22 +51,6 @@ public interface IDirections {
      * @return a new route
      */
     public Route getRoute(LatLng currentPosition, Location finalDestination) throws Exception;
-
-    /**
-     * Get all gas stations that are on or close to the planned route
-     *
-     * @return a list of gas station close to the planned route
-     * @required that a final destination is set
-     */
-    public List<Location> getGasStationsAlongRoute() throws Exception;
-
-    /**
-     * Get all possible rest locations that are on or close to the planned route
-     *
-     * @return a list of rest locations close to the planned route
-     * @required that a final destination is set
-     */
-    public List<Location> getRestLocationsAlongRoute() throws Exception;
 
     /**
      * Get Estimated Time of Arrival to specified location without checkpoints
