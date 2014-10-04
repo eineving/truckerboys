@@ -147,4 +147,35 @@ public class GoogleDirectionsJSONDecoder {
 
         return poly;
     }
+
+    /**
+     * Creates a ETA duration from a Google Direction JSON response
+     * @param response Google Direction JSON
+     * @return ETA to requested location
+     */
+    public static Duration etaToDestination(String response) {
+        //Some shady typecasting here, take care when changing
+
+        //Creating a HashMap from from the whole response
+        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
+
+        //Making all routes into HashMaps
+        ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
+
+        ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
+        ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
+
+        //Combines all the legs to one common array
+        for (LinkedTreeMap<String, Object> route : routes) {
+            for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
+                allLegs.add(leg);
+        }
+
+        //Creating ETA
+        int etaSeconds = 0;
+        for (LinkedTreeMap<String, Object> leg : allLegs) {
+            etaSeconds +=  ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
+        }
+        return new Duration(etaSeconds * 1000);
+    }
 }

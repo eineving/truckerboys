@@ -55,8 +55,9 @@ public interface IDirections {
     /**
      * Get Estimated Time of Arrival to specified location without checkpoints
      *
-     * @param location that Estimated Time of Arrival is needed upon
+     * @param currentPosition current position of the device
+     * @param finalDestination that Estimated Time of Arrival is needed upon
      * @return Estimated Time of Arrival to target location without checkpoints
      */
-    public Duration getETA(Location location) throws Exception;
+    public Duration getETA(LatLng currentPosition, LatLng finalDestination) throws Exception;
 }

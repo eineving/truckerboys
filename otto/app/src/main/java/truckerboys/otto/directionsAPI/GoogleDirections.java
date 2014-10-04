@@ -19,7 +19,7 @@ public class GoogleDirections implements IDirections {
     @Override
     public Route getRoute(LatLng currentPosition, Location finalDestination, RoutePreferences preferences,
                           Location... checkpoint) throws Exception {
-        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination.getLatLng(), null, null)).get();
         return GoogleDirectionsJSONDecoder.stringToRoute(response);
     }
 
@@ -39,16 +39,16 @@ public class GoogleDirections implements IDirections {
     }
 
     @Override
-    public Duration getETA(Location location) throws Exception {
-        return null;
+    public Duration getETA(LatLng currentPosition, LatLng finalDestination) throws Exception {
+        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+        return GoogleDirectionsJSONDecoder.etaToDestination(response);
     }
 
-    private String jsonStringCreator(LatLng currentPosition, Location finalDestination,
+    private String jsonStringCreator(LatLng currentPosition, LatLng finalDestination,
                                      RoutePreferences preferences, Location[] checkpoint) {
 
-        //TODO Eineving redo method
         String returnValue = "json?origin=" + currentPosition.latitude + "," + currentPosition.longitude +
-                "&destination=" + finalDestination.getLatLng().latitude + "," + finalDestination.getLatLng().longitude;
+                "&destination=" + finalDestination.latitude + "," + finalDestination.longitude;
 
         if (checkpoint != null) {
             returnValue += "&waypoints=";
@@ -62,9 +62,6 @@ public class GoogleDirections implements IDirections {
         returnValue += "&key=" + GOOGLE_KEY;
         Log.w("GoogleDirections", returnValue);
         return returnValue;
-
-        //TODO Eineving remove test hard coding
-        //return "json?origin=Gothenburg&destination=Stockholm&key=AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
     }
 
 
