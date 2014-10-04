@@ -21,7 +21,7 @@ public class TripPlanner {
     /**
      * Calculates a new route for when the driver is not driving
      *
-     * @param finalDestination target location to drive to
+     * @param endLocation target location to drive to
      * @required the truck needs to be standing still
      */
     public Route calculateRoute(Location startLocation, Location endLocation) {

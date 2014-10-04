@@ -12,9 +12,18 @@ public interface IPlaces {
     /**
      * Get a suggested address (location) from a user input String
      * @param input user input
-     * @return suggestedAddresses
+     * @return suggested addresses
      */
     public List<String> getSuggestedAddresses(String input);
+
+    /**
+     *
+     * Get a suggested address (location) from a user input String
+     * @param input user input
+     * @param currentLocation location to focus the searches from
+     * @return suggested addresses
+     */
+    public List<String> getSuggestedAddresses(String input, Location currentLocation);
 
     /**
      * Get the closest rest locations to given position

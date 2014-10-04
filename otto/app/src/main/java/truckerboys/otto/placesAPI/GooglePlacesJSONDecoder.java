@@ -1,5 +1,7 @@
 package truckerboys.otto.placesAPI;
 
+import android.location.Location;
+
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -35,5 +37,13 @@ public class GooglePlacesJSONDecoder {
             decoded.add((String) prediction.get("description")) ;
         }
         return decoded;
+    }
+
+    public static ArrayList<Location> getGasStations(String encoded) {
+        return null;
+    }
+
+    public static ArrayList<Location> getRestLocations(String encoded) {
+        return null;
     }
 }

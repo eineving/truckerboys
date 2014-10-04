@@ -17,9 +17,23 @@ public class GooglePlaces implements IPlaces {
 
     @Override
     public List<String> getSuggestedAddresses(String input) {
-        //Creating a request string
-        String request = PLACES_URL;
+        return getSuggestedAddresses(input, null);
+    }
+
+    @Override
+    public List<String> getSuggestedAddresses(String input, Location currentLocation) {
         String response;
+
+        //Creating a request string
+        String request = PLACES_URL + "/autocomplete/json?input=" + input;
+
+        //Adding location to search from
+        if (currentLocation != null) {
+            request += "&location=" + currentLocation.getLatitude() + "," + currentLocation.getLongitude();
+        }
+
+        //Adding key ending to String
+        request += "&key=" + GOOGLE_KEY;
 
         try {
             response = new GoogleRequesterHandler().execute(request).get();
@@ -34,12 +48,42 @@ public class GooglePlaces implements IPlaces {
     }
 
     @Override
-    public ArrayList<Location> getNearbyRestLocations(LatLng position) {
+    public ArrayList<Location> getNearbyGasStations(LatLng position) {
+        String response;
+
+        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude +","+position.longitude+"&types=gas_station" + "&key=" + GOOGLE_KEY;
+
+        try {
+            response = new GoogleRequesterHandler().execute(request).get();
+            return GooglePlacesJSONDecoder.getGasStations(response);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
+
     @Override
-    public ArrayList<Location> getNearbyGasStations(LatLng position) {
+    public ArrayList<Location> getNearbyRestLocations(LatLng position) {
+        String response;
+
+        //TODO What types to search for?  https://developers.google.com/places/documentation/search
+        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude +","+position.longitude+"&types=parking" + "&key=" + GOOGLE_KEY;
+
+        try {
+            response = new GoogleRequesterHandler().execute(request).get();
+            return GooglePlacesJSONDecoder.getRestLocations(response);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         return null;
     }
+
+
 }

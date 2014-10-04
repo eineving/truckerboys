@@ -41,16 +41,6 @@ public class GoogleDirections implements IDirections {
     }
 
     @Override
-    public List<Location> getGasStationsAlongRoute() throws Exception {
-        return null;
-    }
-
-    @Override
-    public List<Location> getRestLocationsAlongRoute() throws Exception {
-        return null;
-    }
-
-    @Override
     public Duration getETA(Location location) throws Exception {
         return null;
     }

@@ -55,22 +55,6 @@ public interface IDirections {
     public Route getRoute(LatLng currentPosition, Location finalDestination) throws Exception;
 
     /**
-     * Get all gas stations that are on or close to the planned route
-     *
-     * @return a list of gas station close to the planned route
-     * @required that a final destination is set
-     */
-    public List<Location> getGasStationsAlongRoute() throws Exception;
-
-    /**
-     * Get all possible rest locations that are on or close to the planned route
-     *
-     * @return a list of rest locations close to the planned route
-     * @required that a final destination is set
-     */
-    public List<Location> getRestLocationsAlongRoute() throws Exception;
-
-    /**
      * Get Estimated Time of Arrival to specified location without checkpoints
      *
      * @param location that Estimated Time of Arrival is needed upon
