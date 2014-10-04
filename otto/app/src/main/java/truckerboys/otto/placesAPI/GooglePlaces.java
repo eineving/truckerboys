@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.RestLocation;
 import truckerboys.otto.utils.GoogleRequesterHandler;
 
 public class GooglePlaces implements IPlaces {
@@ -48,7 +50,7 @@ public class GooglePlaces implements IPlaces {
     }
 
     @Override
-    public ArrayList<Location> getNearbyGasStations(LatLng position) {
+    public ArrayList<GasStation> getNearbyGasStations(LatLng position) {
         String response;
 
         String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude +","+position.longitude+"&&radius=3000types=gas_station" + "&key=" + GOOGLE_KEY;
@@ -67,7 +69,7 @@ public class GooglePlaces implements IPlaces {
 
 
     @Override
-    public ArrayList<Location> getNearbyRestLocations(LatLng position) {
+    public ArrayList<RestLocation> getNearbyRestLocations(LatLng position) {
         String response;
 
         //TODO What types to search for?  https://developers.google.com/places/documentation/search

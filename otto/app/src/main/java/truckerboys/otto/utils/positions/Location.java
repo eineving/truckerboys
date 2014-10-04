@@ -1,4 +1,4 @@
-package truckerboys.otto.planner.positions;
+package truckerboys.otto.utils.positions;
 
 import com.google.android.gms.maps.model.LatLng;
 

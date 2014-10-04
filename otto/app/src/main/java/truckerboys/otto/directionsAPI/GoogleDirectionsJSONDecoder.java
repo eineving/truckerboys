@@ -7,7 +7,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.joda.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.Location;
 
 /**
  * Help class to decode a Google Direction JSON response

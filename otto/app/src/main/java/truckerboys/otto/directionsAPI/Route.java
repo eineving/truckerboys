@@ -6,7 +6,7 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.Location;
 
 /**
  * Created by Daniel on 2014-09-24.

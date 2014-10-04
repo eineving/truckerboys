@@ -6,10 +6,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
 
-import java.util.List;
-
 import truckerboys.otto.utils.GoogleRequesterHandler;
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.Location;
 
 
 public class GoogleDirections implements IDirections {

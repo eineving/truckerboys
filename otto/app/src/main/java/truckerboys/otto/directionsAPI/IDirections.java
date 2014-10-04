@@ -4,9 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
 
-import java.util.List;
-
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.Location;
 
 /**
  * Interface to make project work with multiple mapAPIs

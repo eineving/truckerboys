@@ -1,13 +1,15 @@
 package truckerboys.otto.placesAPI;
 
-import android.location.Location;
-
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
@@ -39,11 +41,40 @@ public class GooglePlacesJSONDecoder {
         return decoded;
     }
 
-    public static ArrayList<Location> getGasStations(String encoded) {
-        return null;
+    public static ArrayList<GasStation> getGasStations(String encoded) {
+        ArrayList<GasStation> decoded = new ArrayList<GasStation>();
+
+        //Creating a HashMap from from the whole response
+        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(encoded, HashMap.class);
+
+        //Making all results into HashMaps
+        ArrayList<LinkedTreeMap<String, Object>> results = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("results");
+
+        for(LinkedTreeMap<String, Object> location : results) {
+            LinkedTreeMap<String, Double> coordinate = (LinkedTreeMap<String, Double>)((LinkedTreeMap<String, Object>) location.get("geometry")).get("location");
+            LatLng position = new LatLng(coordinate.get("lat"), coordinate.get("lng"));
+            decoded.add(new GasStation(position,(String) location.get("name")));
+        }
+
+        return decoded;
     }
 
-    public static ArrayList<Location> getRestLocations(String encoded) {
-        return null;
+    public static ArrayList<RestLocation> getRestLocations(String encoded) {
+        ArrayList<RestLocation> decoded = new ArrayList<RestLocation>();
+
+        //Creating a HashMap from from the whole response
+        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(encoded, HashMap.class);
+
+        //Making all results into HashMaps
+        ArrayList<LinkedTreeMap<String, Object>> results = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("results");
+
+        for(LinkedTreeMap<String, Object> location : results) {
+            LinkedTreeMap<String, Double> coordinate = (LinkedTreeMap<String, Double>)((LinkedTreeMap<String, Object>) location.get("geometry")).get("location");
+            LatLng position = new LatLng(coordinate.get("lat"), coordinate.get("lng"));
+            ArrayList<String> types = (ArrayList<String>)location.get("types");
+            decoded.add(new RestLocation(position,(String) location.get("name"), types));
+        }
+
+        return decoded;
     }
 }

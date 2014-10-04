@@ -6,7 +6,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+
+import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 public interface IPlaces {
     /**
@@ -30,12 +32,12 @@ public interface IPlaces {
      * @param position target position to calculate from
      * @return rest locations nearby given positions
      */
-    public ArrayList<Location> getNearbyRestLocations(LatLng position);
+    public ArrayList<RestLocation> getNearbyRestLocations(LatLng position);
 
     /**
      * Get the closest gas stations to given position
      * @param position target position to calculate from
      * @return gas stations nearby given positions
      */
-    public ArrayList<Location> getNearbyGasStations(LatLng position);
+    public ArrayList<GasStation> getNearbyGasStations(LatLng position);
 }
