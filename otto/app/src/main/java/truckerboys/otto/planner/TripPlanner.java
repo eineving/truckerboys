@@ -18,12 +18,14 @@ public class TripPlanner {
     private IPlaces placesProvider;
     private MapLocation finalDestination;
 
+
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
         this.directionsProvider = directionsProvider;
         this.placesProvider = placesProvider;
         this.user = user;
     }
+
 
     /**
      * Calculate a new route based on a start location and end location provided

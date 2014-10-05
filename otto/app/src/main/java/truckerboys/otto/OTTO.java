@@ -52,6 +52,9 @@ public class OTTO {
         views.add(new StatsView());
     }
 
+    public TripPlanner getTripPlanner() {
+        return tripPlanner;
+    }
 
     public List<IView> getViews() {
         return views;

@@ -26,7 +26,7 @@ public class GooglePlaces implements IPlaces {
         String response;
 
         //Creating a request string
-        String request = PLACES_URL + "/autocomplete/json?input=" + input;
+        String request = PLACES_URL + "autocomplete/json?input=" + input;
 
         //Adding location to search from
         if (currentLocation != null) {

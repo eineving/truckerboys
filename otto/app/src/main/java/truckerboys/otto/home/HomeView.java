@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import truckerboys.otto.MainActivity;
+import truckerboys.otto.OTTO;
 import truckerboys.otto.R;
 import truckerboys.otto.RouteActivity;
 import utils.IView;
@@ -63,6 +65,7 @@ public class HomeView extends Fragment implements IView {
                 //((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
                 Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
                 getActivity().startActivity(newRouteIntent);
+
 
             }
         });

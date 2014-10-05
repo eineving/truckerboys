@@ -46,6 +46,10 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    public OTTO getOtto () {
+        return otto;
+    }
+
     @Override
     protected void onStop() {
         super.onStop();

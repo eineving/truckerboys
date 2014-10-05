@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.ContentProvider;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.method.KeyListener;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -17,9 +19,8 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import utils.PlacesAutoCompleteAdapter;
 import utils.SuggestionProvider;
-
-// import google places API
 
 /**
  * Created by Mikael Malmqvist on 2014-10-02.
@@ -40,17 +41,19 @@ public class RouteActivity extends Activity implements IEventListener{
     private RelativeLayout history2;
     private RelativeLayout history3;
 
-
     private ContentProvider suggestionProvider = new SuggestionProvider();
 
     public static final String HISTORY = "History_file";
+
+    public RouteActivity() {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.fragment_new_route);
         EventTruck.getInstance().subscribe(this);
-
 
         // Sets ui components
         resultsBox = (LinearLayout) findViewById(R.id.results_box);
@@ -67,18 +70,10 @@ public class RouteActivity extends Activity implements IEventListener{
         search = (AutoCompleteTextView) findViewById(R.id.search_text_view);
         result = (TextView) findViewById(R.id.result_text_view);
 
-        // This string should get street names from the places API
-        String[] array = {"Gibraltargatan 90, Göteborg", "Gibraltargatan 89, Göteborg", "Holland", "Sweden", "Afterlife", "Affection", "Ben Affleck", "Afterdeck", "Afflicted", "After party", "Afternoon", "Affirmative", "Affisherman", "Afraid", "Afghanistan", "Affe", "Africa", "Argentina", "Alpas", "Angustura Bitter", "Armenia", "Babylon", "Bulgaria", "USA", "Mexico", "Niger"};
 
-
-
-        // Or instead of array use google places list of places
-        ArrayAdapter adapter = new ArrayAdapter
-                (this, android.R.layout.simple_list_item_1, array);
-
-
-        search.setAdapter(adapter);
-
+        // Sets the adapter to our PlacesAutoCompleteAdapter which uses the TripPlanner class
+        // for getting the results
+        search.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_list_item_1));
 
         // When the user selects an item from the drop-down menu
         search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -95,6 +90,7 @@ public class RouteActivity extends Activity implements IEventListener{
 
             }
         });
+
 
         // When the user clicks the destination selected
         history1.setOnClickListener(new View.OnClickListener() {
