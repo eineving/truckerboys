@@ -1,6 +1,5 @@
 package truckerboys.otto.maps;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,13 +8,10 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import java.beans.PropertyChangeEvent;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
@@ -24,6 +20,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.positions.MapLocation;
 import utils.IView;
 
 /**
@@ -44,31 +41,51 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = super.onCreateView(inflater, container, savedInstanceState);
+        EventTruck.getInstance().subscribe(this);
 
+        //Get map from Google.
         googleMap = getMap();
-        //MapsInitializer.initialize(getActivity());
 
-        if(googleMap != null){ //Map is not null, modify freely.
+        //TODO Optimize this so that it doens't lagg every time we need to reload the map tab.
+        //If we could receive map from Google, modify freely to our needs.
+        if(googleMap != null){
+
+            //Set all gestures disabled, truckdriver shouldn't be able to move the map.
             googleMap.getUiSettings().setAllGesturesEnabled(false);
             googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+            //TODO Read from settings if the user wants Hybrid or Normal map type.
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+            //TODO Remove this and draw a custom marker on map at current location instead.
             googleMap.setMyLocationEnabled(true);
 
+            //Set default LatLng (0, 0), zoom, tilt and bearing.
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         }
 
-        mapPresenter = new MapPresenter(getActivity(), this.googleMap, this.tripPlanner);
-        EventTruck.getInstance().subscribe(this);
+        mapPresenter = new MapPresenter(this.tripPlanner);
 
         return rootView;
     }
 
+    @Override
+    public void performEvent(Event event) {
+        if(event.isType(LocationChangedEvent.class)){
+            adjustCamera(((LocationChangedEvent) event).getNewPosition());
+        }
+        if(event.isType(NewRouteEvent.class)){
+            NewRouteEvent routeEvent = (NewRouteEvent) event;
+            paintRoute(routeEvent.getNewRoute());
+        }
+    }
+
     /**
-     * Center and rotates the camera accordingly to longitude, latitude and bearing of location.
-     * @param location The location to adjust accordingly to.
+     * Adjust the camera position and bearing to match the location provided.
+     * @param location The location to adjust adjust accordingly to.
      */
-    public void centerAtPosition(Location location){
+    private void adjustCamera(MapLocation location){
         if(googleMap != null) {
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
@@ -80,8 +97,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         }
     }
 
-    public void paintRoute(Route route){
-        PolylineOptions polylineOptions = new PolylineOptions().addAll(route.getOverviewPolyline());
+    /**
+     * Paint the route provided to this views Google Map.
+     * @param route The route to paint.
+     */
+    private void paintRoute(Route route){
+        PolylineOptions polylineOptions = new PolylineOptions().addAll(route.getDetailedPolyline());
         googleMap.addPolyline(polylineOptions);
     }
 
@@ -95,22 +116,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         return "Map";
     }
 
-    public TripPlanner getTripPlanner() {
-        return tripPlanner;
-    }
-
     public void setTripPlanner(TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
-    }
-
-    @Override
-    public void performEvent(Event event) {
-        if(event.isType(LocationChangedEvent.class)){
-            centerAtPosition(((LocationChangedEvent) event).getNewPosition());
-        }
-        if(event.isType(NewRouteEvent.class)){
-            NewRouteEvent routeEvent = (NewRouteEvent) event;
-            paintRoute(routeEvent.getNewRoute());
-        }
     }
 }

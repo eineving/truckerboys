@@ -3,18 +3,18 @@ package truckerboys.otto;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
-
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
 
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
 public class MainActivity extends FragmentActivity {
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
+    private LocationHandler locationHandler;
     private OTTO otto;
 
     public static final String SETTINGS = "Settings_file";
@@ -27,6 +27,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         otto = new OTTO();
+        locationHandler = new LocationHandler(this);
 
         //Create standard view with a ViewPager and corresponding tabs.
         viewPager = (ViewPager) findViewById(R.id.pager);

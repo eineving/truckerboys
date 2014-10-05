@@ -8,14 +8,14 @@ import java.util.List;
 import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.MapLocation;
 
 public class TripPlanner {
     private User user;
     private IRegulationHandler regulationHandler;
     private IDirections directionsProvider;
 
-    private Location finalDestination;
+    private MapLocation finalDestination;
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, User user) {
         this.regulationHandler = regulationHandler;
@@ -24,17 +24,14 @@ public class TripPlanner {
     }
 
     /**
-     * Calculates a new route for when the driver is not driving
+     * Calculate a new route based on a start location and end location provided
+     *
+     * @param startLocation The location that the route should start from.
+     * @param endLocation   The location that the route should end at.
      */
-    public Route calculateRoute(Location startLocation, Location endLocation) {
+    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) {
         try {
-            Route route = directionsProvider.getRoute(startLocation.getLatLng(), endLocation);
-
-
-
-
-
-            return route;
+            return directionsProvider.getRoute(startLocation, endLocation);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,16 +41,17 @@ public class TripPlanner {
     /**
      * Calculates the optimal times to take a break depending on the ETA to the destination
      * and the driving regulations.
+     *
      * @param ETA The ETA to the final destination.
      * @return
      */
-    private List<Duration> getOptimalBreaks(Duration ETA){
+    private List<Duration> getOptimalBreaks(Duration ETA) {
         ArrayList<Duration> breaks = new ArrayList<Duration>();
 
         Duration legTL = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
         Duration totalTL = ETA;
 
-        while(ETA.isLongerThan(legTL)){
+        while (ETA.isLongerThan(legTL)) {
             breaks.add(legTL.minus(Duration.standardMinutes(10)));
             totalTL = totalTL.minus(legTL);
             // How do we predict the allowed time for future sessions
@@ -64,7 +62,6 @@ public class TripPlanner {
         //Should not only return times of the breaks but also the duration of the breaks.
         return breaks;
     }
-
 
 
 }

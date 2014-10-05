@@ -2,14 +2,9 @@ package truckerboys.otto.settings;
 
 
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.TextView;
 
-import truckerboys.otto.IPresenter;
-import truckerboys.otto.MainActivity;
-import truckerboys.otto.R;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 

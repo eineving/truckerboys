@@ -1,6 +1,6 @@
 package truckerboys.otto.utils.eventhandler.events;
 
-import android.location.Location;
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Simon Petersson on 2014-10-02.
@@ -8,27 +8,27 @@ import android.location.Location;
  * Represents an event that indicates that the device position has changed.
  */
 public class LocationChangedEvent extends Event {
-    private Location newPosition;
-    private Location oldPosition;
+    private MapLocation newPosition;
+    private MapLocation oldPosition;
 
-    public LocationChangedEvent(Location newPosition, Location oldPosition){
+    public LocationChangedEvent(MapLocation newPosition, MapLocation oldPosition){
         this.newPosition = newPosition;
         this.oldPosition = oldPosition;
     }
 
-    public Location getNewPosition() {
+    public MapLocation getNewPosition() {
         return newPosition;
     }
 
-    public void setNewPosition(Location newPosition) {
+    public void setNewPosition(MapLocation newPosition) {
         this.newPosition = newPosition;
     }
 
-    public Location getOldPosition() {
+    public MapLocation getOldPosition() {
         return oldPosition;
     }
 
-    public void setOldPosition(Location oldPosition) {
+    public void setOldPosition(MapLocation oldPosition) {
         this.oldPosition = oldPosition;
     }
 }

@@ -1,9 +1,5 @@
 package truckerboys.otto.maps;
 
-import android.content.Context;
-
-import com.google.android.gms.maps.GoogleMap;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -15,8 +11,8 @@ import truckerboys.otto.planner.TripPlanner;
 public class MapPresenter implements PropertyChangeListener {
     private MapModel mapModel;
 
-    public MapPresenter(Context context, GoogleMap googleMap, TripPlanner tripPlanner){
-        this.mapModel = new MapModel(context, googleMap, tripPlanner);
+    public MapPresenter(TripPlanner tripPlanner){
+        this.mapModel = new MapModel(tripPlanner);
     }
 
     @Override
