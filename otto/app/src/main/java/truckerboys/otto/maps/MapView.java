@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.LinkedList;
+
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
@@ -24,6 +26,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
 import utils.IView;
 
@@ -38,6 +41,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private Marker posMarker;
 
     private TripPlanner tripPlanner;
+
+    private int freq = 1; //The frequency of the updates;
+    private int index; //The step of the interpolation.
+
+    private LinkedList<Double2> positions = new LinkedList<Double2>();
+    private LinkedList<Float> bearings = new LinkedList<Float>();
 
     public MapView() {
 
@@ -110,14 +119,54 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     /**
      * Updates the marker for our current position.
-     * @param location The new location on which the device is.
+     * @requires to be updated once every 1/freq second to function properly.
      * @requires setupPositionMarker() has been called.
      */
-    private void updatePositionMarker(MapLocation location){
+    private void updatePositionMarker(){
         if(posMarker != null) { //Make sure we initiated posMaker in onCreateView
-            //TODO Interpolate both theese operations in order to make everything look awesomesauz.
-            posMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-            posMarker.setRotation(location.getBearing());
+
+
+            //We actually just need 2 bearings since we use linear interpolations but we require 3 so
+            //that the bearings and positions are synced.
+            if(positions.size() >= 3  && bearings.size() >= 3){
+
+                Double2 a = positions.get(0);
+                Double2 b = positions.get(1);
+                Double2 c = positions.get(2);
+
+                Double2 vecA = b.sub(a).div(freq);
+                Double2 vecB = c.sub(b).div(freq);
+
+                //The linear interpolations.
+                Double2 ab = a.add(vecA.mul(index));
+                Double2 bc = b.add(vecB.mul(index));
+
+                //The quadratic-interpolation
+                Double2 smooth = ab.add(bc.sub(ab).div(freq).mul(index));
+
+                posMarker.setPosition(new LatLng(smooth.getY(), smooth.getX()));
+
+
+                //Linear intepolation of the bearing.
+                float rot1 = bearings.get(0);
+                float rot2 = bearings.get(0);
+
+                float step = (rot2 - rot1) / freq;
+
+                float smoothBearing = rot1 + step * index;
+
+
+                posMarker.setRotation(smoothBearing);
+
+                index++;
+                index = index % freq;
+
+                if(index == 0){
+                    positions.removeFirst();
+                    bearings.removeFirst();
+
+                }
+            }
         }
     }
 
@@ -126,7 +175,9 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         if (event.isType(LocationChangedEvent.class)) {
             MapLocation newLocation = ((LocationChangedEvent) event).getNewPosition();
             adjustCamera(newLocation);
-            updatePositionMarker(newLocation);
+            positions.add(new Double2(newLocation.getLongitude(), newLocation.getLongitude()));
+            bearings.add(newLocation.getBearing());
+            updatePositionMarker();
         }
         if (event.isType(NewRouteEvent.class)) {
             NewRouteEvent routeEvent = (NewRouteEvent) event;
