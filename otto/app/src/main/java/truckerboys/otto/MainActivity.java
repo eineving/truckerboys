@@ -1,7 +1,5 @@
 package truckerboys.otto;
 
-import android.content.Context;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -46,18 +44,6 @@ public class MainActivity extends FragmentActivity {
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
-
-        // Turns system sound on/off based on saved settings file
-        if(getSharedPreferences(SETTINGS, 0).getBoolean("sound", true)) {
-            ((AudioManager)this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        } else {
-            ((AudioManager)this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        }
-
-
-
-        // Restore preferences from last session
-        // restorePreferences();
     }
 
     @Override

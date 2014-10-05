@@ -4,7 +4,7 @@ package truckerboys.otto.utils.eventhandler.events;
  * Created by root on 2014-10-02.
  */
 public class SettingsChangedEvent extends Event {
-    public static String system = "metric";
+    private static String system = "metric";
 
     public SettingsChangedEvent() {
 
@@ -17,5 +17,6 @@ public class SettingsChangedEvent extends Event {
     public String getSystem() {
         return system;
     }
+
 
 }

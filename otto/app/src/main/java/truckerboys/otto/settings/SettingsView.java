@@ -16,6 +16,7 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
 import utils.IView;
 
 /**
@@ -59,7 +60,16 @@ public class SettingsView extends Fragment implements IView, IEventListener {
         // Restores preferences for settings in presenter
         presenter.restorePreferences();
 
-        update(presenter.isSoundOn(), presenter.isDisplayActive());
+        int ringerMode = ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).getRingerMode();
+
+        // If ringerMode is set on Normal (1) set sound as true
+        boolean sound = (ringerMode == AudioManager.RINGER_MODE_NORMAL);
+
+
+        // Sets switch as checked if sound is on
+        soundSwitch.setChecked(sound);
+
+        update(sound, presenter.isDisplayActive());
         return rootView;
 
     }
@@ -73,6 +83,8 @@ public class SettingsView extends Fragment implements IView, IEventListener {
     public void update(boolean sound, boolean displayAlive) {
         soundSwitch.setChecked(sound);
         displaySwitch.setChecked(displayAlive);
+
+        performEvent(new SoundChangedEvent(sound));
     }
 
     @Override
@@ -88,6 +100,16 @@ public class SettingsView extends Fragment implements IView, IEventListener {
     @Override
     public void performEvent(Event event) {
 
+        if(event.isType(SoundChangedEvent.class)) {
+
+            // Checks if sound is on or off and sets systems sound based on this
+            if (((SoundChangedEvent)event).getSound()) {
+                ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            } else {
+                ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            }
+        }
+
         if(event.isType(SettingsChangedEvent.class)) {
 
             // Loads settings file
@@ -101,14 +123,6 @@ public class SettingsView extends Fragment implements IView, IEventListener {
                 getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
             }
-
-            // Toggles normal or silent mode for sound based on settings
-            if(settings.getBoolean("sound", true)) {
-                ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            } else {
-                ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            }
-
 
         }
     }
