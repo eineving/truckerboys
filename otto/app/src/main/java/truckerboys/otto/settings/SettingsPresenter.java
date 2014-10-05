@@ -4,10 +4,6 @@ package truckerboys.otto.settings;
 import android.content.SharedPreferences;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/soundSettingsFeature
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
