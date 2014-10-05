@@ -1,7 +1,5 @@
 package truckerboys.otto.stats;
 
-import java.text.DecimalFormat;
-
 import truckerboys.otto.driver.User;
 
 /**

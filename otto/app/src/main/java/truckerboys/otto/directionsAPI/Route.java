@@ -6,18 +6,18 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.planner.positions.Location;
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Daniel on 2014-09-24.
  */
 public class Route {
-    private Location finalDestination;
+    private MapLocation finalDestination;
     private Duration eta;
     private int distance;
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
-    private ArrayList<Location> checkpoints;
+    private ArrayList<MapLocation> checkpoints;
 
     /**
      *
@@ -27,8 +27,8 @@ public class Route {
      * @param detailedPolyline polyline details (mush larger than overview)
      * @param distance distance to final destination in meters
      */
-    public Route(Location finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
-                 ArrayList<LatLng> detailedPolyline, ArrayList<Location> checkpoints) {
+    public Route(MapLocation finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
+                 ArrayList<LatLng> detailedPolyline, ArrayList<MapLocation> checkpoints) {
         this.finalDestination = finalDestination;
         this.eta = eta;
         this.overviewPolyline = overviewPolyline;
@@ -41,7 +41,7 @@ public class Route {
      * Get target destination
      * @return target destination
      */
-    public Location getFinalDestination() {
+    public MapLocation getFinalDestination() {
         return finalDestination;
     }
 
@@ -81,7 +81,7 @@ public class Route {
      * Get checkpoints for the route
      * @return route checkpoints
      */
-    public ArrayList<Location> getCheckpoints() {
+    public ArrayList<MapLocation> getCheckpoints() {
         return checkpoints;
     }
 }

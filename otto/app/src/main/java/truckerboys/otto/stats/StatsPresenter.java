@@ -1,10 +1,7 @@
 package truckerboys.otto.stats;
 
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
 
-import truckerboys.otto.IPresenter;
-import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;

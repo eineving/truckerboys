@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationRequest;
 
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Simon Petersson on 2014-10-03.
@@ -27,7 +28,7 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
 
     private LocationClient locationClient;
 
-    private static Location currentLocation;
+    private static MapLocation currentLocation;
     private static boolean connected = false;
 
     public LocationHandler(Context context){
@@ -57,8 +58,8 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
     @Override
     public void onLocationChanged(Location location) {
         if(isMoreAccurate(location)) {
-            EventTruck.getInstance().newEvent(new LocationChangedEvent(location, getCurrentLocation()));
-            this.currentLocation = new Location(location);
+            EventTruck.getInstance().newEvent(new LocationChangedEvent(new MapLocation(location), getCurrentLocation()));
+            this.currentLocation = new MapLocation(location);
         }
     }
 
@@ -83,7 +84,7 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         return connected;
     }
 
-    public Location getCurrentLocation() {
+    public MapLocation getCurrentLocation() {
         return currentLocation;
     }
 }

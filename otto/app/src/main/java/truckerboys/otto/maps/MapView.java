@@ -1,6 +1,5 @@
 package truckerboys.otto.maps;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -25,6 +24,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.positions.MapLocation;
 import utils.IView;
 
 /**
@@ -70,8 +70,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * Adjust the camera position and bearing to match the location provided.
      * @param location The location to adjust adjust accordingly to.
      */
-    private void adjustCamera(Location location){
-        if(googleMap != null ) {
+    private void adjustCamera(MapLocation location){
+        if(googleMap != null) {
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
                             new LatLng(location.getLatitude(), location.getLongitude()),
@@ -113,7 +113,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * @param location The new location on which the device is.
      * @requires setupPositionMarker() has been called.
      */
-    private void updatePositionMarker(Location location){
+    private void updatePositionMarker(MapLocation location){
         if(posMarker != null) { //Make sure we initiated posMaker in onCreateView
             //TODO Interpolate both theese operations in order to make everything look awesomesauz.
             posMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
@@ -124,7 +124,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     @Override
     public void performEvent(Event event) {
         if (event.isType(LocationChangedEvent.class)) {
-            Location newLocation = ((LocationChangedEvent) event).getNewPosition();
+            MapLocation newLocation = ((LocationChangedEvent) event).getNewPosition();
             adjustCamera(newLocation);
             updatePositionMarker(newLocation);
         }

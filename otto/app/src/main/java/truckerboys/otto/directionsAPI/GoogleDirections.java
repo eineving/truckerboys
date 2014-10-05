@@ -2,69 +2,56 @@ package truckerboys.otto.directionsAPI;
 
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.joda.time.Duration;
 
-import java.util.List;
+import truckerboys.otto.utils.GoogleRequesterHandler;
+import truckerboys.otto.utils.positions.MapLocation;
 
-import truckerboys.otto.planner.positions.Location;
 
-
-public class GoogleDirections implements IDirections {
-    private DirectionsRequesterHandler requesterHandler;
+public class GoogleDirections implements IDirections{
+    private GoogleRequesterHandler requesterHandler;
 
     private static final String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/";
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
 
     @Override
-    public Route getRoute(LatLng currentPosition, Location finalDestination, RoutePreferences preferences,
-                          Location... checkpoint) throws Exception {
-        String response = new DirectionsRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
-        return GoogleJSONDecoder.stringToRoute(response);
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, RoutePreferences preferences,
+                          MapLocation... checkpoint) throws Exception {
+        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+        return GoogleDirectionsJSONDecoder.stringToRoute(response);
     }
 
     @Override
-    public Route getRoute(LatLng currentPosition, Location finalDestination, RoutePreferences preferences) throws Exception {
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, RoutePreferences preferences) throws Exception {
         return getRoute(currentPosition, finalDestination, preferences, null);
     }
 
     @Override
-    public Route getRoute(LatLng currentPosition, Location finalDestination, Location... checkpoint) throws Exception {
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, MapLocation... checkpoint) throws Exception {
         return getRoute(currentPosition, finalDestination, null, checkpoint);
     }
 
     @Override
-    public Route getRoute(LatLng currentPosition, Location finalDestination) throws Exception {
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination) throws Exception {
         return getRoute(currentPosition, finalDestination, null, null);
     }
 
     @Override
-    public List<Location> getGasStationsAlongRoute() throws Exception {
-        return null;
+    public Duration getETA(MapLocation currentPosition, MapLocation finalDestination) throws Exception {
+        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+        return GoogleDirectionsJSONDecoder.etaToDestination(response);
     }
 
-    @Override
-    public List<Location> getRestLocationsAlongRoute() throws Exception {
-        return null;
-    }
+    private String jsonStringCreator(MapLocation currentPosition, MapLocation finalDestination,
+                                     RoutePreferences preferences, MapLocation[] checkpoint) {
 
-    @Override
-    public Duration getETA(Location location) throws Exception {
-        return null;
-    }
-
-    private String jsonStringCreator(LatLng currentPosition, Location finalDestination,
-                                     RoutePreferences preferences, Location[] checkpoint) {
-
-        //TODO Eineving redo method
-        String returnValue = "json?origin=" + currentPosition.latitude + "," + currentPosition.longitude +
-                "&destination=" + finalDestination.getLatLng().latitude + "," + finalDestination.getLatLng().longitude;
+        String returnValue = "json?origin=" + currentPosition.getLatitude() + "," + currentPosition.getLongitude() +
+                "&destination=" + finalDestination.getLatitude() + "," + finalDestination.getLongitude();
 
         if (checkpoint != null) {
             returnValue += "&waypoints=";
             for (int i = 0; i < checkpoint.length; i++) {
-                returnValue += checkpoint[i].getLatLng().latitude + "," + checkpoint[i].getLatLng().longitude;
+                returnValue += checkpoint[i].getLatitude() + "," + checkpoint[i].getLongitude();
                 if (i != checkpoint.length - 1) {
                     returnValue += "|";
                 }
@@ -73,9 +60,6 @@ public class GoogleDirections implements IDirections {
         returnValue += "&key=" + GOOGLE_KEY;
         Log.w("GoogleDirections", returnValue);
         return returnValue;
-
-        //TODO Eineving remove test hard coding
-        //return "json?origin=Gothenburg&destination=Stockholm&key=AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
     }
 
 
