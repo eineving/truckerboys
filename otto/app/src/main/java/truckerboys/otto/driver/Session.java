@@ -79,9 +79,12 @@ public class Session {
      * PastSession extends session which adds this method, and takes a Session as a parameter to the constructor.
      * Thoughts?
      *
+     *
+     *
      * @return the end time of the session as an instant.
      */
     public Instant getEndTime() {
+        //TODO Do as described as above.
         return end;
     }
 }
