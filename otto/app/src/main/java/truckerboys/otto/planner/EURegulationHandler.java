@@ -14,17 +14,10 @@ public class EURegulationHandler implements IRegulationHandler {
 
     private final Duration ZERO_DURATION = new Duration(0);
 
-    private final Duration MAX_SESSION_LENGTH = Duration.standardMinutes(270);
+    private final Duration MAX_SESSION_LENGTH = Duration.standardHours(270);
 
-    private final Duration MAX_EXTENDED_SESSION_LENGTH = Duration.standardMinutes(330);
-
-    private final Duration MAX_DAY_LENGTH = Duration.standardMinutes(540);
-    private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardMinutes(600);
-
-    private final Duration STANDARD_DAY_EXTENSION = Duration.standardMinutes(60);
-
-    private final Duration STANDARD_DAILY_REST = Duration.standardMinutes(660);
-    private final Duration REDUCED_DAILY_REST = Duration.standardMinutes(540);
+    private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
+    private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardHours(6);
     private final Duration STANDARD_SESSION_BREAK = Duration.standardMinutes(45);
 
     @Override
@@ -47,16 +40,13 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getNextSessionTL(SessionHistory history) {
-        //TODO PEGELOW
         return null;
     }
 
     @Override
     public TimeLeft getThisDayTL(SessionHistory history) {
 
-        //TODO Take different dailybreaks to account
-
-        Duration timeSinceDailyBreak = history.getActiveTimeSinceBreakLongerThan(REDUCED_DAILY_REST);
+        Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
         Duration TL;
         Duration extendedTL = new Duration(ZERO_DURATION);
         Duration TLThisWeek = getThisWeekTL(history).getTimeLeft();
@@ -73,11 +63,15 @@ public class EURegulationHandler implements IRegulationHandler {
         //The same thing as above but do it as the max day is 10 hours and calculate the difference.
         if (history.getNumberOfExtendedDaysThisWeek() < 2) {
             //If you are allowed to take an extended day.
+
             extendedTL = MAX_DAY_LENGTH_EXTENDED.minus(timeSinceDailyBreak);
             extendedTL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : extendedTL);
 
             //Calculate the difference of the TL and the extendedTL which will be the net extended time.
             extendedTL = extendedTL.minus(TL);
+
+            //Avoid negative extendedTL
+            TL = (extendedTL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : extendedTL);
         }
 
         return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, extendedTL) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
