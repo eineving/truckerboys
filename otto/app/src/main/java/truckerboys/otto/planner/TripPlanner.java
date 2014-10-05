@@ -46,7 +46,7 @@ public class TripPlanner {
      * @param currentLocation location to focus the searches from
      * @return suggested addresses
      */
-    public Object getAddressSuggestion(String input, MapLocation currentLocation){
+    public List<String> getAddressSuggestion(String input, MapLocation currentLocation){
         return placesProvider.getSuggestedAddresses(input, currentLocation);
     }
 
@@ -56,7 +56,7 @@ public class TripPlanner {
      * @param input user input
      * @return suggested addresses
      */
-    public Object getAddressSuggestion(String input){
+    public List<String> getAddressSuggestion(String input){
         return placesProvider.getSuggestedAddresses(input);
     }
 
