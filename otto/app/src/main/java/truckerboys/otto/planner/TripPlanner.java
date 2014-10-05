@@ -8,18 +8,20 @@ import java.util.List;
 import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
+import truckerboys.otto.placesAPI.IPlaces;
 import truckerboys.otto.utils.positions.MapLocation;
 
 public class TripPlanner {
     private User user;
     private IRegulationHandler regulationHandler;
     private IDirections directionsProvider;
-
+    private IPlaces placesProvider;
     private MapLocation finalDestination;
 
-    public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, User user) {
+    public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
         this.directionsProvider = directionsProvider;
+        this.placesProvider = placesProvider;
         this.user = user;
     }
 
@@ -36,6 +38,26 @@ public class TripPlanner {
             e.printStackTrace();
         }
         return null;
+    }
+    /**
+     *
+     * Get a suggested address (location) from a user input String
+     * @param input user input
+     * @param currentLocation location to focus the searches from
+     * @return suggested addresses
+     */
+    public Object getAddressSuggestion(String input, MapLocation currentLocation){
+        return placesProvider.getSuggestedAddresses(input, currentLocation);
+    }
+
+    /**
+     *
+     * Get a suggested address (location) from a user input String
+     * @param input user input
+     * @return suggested addresses
+     */
+    public Object getAddressSuggestion(String input){
+        return placesProvider.getSuggestedAddresses(input);
     }
 
     /**

@@ -8,6 +8,7 @@ import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.home.HomeView;
 import truckerboys.otto.maps.MapView;
+import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
@@ -29,15 +30,15 @@ public class OTTO {
     private User user;
 
 
-    public OTTO(){
+    public OTTO() {
         regulationHandler = new EURegulationHandler();
         user = User.getInstance();
-        tripPlanner = new TripPlanner(regulationHandler,new GoogleDirections(),user);
+        tripPlanner = new TripPlanner(regulationHandler, new GoogleDirections(), new GooglePlaces(), user);
 
         createPresenters();
     }
 
-    private void createPresenters(){
+    private void createPresenters() {
         views.add(new HomeView());
 
         MapView mapView = new MapView();
@@ -52,12 +53,9 @@ public class OTTO {
     }
 
 
-    public List<IView> getViews(){
+    public List<IView> getViews() {
         return views;
     }
-
-
-
 
 
 }
