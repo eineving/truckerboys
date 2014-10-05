@@ -20,11 +20,9 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
-import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.GPSConnectedEvent;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
 import utils.IView;
@@ -105,7 +103,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
         posMarker = googleMap.addMarker(new MarkerOptions()
                 //TODO Create a better looking current position arrow.
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow))
                 .position(currentLocation)
                 .flat(true));
     }
