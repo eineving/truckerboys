@@ -10,15 +10,21 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.GPSConnectedEvent;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
 import utils.IView;
@@ -30,7 +36,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private View rootView;
     private GoogleMap googleMap;
     private MapPresenter mapPresenter;
-    private CameraPosition cameraPosition = new CameraPosition(new LatLng(0, 0), 16f, 50, 0);
+
+    private Marker posMarker;
 
     private TripPlanner tripPlanner;
 
@@ -46,39 +53,19 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         //Get map from Google.
         googleMap = getMap();
 
-        //TODO Optimize this so that it doens't lagg every time we need to reload the map tab.
         //If we could receive map from Google, modify freely to our needs.
         if(googleMap != null){
-
             //Set all gestures disabled, truckdriver shouldn't be able to move the map.
             googleMap.getUiSettings().setAllGesturesEnabled(false);
             googleMap.getUiSettings().setZoomControlsEnabled(true);
 
             //TODO Read from settings if the user wants Hybrid or Normal map type.
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-            //TODO Remove this and draw a custom marker on map at current location instead.
-            googleMap.setMyLocationEnabled(true);
-
-            //Set default LatLng (0, 0), zoom, tilt and bearing.
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
+            setupPositionMarker();
         }
 
         mapPresenter = new MapPresenter(this.tripPlanner);
-
         return rootView;
-    }
-
-    @Override
-    public void performEvent(Event event) {
-        if(event.isType(LocationChangedEvent.class)){
-            adjustCamera(((LocationChangedEvent) event).getNewPosition());
-        }
-        if(event.isType(NewRouteEvent.class)){
-            NewRouteEvent routeEvent = (NewRouteEvent) event;
-            paintRoute(routeEvent.getNewRoute());
-        }
     }
 
     /**
@@ -86,12 +73,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * @param location The location to adjust adjust accordingly to.
      */
     private void adjustCamera(Location location){
-        if(googleMap != null) {
+        if(googleMap != null ) {
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
                             new LatLng(location.getLatitude(), location.getLongitude()),
                             googleMap.getCameraPosition().zoom,
-                            cameraPosition.tilt,
+                            googleMap.getCameraPosition().tilt,
                             location.getBearing()
                     )));
         }
@@ -104,6 +91,49 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private void paintRoute(Route route){
         PolylineOptions polylineOptions = new PolylineOptions().addAll(route.getDetailedPolyline());
         googleMap.addPolyline(polylineOptions);
+    }
+
+    /**
+     * Setups the marker for our current position.
+     * @requires LocationHandler is connected.
+     */
+    private void setupPositionMarker(){
+        LatLng currentLocation = new LatLng(0,0);
+
+        //Set current position and default zoom, tilt and bearing.
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(currentLocation, 16f, 50, 0)));
+
+        posMarker = googleMap.addMarker(new MarkerOptions()
+                //TODO Create a better looking current position arrow.
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher))
+                .position(currentLocation)
+                .flat(true));
+    }
+
+    /**
+     * Updates the marker for our current position.
+     * @param location The new location on which the device is.
+     * @requires setupPositionMarker() has been called.
+     */
+    private void updatePositionMarker(Location location){
+        if(posMarker != null) { //Make sure we initiated posMaker in onCreateView
+            //TODO Interpolate both theese operations in order to make everything look awesomesauz.
+            posMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+            posMarker.setRotation(location.getBearing());
+        }
+    }
+
+    @Override
+    public void performEvent(Event event) {
+        if (event.isType(LocationChangedEvent.class)) {
+            Location newLocation = ((LocationChangedEvent) event).getNewPosition();
+            adjustCamera(newLocation);
+            updatePositionMarker(newLocation);
+        }
+        if (event.isType(NewRouteEvent.class)) {
+            NewRouteEvent routeEvent = (NewRouteEvent) event;
+            paintRoute(routeEvent.getNewRoute());
+        }
     }
 
     @Override
@@ -119,4 +149,5 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     public void setTripPlanner(TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
     }
+
 }
