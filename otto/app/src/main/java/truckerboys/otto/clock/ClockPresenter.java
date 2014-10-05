@@ -1,9 +1,6 @@
 package truckerboys.otto.clock;
 
-import org.joda.time.Duration;
-
 import java.util.ArrayList;
-import java.util.List;
 
 import truckerboys.otto.planner.TimeLeft;
 

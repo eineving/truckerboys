@@ -1,13 +1,17 @@
 package truckerboys.otto.directionsAPI;
 
 import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
+
 import org.joda.time.Duration;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import truckerboys.otto.utils.positions.Location;
+
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
@@ -24,12 +28,12 @@ public class GoogleDirectionsJSONDecoder {
      * @return a decoded Route
      */
     public static Route stringToRoute(String response) {
-        Location finalDestination;
+        MapLocation finalDestination;
         Duration eta;
         int distance = 0;
         ArrayList<LatLng> overviewPolyline;
         ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
-        ArrayList<Location> checkPoints = new ArrayList<Location>();
+        ArrayList<MapLocation> checkPoints = new ArrayList<MapLocation>();
 
         //Creating a HashMap from from the whole response
         HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
@@ -62,7 +66,7 @@ public class GoogleDirectionsJSONDecoder {
         LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
         LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
                 ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
-        finalDestination = new Location(coordinate);
+        finalDestination = new MapLocation(coordinate);
         finalDestination.setAddress((String) lastLeg.get("end_address"));
 
         //Creating ETA and distance
@@ -88,7 +92,7 @@ public class GoogleDirectionsJSONDecoder {
             for(LinkedTreeMap<String, Object> leg : allLegs){
                 LinkedTreeMap<String, Double> startLocation =
                         (LinkedTreeMap<String, Double>) leg.get("start_location");
-                checkPoints.add(new Location(new LatLng(
+                checkPoints.add(new MapLocation(new LatLng(
                         startLocation.get("lat"),startLocation.get("lng"))));
             }
         }

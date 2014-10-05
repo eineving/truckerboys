@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Class representing a rest location
  */
-public class RestLocation extends Location{
+public class RestLocation extends MapLocation {
     private List<String> type;
     private String name;
 

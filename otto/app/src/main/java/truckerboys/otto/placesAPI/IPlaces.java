@@ -1,13 +1,12 @@
 package truckerboys.otto.placesAPI;
 
-import android.location.Location;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
 public interface IPlaces {
@@ -25,7 +24,7 @@ public interface IPlaces {
      * @param currentLocation location to focus the searches from
      * @return suggested addresses
      */
-    public List<String> getSuggestedAddresses(String input, Location currentLocation);
+    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation);
 
     /**
      * Get the closest rest locations to given position

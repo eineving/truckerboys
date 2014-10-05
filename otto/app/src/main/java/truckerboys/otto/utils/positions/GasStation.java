@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * Representing a gas station
  */
-public class GasStation extends Location {
+public class GasStation extends MapLocation {
     private String name;
 
     /**

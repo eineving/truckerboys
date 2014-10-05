@@ -1,10 +1,5 @@
 package truckerboys.otto.driver;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import truckerboys.otto.data.TimeBank;
-
 /**
  * Created by Martin on 17/09/2014.
  * This class is singleton.

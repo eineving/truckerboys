@@ -1,6 +1,5 @@
 package truckerboys.otto.maps;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,6 +20,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.positions.MapLocation;
 import utils.IView;
 
 /**
@@ -85,7 +85,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * Adjust the camera position and bearing to match the location provided.
      * @param location The location to adjust adjust accordingly to.
      */
-    private void adjustCamera(Location location){
+    private void adjustCamera(MapLocation location){
         if(googleMap != null) {
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(

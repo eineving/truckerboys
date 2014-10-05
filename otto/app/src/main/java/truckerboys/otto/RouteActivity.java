@@ -12,13 +12,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-// import google places API
 
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.NewDestination;
 import utils.SuggestionProvider;
+
+// import google places API
 
 /**
  * Created by Mikael Malmqvist on 2014-10-02.

@@ -9,7 +9,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
-import truckerboys.otto.utils.positions.Location;
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -24,8 +24,8 @@ public class MapModel implements IEventListener{
         //TODO Remove this and instead receive new route from RouteActivity.
         if(currentRoute == null){
             currentRoute = this.tripPlanner.calculateRoute(
-                    new Location(new LatLng(57.6878618, 11.9777905)), //Start location
-                    new Location(new LatLng(59.326142, 17.9875455)) //End location
+                    new MapLocation(new LatLng(57.6878618, 11.9777905)), //Start location
+                    new MapLocation(new LatLng(59.326142, 17.9875455)) //End location
             );
             EventTruck.getInstance().newEvent(new NewRouteEvent(currentRoute, currentRoute));
         }

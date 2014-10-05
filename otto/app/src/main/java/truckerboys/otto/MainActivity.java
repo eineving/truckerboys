@@ -3,8 +3,6 @@ package truckerboys.otto;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
-
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.WindowManager;

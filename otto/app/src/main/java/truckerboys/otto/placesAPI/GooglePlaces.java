@@ -1,16 +1,15 @@
 package truckerboys.otto.placesAPI;
 
-import android.location.Location;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import truckerboys.otto.utils.positions.GasStation;
-import truckerboys.otto.utils.positions.RestLocation;
 import truckerboys.otto.utils.GoogleRequesterHandler;
+import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 public class GooglePlaces implements IPlaces {
     private static final String PLACES_URL = "https://maps.googleapis.com/maps/api/place/";
@@ -23,7 +22,7 @@ public class GooglePlaces implements IPlaces {
     }
 
     @Override
-    public List<String> getSuggestedAddresses(String input, Location currentLocation) {
+    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation) {
         String response;
 
         //Creating a request string
