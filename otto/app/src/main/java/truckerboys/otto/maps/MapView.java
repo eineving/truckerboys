@@ -2,7 +2,10 @@ package truckerboys.otto.maps;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,11 +51,20 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private RouteDetail currentDetail = RouteDetail.DETAILED;
     private static final float DETAILED_ZOOM_ABOVE = 10;
 
-    private int freq = 1; //The frequency of the updates;
+
+    private int gps_freq = 500; // The frequency of gps updates.
+    private int freq = 25; //The frequency of the interpolation.
     private int index; //The step of the interpolation.
 
     private LinkedList<Double2> positions = new LinkedList<Double2>();
     private LinkedList<Float> bearings = new LinkedList<Float>();
+
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
+    private Runnable updatePos = new Runnable() {
+        public void run() {
+            updatePositionMarker();
+        }
+    };
 
     public MapView() {
 
@@ -109,16 +121,47 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     }
 
     /**
+     * Paint the route provided to this views Google Map.
+     * @param route The route to paint.
+     */
+    private void paintRoute(Route route){
+        PolylineOptions polylineOptions = new PolylineOptions().addAll(route.getDetailedPolyline());
+        googleMap.addPolyline(polylineOptions);
+    }
+
+    /**
+     * Setups the marker for our current position.
+     * @requires LocationHandler is connected.
+     */
+    private void setupPositionMarker(){
+        LatLng currentLocation = new LatLng(0,0);
+
+        //Set current position and default zoom, tilt and bearing.
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(currentLocation, 16f, 50, 0)));
+
+        positionMarker = googleMap.addMarker(new MarkerOptions()
+                //TODO Create a better looking current position arrow.
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow))
+                .position(currentLocation)
+                .flat(true));
+
+        updatePos.run();
+    }
+
+    /**
      * Updates the marker for our current position.
      * @requires to be updated once every 1/freq second to function properly.
      * @requires setupPositionMarker() has been called.
      */
-    private void updatePositionMarker() {
-        if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
+
+    private void updatePositionMarker(){
+        Log.w("MAP", "index = " + index);
+        if(positionMarker != null) { //Make sure we initiated posMaker in onCreateView
+
 
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
-            if (positions.size() >= 3 && bearings.size() >= 3) {
+            if(positions.size() >= 3){
 
                 Double2 a = positions.get(0);
                 Double2 b = positions.get(1);
@@ -134,12 +177,13 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
                 //The quadratic-interpolation
                 Double2 smooth = ab.add(bc.sub(ab).div(freq).mul(index));
 
-                positionMarker.setPosition(new LatLng(smooth.getY(), smooth.getX()));
+
+                positionMarker.setPosition(new LatLng(smooth.getX(), smooth.getY()));
 
 
                 //Linear intepolation of the bearing.
                 float rot1 = bearings.get(0);
-                float rot2 = bearings.get(0);
+                float rot2 = bearings.get(2);
 
                 float step = (rot2 - rot1) / freq;
 
@@ -147,13 +191,20 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
                 positionMarker.setRotation(smoothBearing);
 
+
+
+
+
                 index++;
                 index = index % freq;
 
-                if (index == 0) {
+                if(index == 0){
+                    //Since we interpolate over 3 values the first 2 has been used when we reach the third.
                     positions.removeFirst();
-                    bearings.removeFirst();
+                    positions.removeFirst();
 
+                    bearings.removeFirst();
+                    bearings.removeFirst();
                 }
 
                 updateCamera(positionMarker.getPosition(), positionMarker.getRotation());
@@ -179,15 +230,17 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
                 currentDetail = RouteDetail.OVERVIEW;
             }
         }
+
+        updateHandler.postDelayed(updatePos,gps_freq/freq);
     }
 
     @Override
     public void performEvent(Event event) {
+
         if (event.isType(GPSUpdateEvent.class)) {
             MapLocation newLocation = ((GPSUpdateEvent) event).getNewPosition();
-            positions.add(new Double2(newLocation.getLongitude(), newLocation.getLongitude()));
+            positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
-            updatePositionMarker();
         }
         if(event.isType(NewRouteEvent.class)) {
             updateRoutePolyline(((NewRouteEvent) event).getNewRoute(), googleMap.getCameraPosition().zoom);
