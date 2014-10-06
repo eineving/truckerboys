@@ -21,6 +21,7 @@ public class SessionHistory {
     private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
     private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
 
+    private final Instant NO_RECORD_FOUND = new Instant(0);
 
     /**
      * The list of past sessions, sorted with the last session first.
@@ -126,8 +127,8 @@ public class SessionHistory {
 
             }
             //Look for the start of the week.
-            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime())) {
-                //getLatestWeeklyRestEndTime might return null but that should be okay.
+            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime()) ||
+                    sessions.get(i).getStartTime().isBefore(getLatestWeeklyRestEndTime())) {
 
                 //check the total time of the previous day (the first day that week) and terminate.
                 if (time.isLongerThan(STANDARD_DAY_SESSION)) {
@@ -182,6 +183,70 @@ public class SessionHistory {
     }
 
     /**
+     * Returns the instant of which the last daily break or break with interchangeable properties ended.
+     * <p/>
+     * All rest longer than a daily rest can due to regulations replace a daily rest.
+     * So the last daily break isn't necessarily a standard daily break.
+     * If it is the beginning of the week the method will return the last weekly rest.
+     * <p/>
+     * If there have been no valid weekly breaks the method will return epoch.
+     *
+     * @return the instant of the last daily break end.
+     */
+    public Instant getLatestDailyRestEndTime() {
+
+        //Find a dailybreak and return the end time.
+        //If its a break longer than 11h no further actions is needed
+        //but if its reduced (9h) we need to check that its valid.
+
+        Duration dailyRest;
+
+        //Find the two previous daily rest, normal or reduced.
+        //Check which if the first one is normal or reduced.
+        for (int i = 0; i < sessions.size() - 1; i++) {
+            dailyRest = new Duration(sessions.get(i + 1).getEndTime(), sessions.get(i).getStartTime());
+            if (dailyRest.isLongerThan(REDUCED_DAILY_REST)) {
+
+                //The last rest found, check if its Standard or longer.
+                if (dailyRest.isLongerThan(STANDARD_DAILY_REST)) {
+                    return sessions.get(i).getStartTime();
+                } else {
+                    //if its not, its a reduced one, check if its valid.
+                    //simply check how many reduced already occurred this week.
+                    if (getNumberOfReducedDailyRestsThisWeek() < 2) {
+                        return sessions.get(i).getStartTime();
+                    } else {
+                        //if its not valid we need to find the last valid one.
+
+                        int validReducedBreakIn = getNumberOfReducedDailyRestsThisWeek() - 2;
+                        for (int j = i + 1; j < sessions.size() - 1; j++) {
+                            //Find the next break, if its a normal one then return that.
+                            //If its not continue until we find one or until we find the last valid reduced on.
+                            //TODO: Catch violation?
+
+                            dailyRest = new Duration(sessions.get(j + 1).getEndTime(), sessions.get(j).getStartTime());
+                            if (dailyRest.isLongerThan(STANDARD_DAILY_REST)) {
+                                return sessions.get(j).getStartTime();
+                            } else {
+                                //
+                                validReducedBreakIn--;
+                                if (validReducedBreakIn == 0) {
+                                    //last valid reduced break found
+                                    return sessions.get(j).getStartTime();
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+        //No valid daily break found
+        return NO_RECORD_FOUND;
+    }
+
+    /**
      * Returns the instant of which the last weekly break ended.
      * If there have been no valid weekly breaks the method will return epoch.
      *
@@ -207,11 +272,11 @@ public class SessionHistory {
 
                         //If the first is a normal then no further actions is needed.
                         if (weeklyRest1.isLongerThan(STANDARD_WEEKLY_REST)) {
-                            return new Instant(sessions.get(i + 1).getEndTime());
+                            return new Instant(sessions.get(i).getStartTime());
                         }
                         //if its not but second one is no further actions is needed.
                         else if (weeklyRest2.isLongerThan(STANDARD_WEEKLY_REST)) {
-                            return new Instant(sessions.get(i + 1).getEndTime());
+                            return new Instant(sessions.get(i).getStartTime());
                         } else {
                             //Both the two contended rests are reduced ones and there for weeklyRest1 is not valid .
                             //Should only happen if the driver chooses to ignore the app.
@@ -224,23 +289,14 @@ public class SessionHistory {
                 }
                 //Only one rest found or only one valid.
                 //return that one.
-                return new Instant(sessions.get(i + 1).getEndTime());
+                return new Instant(sessions.get(i).getStartTime());
             }
         }
         //No weekly rests found
-        //return epoch TODO: Thing about this a bit more, don't forget javadoc.
-        return new Instant(0);
+        //return epoch, think about this a bit more, don't forget javadoc.
+        return NO_RECORD_FOUND;
     }
-    /**
-     * Returns the instant of which the last daily break ended.
-     *
-     * @return the instant of the last daily break end.
-     */
-    public Instant getLatestDailyRestEndTime() {
-        //TODO: implement
 
-        return null;
-    }
 
     /**
      * Returns the total driving time since the last daily break.
