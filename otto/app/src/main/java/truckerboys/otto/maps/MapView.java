@@ -44,8 +44,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private MapPresenter mapPresenter;
     private TripPlanner tripPlanner;
 
+    //Default to detailed route, since zoom default is 16f.
     private RouteDetail currentDetail = RouteDetail.DETAILED;
-
     private static final float DETAILED_ZOOM_ABOVE = 10;
 
     private int freq = 1; //The frequency of the updates;
@@ -96,7 +96,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * Adjust the camera position and bearing to match the location provided.
      * @param location The location to adjust adjust accordingly to.
      */
-    private void adjustCamera(LatLng location, float bearing){
+    private void updateCamera(LatLng location, float bearing){
         if(googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
@@ -156,7 +156,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
                 }
 
-                adjustCamera(positionMarker.getPosition(), positionMarker.getRotation());
+                updateCamera(positionMarker.getPosition(), positionMarker.getRotation());
             }
         }
     }
@@ -165,15 +165,16 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * Paint the route provided to this views Google Map.
      * @param route The route to paint.
      */
-    private void updateRoutePolyline(Route route, RouteDetail detail){
+    private void updateRoutePolyline(Route route, float zoomLevel){
+        //Check what detail level we want based on Zoom amount.
+        RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
+
         //If change level of detail or route was never set.
-        System.out.println("currentDetail: " + currentDetail);
-        System.out.println("detail: " + detail);
         if(currentDetail != detail || currentRoutePolyline.getPoints().size() < 1) {
             if (detail == RouteDetail.DETAILED) {
                 currentRoutePolyline.setPoints(route.getDetailedPolyline());
                 currentDetail = RouteDetail.DETAILED;
-            } else if (detail == RouteDetail.OVERVIEW) {
+            } else {
                 currentRoutePolyline.setPoints(route.getOverviewPolyline());
                 currentDetail = RouteDetail.OVERVIEW;
             }
@@ -188,8 +189,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             bearings.add(newLocation.getBearing());
             updatePositionMarker();
         }
-        if(event.isType(NewRouteEvent.class)){
-            updateRoutePolyline(((NewRouteEvent) event).getNewRoute(), currentDetail);
+        if(event.isType(NewRouteEvent.class)) {
+            updateRoutePolyline(((NewRouteEvent) event).getNewRoute(), googleMap.getCameraPosition().zoom);
         }
     }
 
@@ -207,17 +208,9 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         this.tripPlanner = tripPlanner;
     }
 
-    private RouteDetail calcRouteDetail(float zoomLevel){
-        return (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
-    }
-
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        if(calcRouteDetail(cameraPosition.zoom) == RouteDetail.DETAILED) {
-            updateRoutePolyline(mapPresenter.getCurrentRoute(), RouteDetail.DETAILED);
-        } else {
-            updateRoutePolyline(mapPresenter.getCurrentRoute(), RouteDetail.OVERVIEW);
-        }
+        updateRoutePolyline(mapPresenter.getCurrentRoute(), cameraPosition.zoom);
     }
 }
 

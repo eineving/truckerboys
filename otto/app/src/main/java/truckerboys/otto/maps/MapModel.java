@@ -38,7 +38,7 @@ public class MapModel implements IEventListener{
             //TODO Check if outside current route, calculate new route.
         }
         if(event.isType(NewRouteEvent.class)) {
-
+            currentRoute = ((NewRouteEvent) event).getNewRoute();
         }
     }
 
