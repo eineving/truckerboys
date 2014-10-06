@@ -1,20 +1,22 @@
 package truckerboys.otto.maps;
 
-import android.app.Activity;
-import android.location.Address;
-import android.location.Geocoder;
-
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
-import truckerboys.otto.OTTO;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.NewDestination;
-import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
@@ -22,36 +24,44 @@ import truckerboys.otto.utils.positions.MapLocation;
  */
 public class MapModel implements IEventListener{
     private TripPlanner tripPlanner;
-    private Route currentRoute;
+    private Route originalRoute;
+    private EventTruck eventTruck = EventTruck.getInstance();
 
-    public MapModel(TripPlanner tripPlanner) {
+    public MapModel(final TripPlanner tripPlanner, GoogleMap googleMap) {
         this.tripPlanner = tripPlanner;
+        eventTruck.subscribe(this);
 
-        //TODO Remove this and instead receive new route from RouteActivity.
-        if(currentRoute == null){
-            currentRoute = this.tripPlanner.calculateRoute(
-                    new MapLocation(new LatLng(57.6878618, 11.9777905)), //Start location
-                    new MapLocation(new LatLng(59.326142, 17.9875455)) //End location
-            );
-            EventTruck.getInstance().newEvent(new NewRouteEvent(currentRoute, currentRoute));
-        }
+        Runnable updateRoute = new Runnable() {
+            @Override
+            public void run() {
+                if(LocationHandler.isConnected()) {
+                    eventTruck.newEvent(new UpdatedRouteEvent(
+                                    tripPlanner.calculateRoute(LocationHandler.getCurrentLocation(),
+                                    originalRoute.getFinalDestination()
+                                    )));
+                }
+            }
+        };
+        ScheduledThreadPoolExecutor routeExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+        routeExecutor.scheduleWithFixedDelay(updateRoute, 0, 30, TimeUnit.SECONDS);
     }
-
 
     @Override
     public void performEvent(Event event) {
-        if(event.isType(LocationChangedEvent.class)){
+        if(event.isType(GPSUpdateEvent.class)) {
             //TODO Check if outside current route, calculate new route.
         }
-
         if(event.isType(NewDestination.class)) {
-            currentRoute = tripPlanner.calculateRoute(
+            originalRoute = tripPlanner.calculateRoute(
                     new MapLocation(new LatLng(57.6878618, 11.9777905)), //Start location
-                    new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(), ((NewDestination) event).getLocation().getLongitude())) //End location
+                    new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
+                            ((NewDestination) event).getLocation().getLongitude())) //End location
             );
-
-            System.out.println("*************" + currentRoute.toString());
-            EventTruck.getInstance().newEvent(new NewRouteEvent(currentRoute, currentRoute));
+            EventTruck.getInstance().newEvent(new ChangedRouteEvent(originalRoute));
         }
+    }
+
+    public Route getOriginalRoute(){
+        return originalRoute;
     }
 }

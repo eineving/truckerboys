@@ -1,22 +1,21 @@
 package truckerboys.otto.maps;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import com.google.android.gms.maps.GoogleMap;
 
+import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapPresenter implements PropertyChangeListener {
+public class MapPresenter {
     private MapModel mapModel;
 
-    public MapPresenter(TripPlanner tripPlanner){
-        this.mapModel = new MapModel(tripPlanner);
+    public MapPresenter(TripPlanner tripPlanner, GoogleMap googleMap){
+        this.mapModel = new MapModel(tripPlanner, googleMap);
     }
 
-    @Override
-    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-
+    public Route getOriginalRoute(){
+        return mapModel.getOriginalRoute();
     }
 }

@@ -32,6 +32,12 @@ public class MainActivity extends FragmentActivity {
         pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), otto.getViews());
         viewPager.setAdapter(pagerAdapter);
 
+        /*
+         * Make sure we never have to reload any of the tabs after the app has been started.
+         * This makes the users interaction experience with the app alot smoother.
+         */
+        viewPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
+
 
         //Use Googles 'SlidingTabLayout' to display tabs for all views.
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
