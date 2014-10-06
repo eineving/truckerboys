@@ -49,13 +49,8 @@ public class MapModel implements IEventListener{
                 }
             }
         };
-        ScheduledThreadPoolExecutor routeExecutor = (ScheduledThreadPoolExecutor)
-                                                    Executors.newScheduledThreadPool(1)
-                                                            .scheduleWithFixedDelay(
-                                                                    updateRoute,
-                                                                    0,
-                                                                    30,
-                                                                    TimeUnit.SECONDS);
+        ScheduledThreadPoolExecutor routeExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+        routeExecutor.scheduleWithFixedDelay(updateRoute, 0, 30, TimeUnit.SECONDS);
     }
 
     @Override

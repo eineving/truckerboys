@@ -100,6 +100,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             currentRoutePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.BLUE));
         }
 
+        updatePos.run();
         mapPresenter = new MapPresenter(this.tripPlanner, googleMap);
         return rootView;
     }
@@ -121,41 +122,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     }
 
     /**
-     * Paint the route provided to this views Google Map.
-     * @param route The route to paint.
-     */
-    private void paintRoute(Route route){
-        PolylineOptions polylineOptions = new PolylineOptions().addAll(route.getDetailedPolyline());
-        googleMap.addPolyline(polylineOptions);
-    }
-
-    /**
-     * Setups the marker for our current position.
-     * @requires LocationHandler is connected.
-     */
-    private void setupPositionMarker(){
-        LatLng currentLocation = new LatLng(0,0);
-
-        //Set current position and default zoom, tilt and bearing.
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(currentLocation, 16f, 50, 0)));
-
-        positionMarker = googleMap.addMarker(new MarkerOptions()
-                //TODO Create a better looking current position arrow.
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow))
-                .position(currentLocation)
-                .flat(true));
-
-        updatePos.run();
-    }
-
-    /**
      * Updates the marker for our current position.
      * @requires to be updated once every 1/freq second to function properly.
      * @requires setupPositionMarker() has been called.
      */
 
     private void updatePositionMarker(){
-        Log.w("MAP", "index = " + index);
         if(positionMarker != null) { //Make sure we initiated posMaker in onCreateView
 
 
@@ -210,6 +182,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
                 updateCamera(positionMarker.getPosition(), positionMarker.getRotation());
             }
         }
+
+        updateHandler.postDelayed(updatePos,gps_freq/freq);
     }
 
     /*
@@ -230,13 +204,10 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
                 currentDetail = RouteDetail.OVERVIEW;
             }
         }
-
-        updateHandler.postDelayed(updatePos,gps_freq/freq);
     }
 
     @Override
     public void performEvent(Event event) {
-
         if (event.isType(GPSUpdateEvent.class)) {
             MapLocation newLocation = ((GPSUpdateEvent) event).getNewPosition();
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
