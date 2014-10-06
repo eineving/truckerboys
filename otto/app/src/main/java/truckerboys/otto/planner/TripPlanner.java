@@ -40,6 +40,7 @@ public class TripPlanner {
             e.printStackTrace();
         }
         return null;
+
     }
     /**
      *
@@ -61,7 +62,6 @@ public class TripPlanner {
     public List<String> getAddressSuggestion(String input){
         return placesProvider.getSuggestedAddresses(input);
     }
-
     /**
      * Calculates the optimal times to take a break depending on the ETA to the destination
      * and the driving regulations.

@@ -7,13 +7,9 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 
-import truckerboys.otto.MainActivity;
-import truckerboys.otto.OTTO;
 import truckerboys.otto.R;
-import truckerboys.otto.RouteActivity;
+import truckerboys.otto.newroute.RouteActivity;
 import utils.IView;
 
 /**
