@@ -53,7 +53,7 @@ public class MapModel implements IEventListener{
         }
         if(event.isType(NewDestination.class)) {
             originalRoute = tripPlanner.calculateRoute(
-                    new MapLocation(new LatLng(57.6878618, 11.9777905)), //Start location
+                    new MapLocation(LocationHandler.getCurrentLocation()), //Start location
                     new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
                             ((NewDestination) event).getLocation().getLongitude())) //End location
             );
