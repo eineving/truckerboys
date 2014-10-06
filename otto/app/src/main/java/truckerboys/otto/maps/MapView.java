@@ -189,19 +189,16 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * Paint the route provided to this views Google Map.
      * @param route The route to paint.
      */
-    private void updateRoutePolyline(Route route, float zoomLevel){
+    private void updatePolylineByZoom(Route route, float zoomLevel) {
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
-        //If change level of detail or route was never set.
-        if(currentDetail != detail || currentRoutePolyline.getPoints().size() < 1) {
-            if (detail == RouteDetail.DETAILED) {
-                currentRoutePolyline.setPoints(route.getDetailedPolyline());
-                currentDetail = RouteDetail.DETAILED;
-            } else {
-                currentRoutePolyline.setPoints(route.getOverviewPolyline());
-                currentDetail = RouteDetail.OVERVIEW;
-            }
+        if (detail == RouteDetail.DETAILED) {
+            currentRoutePolyline.setPoints(route.getDetailedPolyline());
+            currentDetail = RouteDetail.DETAILED;
+        } else {
+            currentRoutePolyline.setPoints(route.getOverviewPolyline());
+            currentDetail = RouteDetail.OVERVIEW;
         }
     }
 
@@ -213,7 +210,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             bearings.add(newLocation.getBearing());
         }
         if(event.isType(ChangedRouteEvent.class)) {
-            updateRoutePolyline(((ChangedRouteEvent) event).getRoute(), googleMap.getCameraPosition().zoom);
+            updatePolylineByZoom(((ChangedRouteEvent) event).getRoute(), googleMap.getCameraPosition().zoom);
         }
     }
 
@@ -234,7 +231,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         if(mapPresenter.getOriginalRoute() != null) {
-            updateRoutePolyline(mapPresenter.getOriginalRoute(), cameraPosition.zoom);
+            updatePolylineByZoom(mapPresenter.getOriginalRoute(), cameraPosition.zoom);
         }
     }
 }
