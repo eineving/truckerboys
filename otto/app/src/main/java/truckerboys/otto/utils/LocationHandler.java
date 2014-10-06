@@ -84,7 +84,7 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         return connected;
     }
 
-    public MapLocation getCurrentLocation() {
+    public static MapLocation getCurrentLocation() {
         return currentLocation;
     }
 }

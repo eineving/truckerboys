@@ -2,9 +2,6 @@ package truckerboys.otto.maps;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 
@@ -19,6 +16,6 @@ public class MapPresenter {
     }
 
     public Route getCurrentRoute(){
-        return mapModel.getCurrentRoute();
+        return mapModel.getOriginalRoute();
     }
 }
