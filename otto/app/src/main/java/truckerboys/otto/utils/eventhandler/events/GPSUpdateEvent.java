@@ -7,11 +7,11 @@ import truckerboys.otto.utils.positions.MapLocation;
  *
  * Represents an event that indicates that the device position has changed.
  */
-public class LocationChangedEvent extends Event {
+public class GPSUpdateEvent extends Event {
     private MapLocation newPosition;
     private MapLocation oldPosition;
 
-    public LocationChangedEvent(MapLocation newPosition, MapLocation oldPosition){
+    public GPSUpdateEvent(MapLocation newPosition, MapLocation oldPosition){
         this.newPosition = newPosition;
         this.oldPosition = oldPosition;
     }

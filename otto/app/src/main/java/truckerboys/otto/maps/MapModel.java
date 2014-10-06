@@ -1,5 +1,6 @@
 package truckerboys.otto.maps;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import truckerboys.otto.directionsAPI.Route;
@@ -7,7 +8,7 @@ import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.LocationChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
 import truckerboys.otto.utils.positions.MapLocation;
 
@@ -18,7 +19,7 @@ public class MapModel implements IEventListener{
     private TripPlanner tripPlanner;
     private Route currentRoute;
 
-    public MapModel(TripPlanner tripPlanner) {
+    public MapModel(TripPlanner tripPlanner, GoogleMap googleMap) {
         this.tripPlanner = tripPlanner;
 
         //TODO Remove this and instead receive new route from RouteActivity.
@@ -31,11 +32,17 @@ public class MapModel implements IEventListener{
         }
     }
 
-
     @Override
     public void performEvent(Event event) {
-        if(event.isType(LocationChangedEvent.class)){
+        if(event.isType(GPSUpdateEvent.class)) {
             //TODO Check if outside current route, calculate new route.
         }
+        if(event.isType(NewRouteEvent.class)) {
+
+        }
+    }
+
+    public Route getCurrentRoute(){
+        return currentRoute;
     }
 }
