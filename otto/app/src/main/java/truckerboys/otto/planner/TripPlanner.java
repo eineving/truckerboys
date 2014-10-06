@@ -32,34 +32,48 @@ public class TripPlanner {
      *
      * @param startLocation The location that the route should start from.
      * @param endLocation   The location that the route should end at.
+     * @param checkpoints   Checkpoints to visit before the end location
      */
-    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) {
+    public Route getNewRoute(MapLocation startLocation, MapLocation endLocation, MapLocation... checkpoints) {
+        //TODO This is where shit will go down, I guess!!
         try {
-            return directionsProvider.getRoute(startLocation, endLocation);
+            return directionsProvider.getRoute(startLocation, endLocation, checkpoints);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
 
     }
+
     /**
+     * Calculate a new route based on a start location and end location provided
      *
+     * @param startLocation The location that the route should start from.
+     * @param endLocation   The location that the route should end at.
+     */
+    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) {
+        return getNewRoute(startLocation, endLocation, null);
+    }
+
+
+    /**
      * Get a suggested address (location) from a user input String
-     * @param input user input
+     *
+     * @param input           user input
      * @param currentLocation location to focus the searches from
      * @return suggested addresses
      */
-    public List<String> getAddressSuggestion(String input, MapLocation currentLocation){
+    public List<String> getAddressSuggestion(String input, MapLocation currentLocation) {
         return placesProvider.getSuggestedAddresses(input, currentLocation);
     }
 
     /**
-     *
      * Get a suggested address (location) from a user input String
+     *
      * @param input user input
      * @return suggested addresses
      */
-    public List<String> getAddressSuggestion(String input){
+    public List<String> getAddressSuggestion(String input) {
         return placesProvider.getSuggestedAddresses(input);
     }
     /**
@@ -86,6 +100,4 @@ public class TripPlanner {
         //Should not only return times of the breaks but also the duration of the breaks.
         return breaks;
     }
-
-
 }
