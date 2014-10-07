@@ -50,17 +50,6 @@ public interface IRegulationHandler {
     public TimeLeft getNextDayTL(SessionHistory history);
 
     /**
-     * Maximum time to drive the next day
-     *
-     * @param history All sessions from at least 30 days back
-     * @return maximum time to drive the next day
-     */
-    public TimeLeft getNextDayTL(List<Session> history);
-    //End Day
-
-    //Week
-
-    /**
      * Time left to drive this week
      *
      * @param history       All sessions from at least 30 days back
