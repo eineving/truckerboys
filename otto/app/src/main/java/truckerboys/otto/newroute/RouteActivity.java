@@ -98,7 +98,7 @@ public class RouteActivity extends Activity implements IEventListener{
         search.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_list_item_1));
 
 
-        // When the user selects an item from the drop-down menu
+        // Handles when user selects an item from the drop-down menu
         search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -106,10 +106,31 @@ public class RouteActivity extends Activity implements IEventListener{
                 result.setText(search.getText());
 
                 LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(resultsBox.getWidth(), 150);
-                layout.setMargins(30,30,30,0);
+                layout.setMargins(30, 30, 30, 0);
 
                 resultsBox.setLayoutParams(layout);
 
+            }
+        });
+
+        // Handles when user clicks "done" button on keyboard
+        search.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                // If "done" on keyboard is clicked set search result to most accurate item
+                if(i == 66 && !search.getAdapter().isEmpty()) {
+                    result.setText(search.getAdapter().getItem(0).toString());
+                    search.setText(search.getAdapter().getItem(0).toString());
+                    search.clearFocus();
+
+                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(resultsBox.getWidth(), 150);
+                    layout.setMargins(30, 30, 30, 0);
+
+                    resultsBox.setLayoutParams(layout);
+                }
+
+                return true;
             }
         });
 

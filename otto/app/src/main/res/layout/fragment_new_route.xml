@@ -23,6 +23,7 @@
             android:id="@+id/search_text_view"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:singleLine="true"
             android:iconifiedByDefault="false"
             android:layout_gravity="right" />
 
