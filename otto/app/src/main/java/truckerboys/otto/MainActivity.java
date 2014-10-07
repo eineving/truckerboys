@@ -6,10 +6,14 @@ import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
 
 import truckerboys.otto.utils.LocationHandler;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.NewDestination;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements IEventListener {
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
     private LocationHandler locationHandler;
@@ -38,7 +42,6 @@ public class MainActivity extends FragmentActivity {
          */
         viewPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
 
-
         //Use Googles 'SlidingTabLayout' to display tabs for all views.
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
         slidingTabLayout.setViewPager(viewPager);
@@ -50,6 +53,8 @@ public class MainActivity extends FragmentActivity {
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+
+        EventTruck.getInstance().subscribe(this);
     }
 
     public OTTO getOtto () {
@@ -61,4 +66,11 @@ public class MainActivity extends FragmentActivity {
         super.onStop();
     }
 
+    @Override
+    public void performEvent(Event event) {
+        // Sets the current page to Map if a new destination is set
+        if(event.isType(NewDestination.class)) {
+            viewPager.setCurrentItem(1);
+        }
+    }
 }

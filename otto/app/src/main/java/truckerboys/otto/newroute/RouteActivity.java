@@ -104,9 +104,11 @@ public class RouteActivity extends Activity implements IEventListener{
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 result.setText(search.getText());
-                resultsBox.setLayoutParams(new LinearLayout.LayoutParams(resultsBox.getWidth(), ViewGroup.LayoutParams.WRAP_CONTENT));
-                resultsBox.setY(historyBox.getY() - resultsBox.getHeight() - 20);
 
+                LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(resultsBox.getWidth(), 150);
+                layout.setMargins(30,30,30,0);
+
+                resultsBox.setLayoutParams(layout);
 
             }
         });
@@ -168,8 +170,6 @@ public class RouteActivity extends Activity implements IEventListener{
         }
 
         if(event.isType(RefreshHistoryEvent.class)) {
-
-            System.out.println("**************LOADED HISTORY PLACE1: " + ((RefreshHistoryEvent)event).getPlace1() + "***************");
             history1Text.setText(((RefreshHistoryEvent)event).getPlace1());
             history2Text.setText(((RefreshHistoryEvent)event).getPlace2());
             history3Text.setText(((RefreshHistoryEvent)event).getPlace3());
