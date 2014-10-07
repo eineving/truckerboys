@@ -1,5 +1,7 @@
 package truckerboys.otto.planner;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.joda.time.Duration;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
+import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 
 public class TripPlanner {
@@ -26,7 +29,6 @@ public class TripPlanner {
         this.user = user;
     }
 
-
     /**
      * Calculate a new route based on a start location and end location provided
      *
@@ -36,13 +38,63 @@ public class TripPlanner {
      */
     public Route getNewRoute(MapLocation startLocation, MapLocation endLocation, MapLocation... checkpoints) {
         //TODO This is where shit will go down, I guess!!
+
+        Route directRoute;
         try {
-            return directionsProvider.getRoute(startLocation, endLocation, checkpoints);
+            directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return null;
 
+            //TODO Remove null setter
+            directRoute = null;
+        }
+
+        //TODO insert possible restLocations to directRoute here
+
+        //TODO insert possible gas stations to direct route here
+        ArrayList<GasStation> gasStations= getGasSationsAlongRoute(directRoute);
+
+        //Returns the direct route if ETA is shorter than the time you have left to drive
+        if(directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())){
+            return directRoute;
+        }
+
+
+
+
+
+
+
+        return directRoute;
+    }
+
+    private ArrayList<GasStation> getGasSationsAlongRoute(Route directRoute) {
+        ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
+        for(LatLng position : directRoute.getOverviewPolyline()){
+
+            //Getting each gas station within 3km from each point in the polyline
+            for(GasStation gasStation : placesProvider.getNearbyGasStations(position)){
+
+                /*
+                if(!locationExistsInList(gasStation, gasStations)){
+
+                }
+                */
+            }
+
+        }
+
+
+        return null;
+    }
+
+    private boolean locationExistsInList(MapLocation location, ArrayList<MapLocation> list) {
+        for(MapLocation temp : list){
+            if(temp.getLatitude() == location.getLatitude() && temp.getLongitude()==location.getLongitude()){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -56,6 +108,7 @@ public class TripPlanner {
     }
 
 
+    //TODO Eineving put this methods in a different class
     /**
      * Get a suggested address (location) from a user input String
      *
@@ -67,6 +120,8 @@ public class TripPlanner {
         return placesProvider.getSuggestedAddresses(input, currentLocation);
     }
 
+
+    //TODO Eineving put this methods in a different class
     /**
      * Get a suggested address (location) from a user input String
      *
