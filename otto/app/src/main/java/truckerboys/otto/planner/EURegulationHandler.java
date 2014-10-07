@@ -20,6 +20,9 @@ public class EURegulationHandler implements IRegulationHandler {
     private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardHours(6);
     private final Duration STANDARD_SESSION_BREAK = Duration.standardMinutes(45);
 
+    private final Duration MAX_WEEKLY_LENGTH = Duration.standardHours(56);
+    private final Duration MAX_TWOWEEK_LENGTH = Duration.standardHours(90);
+
     @Override
     public TimeLeft getThisSessionTL(SessionHistory history) {
 
@@ -49,7 +52,7 @@ public class EURegulationHandler implements IRegulationHandler {
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
         Duration TL;
         Duration extendedTL = new Duration(ZERO_DURATION);
-        Duration TLThisWeek = getThisWeekTL(history).getTimeLeft();
+        Duration TLThisWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
 
 
         TL = MAX_DAY_LENGTH.minus(timeSinceDailyBreak);
@@ -83,13 +86,18 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getNextDayTL(List<Session> history) {
-        return null;
-    }
-
-    @Override
     public TimeLeft getThisWeekTL(SessionHistory history) {
-        return null;
+        //Calculate TimeLeft
+        Duration TL = new Duration(MAX_WEEKLY_LENGTH.minus((history.getActiveTimeSinceLastWeeklyBreak())));
+
+        //Avoid negative timeLeft
+        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
+        Duration TLThisTwoWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
+
+        //Cap week
+        TL = (TL.isLongerThan(TLThisTwoWeek) ? TL : TLThisTwoWeek);
+
+        return new TimeLeft(TL, ZERO_DURATION);
     }
 
     @Override
@@ -99,7 +107,14 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getThisTwoWeekTL(SessionHistory history) {
-        return null;
+        //Calculate TimeLeft
+        Duration TL = new Duration(MAX_TWOWEEK_LENGTH.minus((history.getActiveTimeSinceWeeklyBreakTwoWeeksAgo())));
+
+        //Avoid negative timeLeft
+        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
+
+        return new TimeLeft(TL, ZERO_DURATION);
+
     }
 
     @Override

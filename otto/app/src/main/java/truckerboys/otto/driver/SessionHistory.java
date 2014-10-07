@@ -12,6 +12,8 @@ import org.joda.time.Instant;
  */
 public class SessionHistory {
 
+    //TODO: Regulation 9.1
+
     private final Duration ZERO_DURATION = new Duration(0);
     private final Duration STANDARD_DAY_SESSION = Duration.standardHours(9);
 
@@ -127,8 +129,8 @@ public class SessionHistory {
 
             }
             //Look for the start of the week.
-            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime()) ||
-                    sessions.get(i).getStartTime().isBefore(getLatestWeeklyRestEndTime())) {
+            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime(sessions)) ||
+                    sessions.get(i).getStartTime().isBefore(getLatestWeeklyRestEndTime(sessions))) {
 
                 //check the total time of the previous day (the first day that week) and terminate.
                 if (time.isLongerThan(STANDARD_DAY_SESSION)) {
@@ -174,7 +176,7 @@ public class SessionHistory {
             }
             //Look for weekly rests.
             //If the current session in the loop is before the latest weekly rest.
-            if (getLatestWeeklyRestEndTime().isAfter(sessions.get(i + 1).getEndTime())) {
+            if (getLatestWeeklyRestEndTime(sessions).isAfter(sessions.get(i + 1).getEndTime())) {
                 return numberOfExtendedDays;
             }
         }
@@ -252,7 +254,7 @@ public class SessionHistory {
      *
      * @return the instant of the last weekly break end.
      */
-    public Instant getLatestWeeklyRestEndTime() {
+    public Instant getLatestWeeklyRestEndTime(List<Session> sessions) {
         //TODO: Regulation 9.6
         //TODO: Regulation 10
 
@@ -298,6 +300,22 @@ public class SessionHistory {
         return NO_RECORD_FOUND;
     }
 
+    /**
+     * Returns the instant of which the weekly break two weeks ago ended.
+     * If there have been no valid weekly breaks the method will return epoch.
+     *
+     * @return the instant of the weekly break two weeks ago end.
+     */
+    public Instant getWeeklyRestEndTimeNotLatestTwoWeeksAgo() {
+        List<Session> subSessions = new ArrayList<Session>();
+
+        for (int i = 0; i < sessions.size() - 1; i++) {
+            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime(sessions))) {
+                subSessions = sessions.subList(i+1, sessions.size() - 1);
+            }
+        }
+        return getLatestWeeklyRestEndTime(subSessions);
+    }
 
     /**
      * Returns the total driving time since the last daily break.
@@ -315,6 +333,10 @@ public class SessionHistory {
      * @return the total driving time
      */
     public Duration getActiveTimeSinceLastWeeklyBreak() {
-        return getActiveTimeSince(getLatestWeeklyRestEndTime());
+        return getActiveTimeSince(getLatestWeeklyRestEndTime(sessions));
+    }
+
+    public Duration getActiveTimeSinceWeeklyBreakTwoWeeksAgo() {
+        return getActiveTimeSince(getWeeklyRestEndTimeNotLatestTwoWeeksAgo());
     }
 }
