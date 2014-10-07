@@ -5,6 +5,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import truckerboys.otto.directionsAPI.GoogleDirections;
@@ -46,6 +47,35 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
     }
 
 
+    public CharSequence replaceSpace(CharSequence charSequence) {
+        Character lastPlace = (charSequence.charAt(charSequence.length()-1));
+        CharSequence myCharSeq;
+
+        if(lastPlace.toString().equals(" ")) {
+            return replaceSpace(charSequence.subSequence(0, charSequence.length()-1)) + URLEncoder.encode(lastPlace.toString());
+        } else {
+            return charSequence;
+        }
+    }
+
+    public CharSequence fixSpace(CharSequence charSequence) {
+        CharSequence temp = "";
+
+        for (int i = 0; i < charSequence.length(); i++) {
+            Character possibleSpace = charSequence.charAt(i);
+
+            // If space found replace
+            if(possibleSpace.equals(' ')) {
+                temp = temp + "";
+                System.out.println("SPACE FOUND MOTHERFUCKER**********************'");
+            } else {
+                temp = temp + possibleSpace.toString();
+            }
+        }
+
+        return temp;
+    }
+
     /**
      * Method for filtering the search results from our wrapper class.
      * @return results from what the user types.
@@ -55,7 +85,22 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
         Filter filter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
+
+                //Character lastPlace = (charSequence.charAt(charSequence.length()-1));
+
+                /*if(lastPlace.toString().equals(" ")) {
+                    charSequence = charSequence.subSequence(0, charSequence.length()-1) + URLEncoder.encode(lastPlace.toString());
+                }
+*/
                 FilterResults filterResults = new FilterResults();
+
+                //charSequence = replaceSpace(charSequence);
+
+                charSequence = fixSpace(charSequence);
+
+                System.out.println("*************************************");
+                System.out.println("*****************" + charSequence + "********************");
+                System.out.println("*************************************");
 
                 if(charSequence != null) {
                     // Retrieves autocomplete results from TripPlanner class
