@@ -67,7 +67,6 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
             // If space found replace
             if(possibleSpace.equals(' ')) {
                 temp = temp + "";
-                System.out.println("SPACE FOUND MOTHERFUCKER**********************'");
             } else {
                 temp = temp + possibleSpace.toString();
             }
