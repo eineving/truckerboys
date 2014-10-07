@@ -35,7 +35,7 @@ import utils.SuggestionProvider;
  * for when selecting a new route.
  */
 public class RouteActivity extends Activity implements IEventListener{
-    private RoutePresenter routePresenter = new RoutePresenter();
+    private RoutePresenter routePresenter;
     private RouteModel routeModel = new RouteModel();
 
     private AutoCompleteTextView search;
@@ -70,7 +70,7 @@ public class RouteActivity extends Activity implements IEventListener{
         EventTruck.getInstance().subscribe(this);
         coder = new Geocoder(this);
         history = getSharedPreferences(HISTORY, 0);
-
+        routePresenter = new RoutePresenter();
 
         // Sets ui components
         historyBox = (LinearLayout) findViewById(R.id.history_box);
@@ -144,8 +144,10 @@ public class RouteActivity extends Activity implements IEventListener{
         resultsBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                routePresenter.sendLocation("" + result.getText(), coder);
-                routePresenter.saveHistory(history, "" + result.getText());
+                if(result != null && coder != null && routePresenter != null) {
+                    routePresenter.sendLocation("" + result.getText(), coder);
+                    routePresenter.saveHistory(history, "" + result.getText());
+                }
             }
         });
 

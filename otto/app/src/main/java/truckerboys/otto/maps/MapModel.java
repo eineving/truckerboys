@@ -24,7 +24,7 @@ import truckerboys.otto.utils.positions.MapLocation;
  */
 public class MapModel implements IEventListener{
     private TripPlanner tripPlanner;
-    private Route originalRoute;
+    private Route originalRoute ;
     private EventTruck eventTruck = EventTruck.getInstance();
 
     public MapModel(final TripPlanner tripPlanner, GoogleMap googleMap) {
@@ -52,7 +52,9 @@ public class MapModel implements IEventListener{
             //TODO Check if outside current route, calculate new route.
         }
         if(event.isType(NewDestination.class)) {
-            originalRoute = tripPlanner.calculateRoute(
+            originalRoute
+                    = tripPlanner.
+                    calculateRoute(
                     new MapLocation(LocationHandler.getCurrentLocation()), //Start location
                     new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
                             ((NewDestination) event).getLocation().getLongitude())) //End location
