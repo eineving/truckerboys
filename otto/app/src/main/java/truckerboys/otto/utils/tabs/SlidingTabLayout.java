@@ -32,6 +32,10 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
+import com.swedspot.vil.distraction.DriverDistractionLevel;
+
+import truckerboys.otto.vehicle.IDistractionListener;
+
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
  * the user's scroll progress.
@@ -48,7 +52,7 @@ import android.widget.TextView;
  * The views used as tabs can be customized by calling {@link #setCustomTabView(int, int)},
  * providing the layout ID of your custom layout.
  */
-public class SlidingTabLayout extends HorizontalScrollView {
+public class SlidingTabLayout extends HorizontalScrollView implements IDistractionListener{
 
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
@@ -81,6 +85,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
+
+    private boolean scrollingPastClockAndMap;
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -265,6 +271,13 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 return;
             }
 
+            if(scrollingPastClockAndMap == false){
+                if(mViewPager.getCurrentItem()==1 && positionOffsetPixels<0)
+                    return;
+                if(mViewPager.getCurrentItem()==2 && positionOffsetPixels>0)
+                    return;
+            }
+
             mTabStrip.onViewPagerPageChanged(position, positionOffset);
 
             View selectedTitle = mTabStrip.getChildAt(position);
@@ -307,10 +320,26 @@ public class SlidingTabLayout extends HorizontalScrollView {
         public void onClick(View v) {
             for (int i = 0; i < mTabStrip.getChildCount(); i++) {
                 if (v == mTabStrip.getChildAt(i)) {
-                    mViewPager.setCurrentItem(i);
+                    if(!scrollingPastClockAndMap && (i == 1 || i == 2)){
+                        mViewPager.setCurrentItem(i);
+                    }else if(scrollingPastClockAndMap){
+                        mViewPager.setCurrentItem(i);
+                    }
                     return;
                 }
             }
+        }
+    }
+
+    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
+        System.out.println("Distraction level: " + driverDistractionLevel.getLevel() + " To string: " + driverDistractionLevel.toString());
+        if(driverDistractionLevel.getLevel()>2){
+            scrollingPastClockAndMap = false;
+            if(mViewPager.getCurrentItem()>2 || mViewPager.getCurrentItem()<1){
+               mViewPager.setCurrentItem(1);
+            }
+        }else{
+            scrollingPastClockAndMap = true;
         }
     }
 
