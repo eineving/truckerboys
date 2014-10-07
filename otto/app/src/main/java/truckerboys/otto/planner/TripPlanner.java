@@ -13,6 +13,7 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 public class TripPlanner {
     private User user;
@@ -44,57 +45,27 @@ public class TripPlanner {
             directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
         } catch (Exception e) {
             e.printStackTrace();
-
-            //TODO Remove null setter
-            directRoute = null;
+            return null;
         }
 
-        //TODO insert possible restLocations to directRoute here
-
-        //TODO insert possible gas stations to direct route here
-        ArrayList<GasStation> gasStations= getGasSationsAlongRoute(directRoute);
-
+        //TODO rough draft
         //Returns the direct route if ETA is shorter than the time you have left to drive
-        if(directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())){
+        if (directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
+            for(GasStation temp : getGasSationsAlongRoute(directRoute)){
+                directRoute.addGasStationAlongRoute(temp);
+            }
+            for(RestLocation temp : getRestLocationsAlongRoute(directRoute)){
+                directRoute.addRestLocationAlongRoute(temp);
+            }
             return directRoute;
         }
 
+        return optimizeAndAddCheckpoints(directRoute);
 
-
-
-
-
-
-        return directRoute;
     }
 
-    private ArrayList<GasStation> getGasSationsAlongRoute(Route directRoute) {
-        ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
-        for(LatLng position : directRoute.getOverviewPolyline()){
-
-            //Getting each gas station within 3km from each point in the polyline
-            for(GasStation gasStation : placesProvider.getNearbyGasStations(position)){
-
-                /*
-                if(!locationExistsInList(gasStation, gasStations)){
-
-                }
-                */
-            }
-
-        }
-
-
+    private Route optimizeAndAddCheckpoints(Route directRoute) {
         return null;
-    }
-
-    private boolean locationExistsInList(MapLocation location, ArrayList<MapLocation> list) {
-        for(MapLocation temp : list){
-            if(temp.getLatitude() == location.getLatitude() && temp.getLongitude()==location.getLongitude()){
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -107,8 +78,8 @@ public class TripPlanner {
         return getNewRoute(startLocation, endLocation, null);
     }
 
-
     //TODO Eineving put this methods in a different class
+
     /**
      * Get a suggested address (location) from a user input String
      *
@@ -120,8 +91,8 @@ public class TripPlanner {
         return placesProvider.getSuggestedAddresses(input, currentLocation);
     }
 
-
     //TODO Eineving put this methods in a different class
+
     /**
      * Get a suggested address (location) from a user input String
      *
@@ -131,6 +102,7 @@ public class TripPlanner {
     public List<String> getAddressSuggestion(String input) {
         return placesProvider.getSuggestedAddresses(input);
     }
+
     /**
      * Calculates the optimal times to take a break depending on the ETA to the destination
      * and the driving regulations.
@@ -154,5 +126,61 @@ public class TripPlanner {
 
         //Should not only return times of the breaks but also the duration of the breaks.
         return breaks;
+    }
+
+    /**
+     * Get all gas stations withing 3km from every point in the polyline overview
+     *
+     * @param route route to measure from
+     * @return list of all gas stations within 3km from points in the route
+     */
+    private ArrayList<GasStation> getGasSationsAlongRoute(Route route) {
+        ArrayList<GasStation> list = new ArrayList<GasStation>();
+        for (LatLng position : route.getOverviewPolyline()) {
+
+            //Getting each gas station within 3km from each point in the polyline
+            for (GasStation gasStation : placesProvider.getNearbyGasStations(position)) {
+                if (!locationExistsInList(gasStation, list)) {
+                    list.add(gasStation);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get all rest locations withing 3km from every point in the polyline overview
+     *
+     * @param route route to measure from
+     * @return list of all rest locations within 3km from points in the route
+     */
+    private ArrayList<RestLocation> getRestLocationsAlongRoute(Route route) {
+        ArrayList<RestLocation> list = new ArrayList<RestLocation>();
+        for (LatLng position : route.getOverviewPolyline()) {
+
+            //Getting each gas station within 3km from each point in the polyline
+            for (RestLocation restLocation : placesProvider.getNearbyRestLocations(position)) {
+                if (!locationExistsInList(restLocation, list)) {
+                    list.add(restLocation);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Checks if a MapLocation already exists in an ArrayList
+     *
+     * @param location Location that you want to see if the list contains
+     * @param list     List that might contain given locataion
+     * @return True if list contains a location with the same coordinates as the location
+     */
+    private boolean locationExistsInList(MapLocation location, ArrayList<? extends MapLocation> list) {
+        for (MapLocation temp : list) {
+            if (temp.getLatitude() == location.getLatitude() && temp.getLongitude() == location.getLongitude()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
