@@ -21,7 +21,7 @@ public class Session {
     /**
      * Starts a session with a specified start time.
      *
-     * @param start The start time, the Instant must have occured, no future Instants allowed.
+     * @param start The start time, the Instant must have occurred, no future Instants allowed.
      */
     public Session(Instant start) {
         if (start.isBefore(new Instant())) {

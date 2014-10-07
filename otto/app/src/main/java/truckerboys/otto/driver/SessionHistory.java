@@ -54,7 +54,7 @@ public class SessionHistory {
 
 
         //Loop through the sessions and add the durations.
-        //If the first sessions is active, add the time so far, dealt by the propoty of session it self.
+        //If the first sessions is active, add the time so far, dealt by the property of session it self.
         for (int i = 0; i < sessions.size(); i++) {
             if (sessions.get(i).getStartTime().isBefore(start)) {
                 time = time.plus(sessions.get(i).getDuration());
@@ -209,12 +209,12 @@ public class SessionHistory {
 
                 //The last rest found, check if its Standard or longer.
                 if (dailyRest.isLongerThan(STANDARD_DAILY_REST)) {
-                    return sessions.get(i).getStartTime();
+                    return new Instant(sessions.get(i).getStartTime());
                 } else {
                     //if its not, its a reduced one, check if its valid.
                     //simply check how many reduced already occurred this week.
                     if (getNumberOfReducedDailyRestsThisWeek() < 2) {
-                        return sessions.get(i).getStartTime();
+                        return new Instant(sessions.get(i).getStartTime());
                     } else {
                         //if its not valid we need to find the last valid one.
 
@@ -226,13 +226,13 @@ public class SessionHistory {
 
                             dailyRest = new Duration(sessions.get(j + 1).getEndTime(), sessions.get(j).getStartTime());
                             if (dailyRest.isLongerThan(STANDARD_DAILY_REST)) {
-                                return sessions.get(j).getStartTime();
+                                return new Instant(sessions.get(j).getStartTime());
                             } else {
                                 //
                                 validReducedBreakIn--;
                                 if (validReducedBreakIn == 0) {
                                     //last valid reduced break found
-                                    return sessions.get(j).getStartTime();
+                                    return new Instant(sessions.get(j).getStartTime());
                                 }
                             }
 
@@ -254,6 +254,7 @@ public class SessionHistory {
      */
     public Instant getLatestWeeklyRestEndTime() {
         //TODO: Regulation 9.6
+        //TODO: Regulation 10
 
         Duration weeklyRest1;
         Duration weeklyRest2;
@@ -316,6 +317,4 @@ public class SessionHistory {
     public Duration getActiveTimeSinceLastWeeklyBreak() {
         return getActiveTimeSince(getLatestWeeklyRestEndTime());
     }
-
-
 }
