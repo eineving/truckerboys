@@ -7,23 +7,27 @@ import org.joda.time.Instant;
  */
 public class Session {
 
+    private final SessionType type;
     private boolean active = false;
     private Instant start, end;
 
     /**
      * Creates a new Session with the current time as a start Time.
      */
-    public Session(){
+    public Session(SessionType type){
         start = new Instant();
         active = true;
+        this.type = type;
     }
 
     /**
      * Starts a session with a specified start time.
      *
-     * @param start The start time, the Instant must have occured, no future Instants allowed.
+     * @param type
+     * @param start The start time, the Instant must have occurred, no future Instants allowed.
      */
-    public Session(Instant start) {
+    public Session(SessionType type, Instant start) {
+        this.type = type;
         if (start.isBefore(new Instant())) {
             this.start = start;
         }else{
@@ -31,6 +35,7 @@ public class Session {
         }
         active = true;
     }
+
 
     /**
      * Ends the session.
@@ -72,6 +77,16 @@ public class Session {
     }
 
     /**
+     * Returns the type of the Session.
+     * @return The type of the session.
+     */
+    public SessionType getSessionType(){
+        return type;
+    }
+
+
+
+    /**
      * Returns the end time of the session
      *
      * This is actually extremely retarded, since it will return NULL when the session is active.
@@ -79,9 +94,12 @@ public class Session {
      * PastSession extends session which adds this method, and takes a Session as a parameter to the constructor.
      * Thoughts?
      *
+     *
+     *
      * @return the end time of the session as an instant.
      */
     public Instant getEndTime() {
+        //TODO Do as described as above.
         return end;
     }
 }
