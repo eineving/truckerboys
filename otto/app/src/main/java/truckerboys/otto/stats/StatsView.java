@@ -11,8 +11,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import truckerboys.otto.R;
+import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -91,24 +93,23 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
 
         // TODO UNCOMMENT THIS
-//        durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
+        durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
 
         // TODO Change this to SessionHistory.getActiveTimeSince(Instant start)
-        // durationTotal = User.getInstance().getSessionHistory.getActiveTimeSince(new Instant()); ????
+        durationTotal = User.getInstance().getHistory().getActiveTimeSince(new Instant(0));
         // TODO Ask pegelow about this
 
 
-        // double timeDrivenToday = durationToday.getStandardMinutes()/60;
-        // double timeDrivenTotal = durationTotal.getStandardMinutes()/60;
+        double timeDrivenToday = durationToday.getStandardMinutes()/60;
+        double timeDrivenTotal = durationTotal.getStandardMinutes()/60;
 
         // TEST VALUES
-        double timeDrivenToday = 55.0/60.0;
-        double timeDrivenTotal = 120.0/60.0;
+        //double timeDrivenToday = 55.0/60.0;
+        //double timeDrivenTotal = 120.0/60.0;
 
         //TODO UNCOMMENT IN NEXT MERGE
         // timeToday.setText(timeDrivenToday + "h");
         // timeTotal.setText(timeDrivenTotal + "h");
-
 
         timeToday.setText(timeDrivenToday + " h");
         timeTotal.setText(timeDrivenTotal + " h");
