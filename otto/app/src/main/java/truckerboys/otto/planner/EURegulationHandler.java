@@ -1,6 +1,7 @@
 package truckerboys.otto.planner;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.List;
 
@@ -18,15 +19,15 @@ public class EURegulationHandler implements IRegulationHandler {
     private final Duration MAX_SESSION_LENGTH = Duration.standardMinutes(270);
 
     private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
-    private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardHours(6);
-
     private final Duration STANDARD_SESSION_REST = Duration.standardMinutes(45);
-
-    private final Duration STANDARD_DAILY_REST = Duration.standardHours(11);
-    private final Duration REDUCED_DAILY_REST = Duration.standardHours(9);
 
     private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
     private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
+
+    private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardHours(10);
+    private final Duration DAY = Duration.standardDays(1);
+    private final Duration STANDARD_DAILY_REST = Duration.standardHours(11);
+    private final Duration REDUCED_DAILY_REST = Duration.standardHours(9);
 
     private final Duration MAX_WEEKLY_LENGTH = Duration.standardHours(56);
     private final Duration MAX_TWOWEEK_LENGTH = Duration.standardHours(90);
@@ -57,11 +58,19 @@ public class EURegulationHandler implements IRegulationHandler {
     @Override
     public TimeLeft getThisDayTL(SessionHistory history) {
 
+        //First check maximum TL today before you have to take a break, so that you will
+        //have time to finish your break before the 24h time limit runs out.
+        Instant maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
+
+
+        if(history.getNumberOfReducedDailyRestsThisWeek()<2){
+            maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
+        }
+
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
         Duration TL;
         Duration extendedTL = new Duration(ZERO_DURATION);
         Duration TLThisWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
-
 
         TL = MAX_DAY_LENGTH.minus(timeSinceDailyBreak);
 
@@ -70,6 +79,11 @@ public class EURegulationHandler implements IRegulationHandler {
 
         //Cap week
         TL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : TL);
+
+        //Check that the TL wont breach the 24h limit
+        if(new Instant().plus(TL).isAfter(maxTimeMarker)){
+            TL = new Duration(new Instant(),maxTimeMarker);
+        }
 
         //The same thing as above but do it as the max day is 10 hours and calculate the difference.
         if (history.getNumberOfExtendedDaysThisWeek() < 2) {
@@ -95,8 +109,16 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getThisWeekTL(SessionHistory history) {
+        //Calculate max time allowed this week based on last week.
+        //MaxTimeTwoWeeks - Active time last week.
+        Duration maxTimeAllowedThisWeek = MAX_TWOWEEK_LENGTH.minus(history.getActiveTimeSinceWeeklyBreakTwoWeeksAgo().
+                minus(history.getActiveTimeSinceLastWeeklyBreak()));
+
+        //Cap maxTimeAllowed based on the max time for one week according to regulation.
+        maxTimeAllowedThisWeek = (maxTimeAllowedThisWeek.isLongerThan(MAX_WEEKLY_LENGTH) ? MAX_WEEKLY_LENGTH : maxTimeAllowedThisWeek);
+
         //Calculate TimeLeft
-        Duration TL = new Duration(MAX_WEEKLY_LENGTH.minus((history.getActiveTimeSinceLastWeeklyBreak())));
+        Duration TL = new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak())));
 
         //Avoid negative timeLeft
         TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
@@ -110,7 +132,11 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getNextWeekTL(SessionHistory history) {
-        return null;
+        Duration TL = new Duration(MAX_TWOWEEK_LENGTH.minus(history.getActiveTimeSinceLastWeeklyBreak()));
+
+        //Cap time left on max time for one week
+        TL = (TL.isLongerThan(MAX_WEEKLY_LENGTH) ? MAX_WEEKLY_LENGTH : TL);
+        return new TimeLeft(TL, Duration.ZERO);
     }
 
     @Override
@@ -127,7 +153,7 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getNextTwoWeekTL(SessionHistory history) {
-        return null;
+        return new TimeLeft(Duration.standardHours(90), Duration.ZERO);
     }
 
     @Override

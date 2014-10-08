@@ -212,14 +212,14 @@ public class SessionHistory {
      */
     public int getNumberOfReducedDailyRestsThisWeek() {
         //TODO: Regulation 7.2.2
-        int numberOfExtendedDays = 0;
+        int numberOfReducedDailyRests = 0;
 
         if (!sessions.get(0).isActive()) {
 
             //If the time since last session is a reduced daily break.
             Duration ongoingBreak = new Duration(sessions.get(0).getEndTime(), new Instant());
             if (ongoingBreak.isLongerThan(REDUCED_DAILY_REST) && ongoingBreak.isShorterThan(STANDARD_DAILY_REST)) {
-                numberOfExtendedDays++;
+                numberOfReducedDailyRests++;
             }
         }
         //Loop through the sessions to find breaks longer than 9h and shorter than 11h.
@@ -229,16 +229,16 @@ public class SessionHistory {
             Duration tempBreak = new Duration(sessions.get(i).getStartTime(), sessions.get(i + 1).getEndTime());
             if (tempBreak.isLongerThan(REDUCED_DAILY_REST) && tempBreak.isShorterThan(STANDARD_DAILY_REST)) {
                 //TODO Check for split daily break, regulation 7.2.2
-                numberOfExtendedDays++;
+                numberOfReducedDailyRests++;
             }
             //Look for weekly rests.
             //If the current session in the loop is before the latest weekly rest.
             if (getLatestWeeklyRestEndTime(sessions).isAfter(sessions.get(i + 1).getEndTime())) {
-                return numberOfExtendedDays;
+                return numberOfReducedDailyRests;
             }
         }
 
-        return numberOfExtendedDays;
+        return numberOfReducedDailyRests;
     }
 
     /**
@@ -363,7 +363,7 @@ public class SessionHistory {
      *
      * @return the instant of the weekly break two weeks ago end.
      */
-    public Instant getWeeklyRestEndTimeNotLatestTwoWeeksAgo() {
+    public Instant getWeeklyRestEndTimeTwoWeeksAgo() {
         List<Session> subSessions = new ArrayList<Session>();
 
         for (int i = 0; i < sessions.size() - 1; i++) {
@@ -394,6 +394,6 @@ public class SessionHistory {
     }
 
     public Duration getActiveTimeSinceWeeklyBreakTwoWeeksAgo() {
-        return getActiveTimeSince(getWeeklyRestEndTimeNotLatestTwoWeeksAgo());
+        return getActiveTimeSince(getWeeklyRestEndTimeTwoWeeksAgo());
     }
 }
