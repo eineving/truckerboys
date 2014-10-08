@@ -3,10 +3,7 @@ package truckerboys.otto.planner;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import java.util.List;
-
-import truckerboys.otto.driver.CurrentlyNotOnBreakException;
-import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.SessionHistory;
 
 /**
@@ -162,7 +159,7 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnBreakException {
+    public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnRestException {
         //If currently on break
         if (!history.isDriving()) {
             if (getThisWeekTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive this week. */ {
@@ -175,16 +172,16 @@ public class EURegulationHandler implements IRegulationHandler {
 
             //TODO Rasten kan ersättas med dygns eller veckovila
             //Check if there was a break of atleast 15 minutes in the last 4 hours 30 minutes.
-            if (history.existBreakLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
+            if (history.existRestLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
                 //Return "30 minutes" - "current break time"
-                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceBreakStart()), Duration.ZERO);
+                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceRestStart()), Duration.ZERO);
             } else /* else check time left until current break is 45 minutes long. */ {
                 //Return "45 minutes" - "current break time"
-                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceBreakStart()), Duration.ZERO);
+                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
             }
 
         } else {
-            throw new CurrentlyNotOnBreakException("Driver currently isn't on a break, can't call getTimeLeftOnBreak");
+            throw new CurrentlyNotOnRestException("Driver currently isn't on a break, can't call getTimeLeftOnBreak");
             //TODO Alternatively return new TimeLeft(Duration.ZERO, Duration.ZERO);
         }
     }

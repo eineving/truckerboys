@@ -84,8 +84,6 @@ public class Session {
         return type;
     }
 
-
-
     /**
      * Returns the end time of the session
      *

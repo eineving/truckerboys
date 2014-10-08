@@ -5,13 +5,13 @@ package truckerboys.otto.driver;
  *
  * Represents that the driver currently isn't on a break.
  */
-public class CurrentlyNotOnBreakException extends Exception {
+public class CurrentlyNotOnRestException extends Exception {
 
-    public CurrentlyNotOnBreakException(){
+    public CurrentlyNotOnRestException(){
         this("");
     }
 
-    public CurrentlyNotOnBreakException(String message){
+    public CurrentlyNotOnRestException(String message){
         super(message);
     }
 }
