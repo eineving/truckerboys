@@ -1,5 +1,7 @@
 package truckerboys.otto.planner;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
@@ -16,6 +18,7 @@ import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
 public class TripPlanner {
+    private final Duration MARGINAL = Duration.standardMinutes(10);
     private User user;
     private IRegulationHandler regulationHandler;
     private IDirections directionsProvider;
@@ -36,35 +39,95 @@ public class TripPlanner {
      * @param startLocation The location that the route should start from.
      * @param endLocation   The location that the route should end at.
      * @param checkpoints   Checkpoints to visit before the end location
+     * @return optimized route with POIs along the route (null if connection to Google is not established)
      */
     public Route getNewRoute(MapLocation startLocation, MapLocation endLocation, MapLocation... checkpoints) {
-        //TODO This is where shit will go down, I guess!!
-
-        Route directRoute;
+        Route optimalRoute = null;
         try {
-            directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
+            Route directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
+
+            //Returns the direct route if ETA is shorter than the time you have left to drive
+            if (directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
+                optimalRoute = directRoute;
+            }
+
+            //If the location is within reach this day but not this session
+            else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft()) &&
+                    directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+                optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
+            }
+
+            //If the location is not within reach this day (drive maximum distance)
+            else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+                optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
+            }
+
+            //TODO Really return null if connections is not made?
+            if (optimalRoute == null) {
+                return null;
+            }
+
+            //Adds POIs along route to Route object
+            for (GasStation temp : getGasSationsAlongRoute(optimalRoute)) {
+                optimalRoute.addGasStationAlongRoute(temp);
+            }
+            for (RestLocation temp : getRestLocationsAlongRoute(optimalRoute)) {
+                optimalRoute.addRestLocationAlongRoute(temp);
+            }
+            return optimalRoute;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-
-        //TODO rough draft
-        //Returns the direct route if ETA is shorter than the time you have left to drive
-        if (directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
-            for(GasStation temp : getGasSationsAlongRoute(directRoute)){
-                directRoute.addGasStationAlongRoute(temp);
-            }
-            for(RestLocation temp : getRestLocationsAlongRoute(directRoute)){
-                directRoute.addRestLocationAlongRoute(temp);
-            }
-            return directRoute;
-        }
-
-        return optimizeAndAddCheckpoints(directRoute);
-
     }
 
-    private Route optimizeAndAddCheckpoints(Route directRoute) {
+    /**
+     * Get optimized route with one rest location as a checkpoint.
+     *
+     * @param startLocation current position.
+     * @param directRoute   Route from Google Directions without any rest or gas stops.
+     * @param within        Within what time a rest should be made.
+     * @return An optimized route with the most suitable rest location as a checkpoint.
+     */
+    private Route getOptimizedRoute(MapLocation startLocation, Route directRoute, Duration within) {
+        Route optimalRoute = null;
+        LatLng optimalLatLong = findLatLngWithinDuration(directRoute, within);
+        ArrayList<RestLocation> closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
+        Log.w("NBRofCloseLocations", closeLocations.size() + "");
+
+        //Just calculating the ten best matches from Google
+        for (int i = 0; i < 10 || i < closeLocations.size(); i++) {
+            try {
+                //Checks if the restLocation is a possible stop and is faster than the previous
+                Route temp = directionsProvider.getRoute(startLocation, finalDestination, new MapLocation(closeLocations.get(i)));
+
+                if (temp.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
+                    if (optimalRoute == null) {
+                        optimalRoute = temp;
+                    } else if (temp.getEta().isShorterThan(optimalRoute.getEta())) {
+                        optimalRoute = temp;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return optimalRoute;
+    }
+
+    /**
+     * Find the coordinate on the polyline that have the smallest delta value from the time left.
+     *
+     * @param directRoute Route from Google Directions without any rest or gas stops.
+     * @param timeLeft    ETA that the coordinate should be close to.
+     * @return The coordinate that matches time left the best.
+     */
+    private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) {
+        ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
+
+        //TODO Implement method with binary search
+
+
         return null;
     }
 
@@ -103,6 +166,7 @@ public class TripPlanner {
         return placesProvider.getSuggestedAddresses(input);
     }
 
+    //TODO Method is no longer needed
     /**
      * Calculates the optimal times to take a break depending on the ETA to the destination
      * and the driving regulations.
@@ -183,4 +247,4 @@ public class TripPlanner {
         }
         return false;
     }
-}
+}   
