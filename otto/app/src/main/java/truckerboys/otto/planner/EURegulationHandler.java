@@ -51,11 +51,6 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getNextSessionTL(SessionHistory history) {
-        return null;
-    }
-
-    @Override
     public TimeLeft getThisDayTL(SessionHistory history) {
 
         //First check maximum TL today before you have to take a break, so that you will
@@ -63,7 +58,7 @@ public class EURegulationHandler implements IRegulationHandler {
         Instant maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
 
 
-        if(history.getNumberOfReducedDailyRestsThisWeek()<2){
+        if (history.getNumberOfReducedDailyRestsThisWeek() < 2) {
             maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
         }
 
@@ -81,8 +76,8 @@ public class EURegulationHandler implements IRegulationHandler {
         TL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : TL);
 
         //Check that the TL wont breach the 24h limit
-        if(new Instant().plus(TL).isAfter(maxTimeMarker)){
-            TL = new Duration(new Instant(),maxTimeMarker);
+        if (new Instant().plus(TL).isAfter(maxTimeMarker)) {
+            TL = new Duration(new Instant(), maxTimeMarker);
         }
 
         //The same thing as above but do it as the max day is 10 hours and calculate the difference.
@@ -92,20 +87,27 @@ public class EURegulationHandler implements IRegulationHandler {
             extendedTL = MAX_DAY_LENGTH_EXTENDED.minus(timeSinceDailyBreak);
             extendedTL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : extendedTL);
 
-            //Calculate the difference of the TL and the extendedTL which will be the net extended time.
+            //Calculate the difference of the TL and the extendedTL which will be the next extended time.
             extendedTL = extendedTL.minus(TL);
 
             //Avoid negative extendedTL
-            TL = (extendedTL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : extendedTL);
+            extendedTL = (extendedTL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : extendedTL);
+
+            //Check that the TL + extendedTL wont breach the 24h limit
+            if (new Instant().plus(TL).plus(extendedTL).isAfter(maxTimeMarker)) {
+                Duration timeUntilMarker = new Duration(new Instant(), maxTimeMarker);
+                if (timeUntilMarker.isShorterThan(TL)) {
+                    TL = timeUntilMarker;
+                    extendedTL = Duration.ZERO;
+                } else {
+                    extendedTL = timeUntilMarker.minus(TL);
+                }
+            }
         }
 
         return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, extendedTL) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }
 
-    @Override
-    public TimeLeft getNextDayTL(SessionHistory history) {
-        return null;
-    }
 
     @Override
     public TimeLeft getThisWeekTL(SessionHistory history) {
@@ -122,8 +124,9 @@ public class EURegulationHandler implements IRegulationHandler {
 
         //Avoid negative timeLeft
         TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
-        Duration TLThisTwoWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
 
+
+        Duration TLThisTwoWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
         //Cap week
         TL = (TL.isLongerThan(TLThisTwoWeek) ? TL : TLThisTwoWeek);
 
@@ -141,8 +144,10 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getThisTwoWeekTL(SessionHistory history) {
-        //Calculate TimeLeft
-        Duration TL = new Duration(MAX_TWOWEEK_LENGTH.minus((history.getActiveTimeSinceWeeklyBreakTwoWeeksAgo())));
+        Duration TL = MAX_TWOWEEK_LENGTH.minus(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
+
+        //Cap week mx time
+        TL = (TL.isShorterThan(MAX_WEEKLY_LENGTH) ? TL : MAX_WEEKLY_LENGTH);
 
         //Avoid negative timeLeft
         TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
@@ -159,7 +164,7 @@ public class EURegulationHandler implements IRegulationHandler {
     @Override
     public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnBreakException {
         //If currently on break
-        if(!history.isDriving()) {
+        if (!history.isDriving()) {
             if (getThisWeekTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive this week. */ {
                 //TODO Logic for weekly break time
             }
