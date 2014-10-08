@@ -21,6 +21,7 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
+import truckerboys.otto.vehicle.VehicleInterface;
 import truckerboys.otto.vehicle.VehicleSignalID;
 import utils.IView;
 
@@ -55,7 +56,6 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
 
 
-
     public StatsView(){
         presenter = new StatsPresenter(this);
     }
@@ -63,6 +63,8 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView  = inflater.inflate(R.layout.fragment_stats, container, false);
+
+        VehicleInterface.subscribe(this);
 
         // Creates TextViews from the fragment for daily stats
         timeToday = (TextView) rootView.findViewById(R.id.timeTodayTime);
