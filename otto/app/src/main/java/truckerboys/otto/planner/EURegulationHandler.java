@@ -4,6 +4,7 @@ import org.joda.time.Duration;
 
 import java.util.List;
 
+import truckerboys.otto.driver.CurrentlyNotOnBreakException;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 
@@ -14,11 +15,18 @@ public class EURegulationHandler implements IRegulationHandler {
 
     private final Duration ZERO_DURATION = new Duration(0);
 
-    private final Duration MAX_SESSION_LENGTH = Duration.standardHours(270);
+    private final Duration MAX_SESSION_LENGTH = Duration.standardMinutes(270);
 
     private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
     private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardHours(6);
-    private final Duration STANDARD_SESSION_BREAK = Duration.standardMinutes(45);
+
+    private final Duration STANDARD_SESSION_REST = Duration.standardMinutes(45);
+
+    private final Duration STANDARD_DAILY_REST = Duration.standardHours(11);
+    private final Duration REDUCED_DAILY_REST = Duration.standardHours(9);
+
+    private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
+    private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
 
     private final Duration MAX_WEEKLY_LENGTH = Duration.standardHours(56);
     private final Duration MAX_TWOWEEK_LENGTH = Duration.standardHours(90);
@@ -27,7 +35,7 @@ public class EURegulationHandler implements IRegulationHandler {
     public TimeLeft getThisSessionTL(SessionHistory history) {
 
         //Find the active time since the last valid break, expand to handle split breaks aswell...
-        Duration sinceLast45 = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_BREAK);
+        Duration sinceLast45 = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
 
         Duration TL = MAX_SESSION_LENGTH.minus(sinceLast45); // Calculate
 
@@ -123,8 +131,31 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getTimeLeftOnBreak(SessionHistory history) {
-        return null;
+    public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnBreakException {
+        //If currently on break
+        if(!history.isDriving()) {
+            if (getThisWeekTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive this week. */ {
+                //TODO Logic for weekly break time
+            }
+
+            if (getThisDayTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive today. */ {
+                //TODO Logic for daily break time.
+            }
+
+            //TODO Rasten kan ersättas med dygns eller veckovila
+            //Check if there was a break of atleast 15 minutes in the last 4 hours 30 minutes.
+            if (history.existBreakLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
+                //Return "30 minutes" - "current break time"
+                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceBreakStart()), Duration.ZERO);
+            } else /* else check time left until current break is 45 minutes long. */ {
+                //Return "45 minutes" - "current break time"
+                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceBreakStart()), Duration.ZERO);
+            }
+
+        } else {
+            throw new CurrentlyNotOnBreakException("Driver currently isn't on a break, can't call getTimeLeftOnBreak");
+            //TODO Alternatively return new TimeLeft(Duration.ZERO, Duration.ZERO);
+        }
     }
 
 }

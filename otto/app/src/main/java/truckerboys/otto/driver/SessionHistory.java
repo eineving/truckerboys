@@ -31,6 +31,63 @@ public class SessionHistory {
     private List<Session> sessions = new ArrayList<Session>();
 
     /**
+     * Checks if there exists a break longer or equal to a specified time in
+     * an interval [now, backLimit]
+     *
+     * @param breakTime The length of the time to check for
+     * @param backLimit The length of the interval to check back to.
+     * @return True if break exists
+     */
+    public boolean existBreakLonger(Duration breakTime, Duration backLimit){
+        //Loop through all sessions and check break time between each one.
+        for(int i = 0; i < sessions.size(); i++){
+            //If previous session ended before (or same time as) limit end.
+            if(sessions.get(i-1).getEndTime().getMillis() >= backLimit.getMillis()) {
+                //If "start-time (current session)" - "end-time (previous session)" >= breakTime
+                if (sessions.get(i).getStartTime().getMillis() - sessions.get(i - 1).getEndTime().getMillis() >= breakTime.getMillis()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns weither the driver is currently driving or not.
+     * @return True if driver is currently driving.
+     */
+    public boolean isDriving(){
+        return sessions.get(0).isActive();
+    }
+
+    /**
+     * Get the duration since current break was started.
+     * @return Duration since break was started.
+     * @throws CurrentlyNotOnBreakException if driver currently isn't on a break.
+     */
+    public Duration getTimeSinceBreakStart() throws CurrentlyNotOnBreakException{
+        if(!isDriving()) {
+            //Current time in millis minus the time in millis since last active session ended.
+            return new Duration((new Instant().getMillis()) - sessions.get(1).getEndTime().getMillis());
+        }
+
+        throw new CurrentlyNotOnBreakException();
+    }
+
+    /**
+     * Returns the active time since the driver last took a break.
+     *
+     * @return Duration since last break, Duration.ZERO if not on break.
+     */
+    public Duration getActiveTimeSinceLastBreak(){
+        if(isDriving()){
+            return sessions.get(0).getDuration();
+        }
+        return Duration.ZERO;
+    }
+
+    /**
      * Adds a sessions to the history.
      *
      * @param session the past sessions
