@@ -67,7 +67,10 @@ public class SettingsView extends Fragment implements IView, IEventListener {
 
 
         // Sets switch as checked if sound is on
-        soundSwitch.setChecked(sound);
+        if(soundSwitch != null) {
+
+            soundSwitch.setChecked(sound);
+        }
 
         update(sound, presenter.isDisplayActive());
         return rootView;
