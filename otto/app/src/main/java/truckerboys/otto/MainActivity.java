@@ -31,6 +31,7 @@ public class MainActivity extends FragmentActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), otto.getViews());
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setCurrentItem(2);
 
 
         //Use Googles 'SlidingTabLayout' to display tabs for all views.

@@ -39,17 +39,17 @@ public class OTTO {
     }
 
     private void createPresenters() {
-        views.add(new HomeView());
-
         MapView mapView = new MapView();
         mapView.setTripPlanner(tripPlanner);
         views.add(mapView);
 
         views.add(new ClockView());
 
-        views.add(new SettingsView());
+        views.add(new HomeView());
 
         views.add(new StatsView());
+
+        views.add(new SettingsView());
     }
 
     public TripPlanner getTripPlanner() {

@@ -35,6 +35,7 @@ import android.widget.TextView;
 import com.swedspot.vil.distraction.DriverDistractionLevel;
 
 import truckerboys.otto.vehicle.IDistractionListener;
+import truckerboys.otto.vehicle.VehicleInterface;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -86,8 +87,6 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
     private final SlidingTabStrip mTabStrip;
 
-    private boolean scrollingPastClockAndMap;
-
     public SlidingTabLayout(Context context) {
         this(context, null);
     }
@@ -108,6 +107,8 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
         mTabStrip = new SlidingTabStrip(context);
         addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
+        VehicleInterface.subscribeToDistractionChange(this);
     }
 
     /**
@@ -271,13 +272,6 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                 return;
             }
 
-            if(scrollingPastClockAndMap == false){
-                if(mViewPager.getCurrentItem()==1 && positionOffsetPixels<0)
-                    return;
-                if(mViewPager.getCurrentItem()==2 && positionOffsetPixels>0)
-                    return;
-            }
-
             mTabStrip.onViewPagerPageChanged(position, positionOffset);
 
             View selectedTitle = mTabStrip.getChildAt(position);
@@ -303,7 +297,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
         @Override
         public void onPageSelected(int position) {
-            if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
+           if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
                 scrollToTab(position, 0);
             }
@@ -320,11 +314,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
         public void onClick(View v) {
             for (int i = 0; i < mTabStrip.getChildCount(); i++) {
                 if (v == mTabStrip.getChildAt(i)) {
-                    if(!scrollingPastClockAndMap && (i == 1 || i == 2)){
-                        mViewPager.setCurrentItem(i);
-                    }else if(scrollingPastClockAndMap){
-                        mViewPager.setCurrentItem(i);
-                    }
+                    mViewPager.setCurrentItem(i);
                     return;
                 }
             }
@@ -332,14 +322,25 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
     public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
-        System.out.println("Distraction level: " + driverDistractionLevel.getLevel() + " To string: " + driverDistractionLevel.toString());
-        if(driverDistractionLevel.getLevel()>2){
-            scrollingPastClockAndMap = false;
-            if(mViewPager.getCurrentItem()>2 || mViewPager.getCurrentItem()<1){
-               mViewPager.setCurrentItem(1);
-            }
+        if(driverDistractionLevel.getLevel()>1) {
+            Runnable setAdapter = new Runnable() {
+                @Override
+                public void run() {
+                    mViewPager.setAdapter(mViewPager.getAdapter());
+                    mViewPager.setCurrentItem(0);
+                    mViewPager.getAdapter().notifyDataSetChanged();
+                }
+            };
+            getRootView().post(setAdapter);
         }else{
-            scrollingPastClockAndMap = true;
+            Runnable setAdapter = new Runnable() {
+                @Override
+                public void run() {
+                    mViewPager.setAdapter(mViewPager.getAdapter());
+                    mViewPager.getAdapter().notifyDataSetChanged();
+                }
+            };
+            getRootView().post(setAdapter);
         }
     }
 
