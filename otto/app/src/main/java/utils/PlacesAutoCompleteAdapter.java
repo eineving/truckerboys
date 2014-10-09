@@ -25,7 +25,7 @@ import truckerboys.otto.planner.TripPlanner;
  * Credits to: Google.
  */
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
-    private ArrayList<String> resultList;
+    private ArrayList<String> resultList = new ArrayList<String>();
     private TripPlanner tripPlanner;
 
     public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
@@ -62,8 +62,6 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
 
                 // Removes all white spaces
                 charSequence = ((String)charSequence).replaceAll("\\s", "");
-
-                System.out.println("**************" + charSequence +"************");
 
                 if(charSequence != null) {
                     // Retrieves autocomplete results from TripPlanner class

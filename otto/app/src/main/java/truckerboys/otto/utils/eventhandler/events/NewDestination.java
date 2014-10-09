@@ -7,6 +7,12 @@ import android.location.Address;
  */
 public class NewDestination extends Event {
     Address location;
+    Address checkPoint;
+
+    public NewDestination(Address location, Address checkPoint) {
+        this.location = location;
+        this.checkPoint = checkPoint;
+    }
 
     public NewDestination(Address location) {
         this.location = location;
@@ -14,5 +20,9 @@ public class NewDestination extends Event {
 
     public Address getLocation() {
         return location;
+    }
+
+    public Address getCheckPoint() {
+        return checkPoint;
     }
 }

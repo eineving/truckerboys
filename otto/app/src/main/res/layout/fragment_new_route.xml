@@ -8,13 +8,21 @@
     android:background="@color/background_color">
 
     <LinearLayout
-        android:id="@+id/search_box"
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/white_dropshadow"
+        android:background="@drawable/white_dropshadow">
+
+    <LinearLayout
+        android:id="@+id/search_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:orientation="vertical">
 
         <AutoCompleteTextView
@@ -23,35 +31,232 @@
             android:id="@+id/search_text_view"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:hint="Destination"
             android:singleLine="true"
+            android:textColorHint="@color/textLight"
+            android:textColor="@color/textLight"
             android:iconifiedByDefault="false"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:autoText="false" />
 
+
+        <LinearLayout
+            android:id="@+id/results_box"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/result_text_view"
+                android:textColor="@color/textLight"
+                android:layout_margin="10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_gravity="right"
+                android:layout_marginTop="-30dp"
+                android:clickable="false"
+                android:visibility="invisible"
+                android:id="@+id/add_button1"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_add"
+                android:background="#00ffc6f1" />
+
+
+        </LinearLayout>
 
     </LinearLayout>
 
+
     <LinearLayout
-        android:id="@+id/results_box"
+        android:id="@+id/checkpoint_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical">
+
+        <AutoCompleteTextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkpoint_text"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:hint="Checkpoint"
+            android:singleLine="true"
+            android:textColorHint="@color/textLight"
+            android:textColor="@color/textLight"
+            android:iconifiedByDefault="false"
+            android:layout_gravity="right"
+            android:autoText="false" />
+
+
+
+        <LinearLayout
+            android:id="@+id/checkpoint_result_box"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkpoint_result_text"
+                android:textColor="@color/textLight"
+                android:layout_margin="10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_gravity="right"
+                android:layout_marginTop="-30dp"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:id="@+id/add_button2"
+                android:visibility="invisible"
+                android:src="@android:drawable/ic_menu_add"
+                android:background="#00ffc6f1" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/final_route_box"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="200dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:layout_centerVertical="true"
         android:background="@drawable/white_dropshadow"
         android:orientation="vertical">
 
-
         <TextView
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/result_text_view"
-            android:textColor="@color/textLight"
-            android:layout_margin="10dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:textColor="@color/textLight"
+            android:textSize="20dp"
+            android:layout_margin="10dp"
+            android:text="Route"
+            android:id="@+id/route_title" />
 
+        <View
+            android:id="@+id/divider4"
+            android:layout_margin="10dp"
+            android:layout_width="fill_parent"
+            android:layout_below="@+id/route_title"
+            android:layout_height="0.5dp"
+            android:background="@color/textLightest"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/final_destination_text_box"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            >
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="#00ffffff"
+                android:id="@+id/imageView3"
+                android:src="@android:drawable/ic_menu_mapmode"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_marginLeft="10dp"
+                android:id="@+id/final_destination_text"
+                android:textColor="@color/textLight"
+                android:textStyle="bold"
+                android:textSize="14dp"
+                android:layout_toRightOf="@+id/imageView3"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+        <View
+            android:id="@+id/divider5"
+            android:layout_margin="10dp"
+            android:layout_width="fill_parent"
+            android:layout_below="@+id/final_destination_text_box"
+            android:layout_height="0.5dp"
+            android:background="@color/textLightest"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/final_checkpoints_box"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            >
+
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="#00ffffff"
+                android:id="@+id/imageView2"
+                android:src="@android:drawable/ic_menu_myplaces" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/final_checkpoints_text"
+                android:textColor="@color/textLight"
+                android:textStyle="bold"
+                android:text=""
+                android:layout_marginLeft="10dp"
+                android:textSize="14dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/imageView2"
+                android:layout_toEndOf="@+id/imageView2" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/navigate_box"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            >
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/navigate_button"
+                android:background="#00ffffff"
+                android:src="@android:drawable/ic_menu_send" />
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -159,5 +364,7 @@
                 android:layout_alignParentStart="true" />
         </RelativeLayout>
     </LinearLayout>
+
+
 
 </LinearLayout>

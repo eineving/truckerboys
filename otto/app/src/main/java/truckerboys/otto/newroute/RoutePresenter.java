@@ -36,9 +36,11 @@ public class RoutePresenter implements IEventListener {
             // Creates an array of addresses (of length 1) based on the string selected
             // and gets the first result
             List<Address> locations = coder.getFromLocationName(nameOfLocation, maxResults);
+            //List<Address> checkPoints = coder.getFromLocationName(nameOfCheckPoint, maxResults);
 
             if(locations.size() > 0) {
                 Address location = locations.get(0);
+                //Address checkPoint = checkPoints.get(0);
                 EventTruck.getInstance().newEvent(new NewDestination(location));
             }
 
