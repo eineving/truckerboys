@@ -7,5 +7,15 @@ import truckerboys.otto.driver.User;
  */
 public class SettingsModel {
     private User user;
+    private boolean displayAlive;
+
+    public void setSettings(boolean displayAlive) {
+        this.displayAlive = displayAlive;
+
+    }
+
+    public boolean getDisplayAlive() {
+        return displayAlive;
+    }
 
 }

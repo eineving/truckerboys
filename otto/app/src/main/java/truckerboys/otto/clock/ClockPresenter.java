@@ -1,9 +1,31 @@
 package truckerboys.otto.clock;
 
+import java.util.ArrayList;
+
+import truckerboys.otto.planner.TimeLeft;
+
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * The presenter class of the clock that acts as a bridge between the view and model.
  */
-public class ClockPresenter {
+public class ClockPresenter{
     private ClockModel model;
-    private ClockView view;
+
+    public ClockPresenter(){
+        this.model = new ClockModel();
+    }
+    /**
+     * Updates the model and view.
+     */
+    public void update() {
+        model.update();
+    }
+
+    public TimeLeft getTimeLeft(){
+        return model.getTimeLeft();
+    }
+
+    public ArrayList<RestStop> getRestStops(){
+        return model.getRestStops();
+    }
 }

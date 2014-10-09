@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    android:paddingTop="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/timeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="-10dp"
+            android:focusableInTouchMode="false"
+            android:text="Until violation"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <TextView
+            android:id="@+id/clockText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="-20dp"
+            android:text="01:32"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textDark"
+            android:textSize="112sp" />
+
+        <TextView
+            android:id="@+id/clockExtendedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="10dp"
+            android:text="Extended time: 02:32"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textLight"
+            android:textSize="24sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nextStopsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="10dp"
+            android:text="Next stops:"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/stopbg_green">
+
+            <ImageView
+                android:id="@+id/stopImage1"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/reststop" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@id/stopImage1"
+                android:layout_toRightOf="@id/stopImage1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/timeStop1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="45 min"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/textDark"
+                    android:textSize="34sp" />
+
+
+                <TextView
+                    android:id="@+id/nameStop1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="McDonalds"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/textDark"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/stopbg_yellow">
+
+            <ImageView
+                android:id="@+id/stopImage2"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/reststop" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@id/stopImage2"
+                android:layout_toRightOf="@id/stopImage2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/timeStop2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1 h 30 min"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/textDark"
+                    android:textSize="34sp" />
+
+                <TextView
+                    android:id="@+id/nameStop2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="Anna's restaurant of awesome"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/textDark"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/stopbg_red">
+
+            <ImageView
+                android:id="@+id/stopImage3"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/reststop" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@id/stopImage3"
+                android:layout_toRightOf="@id/stopImage3"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/timeStop3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2 h 10 min"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/textDark"
+                    android:textSize="34sp" />
+
+                <TextView
+                    android:id="@+id/nameStop3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Grill place"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/textDark"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

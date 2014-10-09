@@ -3,7 +3,7 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/mapsnotext"
         android:theme="@style/AppTheme">
 
 
@@ -16,20 +16,25 @@
             android:value="AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk"/>
 
         <activity
-            android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
 
-            <!-- UNCOMMENT BELLOW TO MAKE THIS LAUNCHER ACTIVITY -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             </activity>
+
+        <activity
+            android:name=".newroute.RouteActivity"
+            android:windowSoftInputMode="stateVisible">
+        </activity>
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
 </manifest>

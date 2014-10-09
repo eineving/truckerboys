@@ -1,9 +1,148 @@
 package truckerboys.otto.stats;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.swedspot.automotiveapi.AutomotiveSignal;
+import android.swedspot.automotiveapi.AutomotiveSignalId;
+
+import com.swedspot.automotiveapi.AutomotiveManager;
+
+import truckerboys.otto.driver.User;
+import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
+import truckerboys.otto.vehicle.IVehicleListener;
+import truckerboys.otto.vehicle.VehicleSignalID;
+
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class StatsPresenter {
+public class StatsPresenter implements IEventListener, IVehicleListener {
     private StatsModel model;
+
     private StatsView view;
+    private String distanceUnit = "km";
+    private String fuelUnit = "L";
+
+    public static final String STATS = "Stats_file";
+    public static final String SETTINGS = "Settings_file";
+
+    public StatsPresenter(StatsView view){
+        this.view = view;
+        this.model = new StatsModel();
+
+        EventTruck.getInstance().subscribe(this);
+    }
+
+    /**
+     * Method for restoring the saved preferences from
+     * the user statistics
+     */
+    public void restorePreferences() {
+        SharedPreferences stats = view.getActivity().getSharedPreferences(STATS, 0);
+
+        // Gets today stats
+        double timeToday = stats.getFloat("timeToday", 0);
+        // double distanceToday = stats.getFloat("distanceToday", 5); // Implement later
+        // double fuelToday = stats.getFloat("fuelToday", 5);
+        double distanceByFuel = stats.getFloat("distanceByFuel", 5);
+
+        // Gets total stats
+        double timeTotal = stats.getFloat("timeTotal", 0);
+        double distanceTotal = stats.getFloat("distanceTotal", 5);
+        double fuelTotal = stats.getFloat("fuelTotal", 5);
+        // double fuelByDistanceTotal = stats.getFloat("fuelByDistanceTotal", 5);
+
+        // Gets total stats
+        int violation = stats.getInt("violation", 0);
+
+ //       double[] statsToday = {timeToday, distanceToday, fuelToday, fuelByDistanceToday};
+ //       double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal};
+
+        double[] statsToday = {timeToday, 0, 0, distanceByFuel};
+        double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, 0};
+
+        setStats(statsToday, statsTotal, violation);
+
+    }
+
+    /**
+     * Method for setting the stored stats in the
+     * model and updating the view
+     * @param statsToday stats for today
+     * @param statsTotal stats for all-time
+     */
+    public void setStats(double[] statsToday, double[] statsTotal, int violations) {
+        // Sets the stats in the model
+        model.setStats(statsToday, statsTotal, violations);
+
+        // Updates the view with stats
+        updateView(statsToday, statsTotal, violations);
+    }
+
+    /**
+     * Method for setting the units in the model.
+     * Calls this method when changing between units by:
+     * presenter.setUnits("imperial").
+     * @param system metric/imperial - defaults to metric.
+     */
+    public void setUnits(String system) {
+        model.setUnits(system);
+        view.updateUnits(system);
+
+       // double[] statsToday = {model.getTimeToday(), model.getDistanceToday(), model.getFuelToday(), model.getfuelByDistanceToday()};
+       // double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};
+
+
+        double[] statsToday = {model.getTimeToday(), 0, 0, 0};
+        double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), 0};
+
+        updateView(statsToday, statsTotal, model.getViolations());
+        // TODO: Sets view fuel, distance etc based on new values in model
+    }
+
+
+    /**
+     * Method for updating the view with corrects stats
+     * @param statsToday stats for today
+     * @param statsTotal stats for all-time
+     * @param violations violations all-time
+     */
+    public void updateView(double[] statsToday, double[] statsTotal, int violations) {
+        view.update(statsToday, statsTotal, violations);
+    }
+
+
+    @Override
+    public void performEvent(Event event) {
+
+        // If the new time has been set in the model
+        if(event.isType(TimeDrivenEvent.class)) {
+
+            double[] statsToday = {((TimeDrivenEvent)event).getTimeToday(), 0, model.getFuelToday(), model.getDistanceByFuel()};
+            double[] statsTotal = {((TimeDrivenEvent)event).getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};
+
+            // Update the time in the view
+            model.setStats(statsToday, statsTotal, model.getViolations());
+        }
+
+        if(event.isType(SettingsChangedEvent.class)) {
+
+            // read from file and set String called system based on that
+
+            setUnits(((SettingsChangedEvent)event).getSystem());
+
+        }
+    }
+
+    @Override
+    public void receive(AutomotiveSignal signal) {
+
+    }
 }
