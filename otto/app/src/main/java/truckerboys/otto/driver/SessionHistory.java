@@ -420,14 +420,27 @@ public class SessionHistory {
                         temp_session = sessions.get(j);
                         if(!temp_session.getDuration().isShorterThan(REDUCED_WEEKLY_REST)){
                             weeklyRest2 = temp_session.getDuration();
+                            //Found second weekly rest.
+
                             if(!weeklyRest1.isShorterThan(STANDARD_WEEKLY_REST)){
+                                //First week was a non-reduced weekly rest
                                 return new Instant(session.getEndTime());
                             } else if(!weeklyRest2.isShorterThan(STANDARD_WEEKLY_REST)){
+                                //Second week was a non-reduced weekly rest
                                 return new Instant(temp_session.getEndTime());
                             } else {
-                                //TODO This operation doesn't seem valid (in Pegelows code)
-                                //     But im way to tired to see if it's actually valid or not,
-                                //     I'll have someone else look at it or do it later. Goodnight.
+                                // TODO Check logics with pegelow.
+                                // None of the two last weeks were standard weekly-rests.
+                                // The driver therefor broke a regulation. But we still need to find
+                                // The last valid weekly break.
+
+                                //Loop through the rest of the sessions, find next full week-break.
+                                for(int k = j; k < sessions.size(); k++){
+                                    if(sessions.get(k).getSessionType() == SessionType.RESTING &&
+                                            !sessions.get(k).getDuration().isShorterThan(STANDARD_WEEKLY_REST)){
+                                        return new Instant(sessions.get(k).getEndTime());
+                                    }
+                                }
                             }
                         }
                     }
@@ -481,7 +494,6 @@ public class SessionHistory {
         */
     }
 
-    //TODO Rewrite to fit new SessionHistory class.
     /**
      * Returns the instant of which the weekly break two weeks ago ended.
      * If there have been no valid weekly breaks the method will return epoch.
