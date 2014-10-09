@@ -123,12 +123,31 @@ public class TripPlanner {
      * @return The coordinate that matches time left the best.
      */
     private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) {
-        ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
+        try {
+            ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
 
-        //TODO Implement method with binary search
+            int topIndex = coordinates.size() - 1;
+            int bottomIndex = 0;
+
+            Duration etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
+                    new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
 
 
-        return null;
+            while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(2))) ||
+                    etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(2)))) {
+                if (etaToCoordinate.isLongerThan(timeLeft)) {
+                    topIndex = (topIndex + bottomIndex) / 2;
+                } else {
+                    bottomIndex = (topIndex + bottomIndex) / 2;
+                }
+                etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
+                        new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+            }
+            return coordinates.get((topIndex+bottomIndex)/2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -167,6 +186,7 @@ public class TripPlanner {
     }
 
     //TODO Method is no longer needed
+
     /**
      * Calculates the optimal times to take a break depending on the ETA to the destination
      * and the driving regulations.
