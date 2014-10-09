@@ -20,7 +20,7 @@ import utils.IView;
  *
  * A FragmentAdapter that is used by the ViewPager to define what fragments
  * we want to be able to display in the "Slideview". This means that each 'page'
- * that it is possible to slide to is infact a fragment, not an activity.
+ * that it is possible to slide to is in fact a fragment, not an activity.
  */
 public class TabPagerAdapter extends FragmentPagerAdapter implements IDistractionListener{
 
@@ -40,7 +40,8 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements IDistractio
 
         numTabs = viewMap.size();
 
-        numTabsDistraction = 2;
+        numTabsDistraction = 2; //Only the first two tabs are shown in driving mode, maps and clock
+
         VehicleInterface.subscribeToDistractionChange(this);
     }
 
@@ -63,6 +64,11 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements IDistractio
         return new ArrayList<String>(viewMap.values()).get(index);
     }
 
+    /**
+     * Gets called when the distraction level of the truck driver changes.
+     * Only sets a boolean value that states if the app is in standstill or driving mode.
+     * @param driverDistractionLevel
+     */
     public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
         if(driverDistractionLevel.getLevel()>1){
             distractionLevelHigher = true;

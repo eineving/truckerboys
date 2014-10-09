@@ -321,6 +321,12 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
         }
     }
 
+    /**
+     * Gets called when the distraction level of the truck driver changes.
+     * Updates the ViewPager that changes has happened to the adapter of the tabs.
+     * This method is the only code added to this class that was originally designed by Google.
+     * @param driverDistractionLevel The distraction level
+     */
     public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
         if(driverDistractionLevel.getLevel()>1) {
             Runnable setAdapter = new Runnable() {
