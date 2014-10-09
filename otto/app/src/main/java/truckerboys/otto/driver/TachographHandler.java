@@ -24,23 +24,25 @@ public class TachographHandler implements IVehicleListener {
     }
 
     private void handleWorkingStateChange(int state){
-        
+        switch(state){
+            case 2:
+                user.startNewSession(SessionType.WORKING);
+                break;
+            case 3:
+                user.startNewSession(SessionType.DRIVING);
+                break;
+            default:
+                user.startNewSession(SessionType.RESTING);
+                break;
+        }
     }
-
-
 
     @Override
     public void receive(AutomotiveSignal signal) {
         switch(signal.getSignalId()){
-            case VehicleSignalID.DRIVER_1_CARD:
-
-
-                break;
-
             case VehicleSignalID.DRIVER_1_WORKING_STATE:
 
-                int x = (new SCSInteger(signal.getData().getData())).getIntValue();
-
+                handleWorkingStateChange((new SCSInteger(signal.getData().getData())).getIntValue());
                 break;
         }
     }
