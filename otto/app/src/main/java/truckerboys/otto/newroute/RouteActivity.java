@@ -254,7 +254,7 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onClick(View view) {
 
-                //routePresenter.sendLocation("" + history1Text.getText(), coder);
+                routePresenter.sendLocation("" + history1Text.getText(), coder);
             }
         });
 
@@ -263,7 +263,7 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onClick(View view) {
 
-                //routePresenter.sendLocation("" + history2Text.getText(), coder);
+                routePresenter.sendLocation("" + history2Text.getText(), coder);
 
             }
         });
@@ -273,7 +273,7 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onClick(View view) {
 
-                //routePresenter.sendLocation("" + history3Text.getText(), coder);
+                routePresenter.sendLocation("" + history3Text.getText(), coder);
 
             }
         });

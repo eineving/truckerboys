@@ -71,7 +71,7 @@ public class MainActivity extends FragmentActivity implements IEventListener {
     public void performEvent(Event event) {
         // Sets the current page to Map if a new destination is set
         if(event.isType(NewDestination.class)) {
-            viewPager.setCurrentItem(1);
+            viewPager.setCurrentItem(0);
         }
     }
 }

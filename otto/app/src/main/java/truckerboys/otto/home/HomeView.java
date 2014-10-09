@@ -69,35 +69,35 @@ public class HomeView extends Fragment implements IView {
         continueRouteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
             }
         });
 
         mapsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
             }
         });
 
         clockButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(2);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
             }
         });
 
         statsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(5);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(3);
             }
         });
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(3);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(4);
             }
         });
 
