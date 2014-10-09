@@ -35,6 +35,7 @@ public class MainActivity extends FragmentActivity implements IEventListener {
         viewPager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), otto.getViews());
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setCurrentItem(2);
 
         /*
          * Make sure we never have to reload any of the tabs after the app has been started.
