@@ -11,22 +11,6 @@ import truckerboys.otto.utils.positions.RestLocation;
 
 public interface IPlaces {
     /**
-     * Get a suggested address (location) from a user input String
-     * @param input user input
-     * @return suggested addresses
-     */
-    public List<String> getSuggestedAddresses(String input);
-
-    /**
-     *
-     * Get a suggested address (location) from a user input String
-     * @param input user input
-     * @param currentLocation location to focus the searches from
-     * @return suggested addresses
-     */
-    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation);
-
-    /**
      * Get the closest rest locations to given position
      * @param position target position to calculate from
      * @return rest locations nearby given positions

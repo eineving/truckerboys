@@ -160,31 +160,6 @@ public class TripPlanner {
         return getNewRoute(startLocation, endLocation, null);
     }
 
-    //TODO Eineving put this methods in a different class
-
-    /**
-     * Get a suggested address (location) from a user input String
-     *
-     * @param input           user input
-     * @param currentLocation location to focus the searches from
-     * @return suggested addresses
-     */
-    public List<String> getAddressSuggestion(String input, MapLocation currentLocation) {
-        return placesProvider.getSuggestedAddresses(input, currentLocation);
-    }
-
-    //TODO Eineving put this methods in a different class
-
-    /**
-     * Get a suggested address (location) from a user input String
-     *
-     * @param input user input
-     * @return suggested addresses
-     */
-    public List<String> getAddressSuggestion(String input) {
-        return placesProvider.getSuggestedAddresses(input);
-    }
-
     //TODO Method is no longer needed
 
     /**

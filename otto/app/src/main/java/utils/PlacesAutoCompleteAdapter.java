@@ -5,11 +5,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.User;
+import truckerboys.otto.placeSuggestion.GooglePlacesAutoComplete;
+import truckerboys.otto.placeSuggestion.IPlacesAutoComplete;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
@@ -26,13 +27,11 @@ import truckerboys.otto.planner.TripPlanner;
  */
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
     private ArrayList<String> resultList = new ArrayList<String>();
-    private TripPlanner tripPlanner;
+    private IPlacesAutoComplete suggestionsProvider;
 
     public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
-
-        // TODO: Use a new or reuse tripplanner?
-        tripPlanner = new TripPlanner(new EURegulationHandler(), new GoogleDirections(), new GooglePlaces(), User.getInstance());
+        suggestionsProvider = new GooglePlacesAutoComplete();
 
     }
 
@@ -65,7 +64,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
 
                 if(charSequence != null) {
                     // Retrieves autocomplete results from TripPlanner class
-                    resultList = (ArrayList<String>)tripPlanner.getAddressSuggestion(charSequence.toString());
+                    resultList = (ArrayList<String>) suggestionsProvider.getSuggestedAddresses(charSequence.toString());
 
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;
