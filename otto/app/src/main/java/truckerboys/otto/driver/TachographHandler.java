@@ -1,7 +1,7 @@
 package truckerboys.otto.driver;
 
 import android.swedspot.automotiveapi.AutomotiveSignal;
-import android.swedspot.scs.data.SCSInteger;
+import android.swedspot.scs.data.Uint8;
 
 import truckerboys.otto.vehicle.IVehicleListener;
 import truckerboys.otto.vehicle.VehicleInterface;
@@ -18,8 +18,6 @@ public class TachographHandler implements IVehicleListener {
     public TachographHandler(User user){
 
         this.user = user;
-
-        VehicleInterface.subscribe(this, VehicleSignalID.DRIVER_1_CARD);
         VehicleInterface.subscribe(this, VehicleSignalID.DRIVER_1_WORKING_STATE);
     }
 
@@ -27,12 +25,15 @@ public class TachographHandler implements IVehicleListener {
         switch(state){
             case 2:
                 user.startNewSession(SessionType.WORKING);
+                System.out.println("Working");
                 break;
             case 3:
                 user.startNewSession(SessionType.DRIVING);
+                System.out.println("DRIVING");
                 break;
             default:
                 user.startNewSession(SessionType.RESTING);
+                System.out.println("RESTING");
                 break;
         }
     }
@@ -42,7 +43,8 @@ public class TachographHandler implements IVehicleListener {
         switch(signal.getSignalId()){
             case VehicleSignalID.DRIVER_1_WORKING_STATE:
 
-                handleWorkingStateChange((new SCSInteger(signal.getData().getData())).getIntValue());
+
+                handleWorkingStateChange(new Uint8(signal.getData().getData()).getIntValue());
                 break;
         }
     }

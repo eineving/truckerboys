@@ -27,7 +27,7 @@ public class User {
      * Starts a new Session.
      */
     public void startNewSession(SessionType type){
-        if(currentSession.isActive()){
+        if(currentSession != null && currentSession.isActive()){
             endSession();
         }
         currentSession = new Session(type);
