@@ -4,6 +4,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
+import truckerboys.otto.driver.NoValidBreakFound;
 import truckerboys.otto.driver.SessionHistory;
 
 /**
@@ -50,13 +51,19 @@ public class EURegulationHandler implements IRegulationHandler {
     @Override
     public TimeLeft getThisDayTL(SessionHistory history) {
 
-        //First check maximum TL today before you have to take a break, so that you will
-        //have time to finish your break before the 24h time limit runs out.
-        Instant maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
+        //Get latest daily break, if no break was found. We are in first week ever. Search all sessions.
+        Instant maxTimeMarker;
+        try {
+            if (history.getNumberOfReducedDailyRestsThisWeek() < 3) {
+                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
+            } else {
+                //Check maximum TL today before you have to take a break, so that you will
+                //have time to finish your break before the 24h time limit runs out.
+                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
+            }
 
-
-        if (history.getNumberOfReducedDailyRestsThisWeek() < 2) {
-            maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
+        } catch (NoValidBreakFound e) {
+            maxTimeMarker = new Instant(0);
         }
 
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
