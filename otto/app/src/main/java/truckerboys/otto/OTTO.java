@@ -3,6 +3,7 @@ package truckerboys.otto;
 import java.util.ArrayList;
 import java.util.List;
 
+import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.clock.ClockView;
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.User;
@@ -43,7 +44,7 @@ public class OTTO {
         mapView.setTripPlanner(tripPlanner);
         views.add(mapView);
 
-        views.add(new ClockView());
+        views.add(new ClockPresenter());
 
         views.add(new HomeView());
 
