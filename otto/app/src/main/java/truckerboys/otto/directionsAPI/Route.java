@@ -6,7 +6,9 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
+import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 /**
  * Created by Daniel on 2014-09-24.
@@ -18,6 +20,10 @@ public class Route {
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
     private ArrayList<MapLocation> checkpoints;
+    private ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
+    private ArrayList<RestLocation> restLocations = new ArrayList<RestLocation>();
+
+
 
     /**
      *
@@ -83,5 +89,37 @@ public class Route {
      */
     public ArrayList<MapLocation> getCheckpoints() {
         return checkpoints;
+    }
+
+    /**
+     * Get gas stations along route
+     * @return gas stations along route
+     */
+    public ArrayList<GasStation> getGasStationsAlongRoute() {
+        return gasStations;
+    }
+
+    /**
+     * Get rest locations along route
+     * @return rest locations along route
+     */
+    public ArrayList<RestLocation> getRestLocationsAlongRoute() {
+        return restLocations;
+    }
+
+    /**
+     * Add gas station along route
+     * @param gasStation a gas station close to the route
+     */
+    public void addGasStationAlongRoute(GasStation gasStation){
+        gasStations.add(gasStation);
+    }
+
+    /**
+     * Add rest location along the route
+     * @param restLocation a rest location close to the route
+     */
+    public void addRestLocationAlongRoute(RestLocation restLocation){
+        restLocations.add(restLocation);
     }
 }

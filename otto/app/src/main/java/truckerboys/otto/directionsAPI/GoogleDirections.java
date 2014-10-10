@@ -17,7 +17,7 @@ public class GoogleDirections implements IDirections{
     @Override
     public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, RoutePreferences preferences,
                           MapLocation... checkpoint) throws Exception {
-        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, null)).get();
+        String response = new GoogleRequesterHandler().execute(DIRECTIONS_URL + jsonStringCreator(currentPosition, finalDestination, null, checkpoint)).get();
         return GoogleDirectionsJSONDecoder.stringToRoute(response);
     }
 
