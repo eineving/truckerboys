@@ -79,7 +79,7 @@ public class ClockView extends Fragment {
             @Override
             public void onClick(View view) {
                 String tag = ((RelativeLayout)view).getTag().toString();
-                //TODO: Add sending events
+                //TODO: Add sending events + method for handling clickevents
                 if(tag.equalsIgnoreCase("recStop")){
                     recStopTitle.setText("Chosen stop");
                 }
@@ -152,7 +152,7 @@ public class ClockView extends Fragment {
     }
 
     /**
-     * Sets the labels of the reststops.
+     * Sets the labels of the time until violation and the reststops.
      */
     private void setLabels() {
         try {

@@ -35,7 +35,9 @@ public class ClockModel {
 
     }
 
-
+    /**
+     * Updates the ETAs of the stops and until violation
+     */
     public void update() {
         timeNow = new Instant();
         timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
@@ -51,14 +53,26 @@ public class ClockModel {
         //TODO: Add checking for reststops with TripPlanner
     }
 
+    /**
+     * Returns the recommended reststop
+     * @return The recommended reststop
+     */
     public RestStop getRecommendedRestStop(){
         return recStop;
     }
 
+    /**
+     * Returns the first alternative reststop
+     * @return The first alternative reststop
+     */
     public RestStop getFirstAltReststop() {
         return firstAltStop;
     }
 
+    /**
+     * Returns the second alternative reststop
+     * @return The second alternative reststop
+     */
     public RestStop getSecondAltReststop() {
         return secAltStop;
     }
