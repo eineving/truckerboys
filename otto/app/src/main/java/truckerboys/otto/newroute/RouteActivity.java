@@ -185,8 +185,11 @@ public class RouteActivity extends Activity implements IEventListener{
                 if(finalDestination != null && coder != null && routePresenter != null) {
                     if(finalDestination.getText() != null && !finalDestination.getText().equals("")){
 
-                        routePresenter.sendLocation("" + finalDestination.getText(), coder);
-                        routePresenter.saveHistory(history, "" + finalDestination.getText());
+                        routePresenter.sendLocation("" + finalDestination.getText().toString(), coder);
+
+                        if(history != null) {
+                            routePresenter.saveHistory(history, "" + finalDestination.getText().toString());
+                        }
                     }
                 }
             }

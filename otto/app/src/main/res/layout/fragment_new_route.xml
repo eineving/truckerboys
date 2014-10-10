@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -7,359 +9,377 @@
     android:imeOptions="actionSearch"
     android:background="@color/background_color">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/white_dropshadow">
 
-    <LinearLayout
-        android:id="@+id/search_box"
+    <ScrollView
+        android:id="@+id/ScrollView"
+        android:scrollbars="none"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
+        android:fadeScrollbars="false"
+        android:scrollbarAlwaysDrawHorizontalTrack="false"
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
 
-            <AutoCompleteTextView
-                android:layout_width="260dp"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/search_text_view"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:hint="Final destination"
-                android:singleLine="true"
-                android:textColorHint="@color/textLight"
-                android:textColor="@color/textLight"
-                android:iconifiedByDefault="false"
-                android:layout_gravity="right"
-                android:autoText="false" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/white_dropshadow">
 
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_gravity="right"
-                android:layout_marginTop="-30dp"
-                android:clickable="false"
-                android:visibility="invisible"
-                android:id="@+id/add_button1"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_menu_add"
-                android:background="#00ffc6f1" />
+                <LinearLayout
+                    android:id="@+id/search_box"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content">
+
+                        <AutoCompleteTextView
+                            android:layout_width="260dp"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/search_text_view"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:hint="Final destination"
+                            android:singleLine="true"
+                            android:textColorHint="@color/textLight"
+                            android:textColor="@color/textLight"
+                            android:iconifiedByDefault="false"
+                            android:layout_gravity="right"
+                            android:autoText="false" />
+
+                        <ImageButton
+                            android:layout_width="50dp"
+                            android:layout_gravity="right"
+                            android:layout_marginTop="-30dp"
+                            android:clickable="false"
+                            android:visibility="invisible"
+                            android:id="@+id/add_button1"
+                            android:layout_height="wrap_content"
+                            android:src="@android:drawable/ic_menu_add"
+                            android:background="#00ffc6f1" />
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/checkpoint_box"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp"
+                        android:layout_height="wrap_content">
+
+                        <AutoCompleteTextView
+                            android:layout_width="260dp"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/checkpoint_text"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:hint="Checkpoint"
+                            android:singleLine="true"
+                            android:textColorHint="@color/textLight"
+                            android:textColor="@color/textLight"
+                            android:iconifiedByDefault="false"
+                            android:layout_gravity="left"
+                            android:autoText="false" />
+
+                        <ImageButton
+                            android:layout_width="50dp"
+                            android:layout_gravity="right"
+                            android:layout_marginTop="-30dp"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:id="@+id/add_button2"
+                            android:visibility="invisible"
+                            android:src="@android:drawable/ic_menu_add"
+                            android:background="#00ffc6f1" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/final_route_box"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/white_dropshadow"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="10dp"
+                        android:background="#00ffffff"
+                        android:id="@+id/imageView3"
+                        android:src="@android:drawable/ic_menu_mapmode"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/textLight"
+                        android:textSize="20dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginLeft="10dp"
+                        android:text="Final destination"
+                        android:layout_toRightOf="@+id/imageView3"
+                        android:layout_toEndOf="@+id/imageView3"
+                        android:id="@+id/route_title" />
+                </LinearLayout>
+
+
+
+                <View
+                    android:id="@+id/divider4"
+                    android:layout_margin="10dp"
+                    android:layout_width="fill_parent"
+                    android:layout_below="@+id/route_title"
+                    android:layout_height="0.5dp"
+                    android:background="@color/textLightest"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/final_destination_text_box"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Karl johans"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="10dp"
+                        android:width="230dp"
+                        android:id="@+id/final_destination_text"
+                        android:textColor="@color/textLight"
+                        android:textStyle="bold"
+                        android:textSize="14dp"
+                        android:layout_centerVertical="true"/>
+
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:id="@+id/navigate_button"
+                        android:background="#00ffffff"
+                        android:src="@android:drawable/ic_menu_send" />
+
+                </RelativeLayout>
+
 
             </LinearLayout>
 
 
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/checkpoint_box"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="10dp"
-            android:layout_height="wrap_content">
-
-            <AutoCompleteTextView
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/checkpoint_text"
+            <LinearLayout
+                android:id="@+id/checks"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:hint="Checkpoint"
-                android:singleLine="true"
-                android:textColorHint="@color/textLight"
-                android:textColor="@color/textLight"
-                android:iconifiedByDefault="false"
-                android:layout_gravity="left"
-                android:autoText="false" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/white_dropshadow"
+                android:orientation="vertical">
 
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_gravity="right"
-                android:layout_marginTop="-30dp"
-                android:layout_height="wrap_content"
-                android:clickable="false"
-                android:id="@+id/add_button2"
-                android:visibility="invisible"
-                android:src="@android:drawable/ic_menu_add"
-                android:background="#00ffc6f1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="#00ffffff"
+                        android:layout_margin="10dp"
+                        android:id="@+id/imageView"
+                        android:src="@android:drawable/ic_menu_myplaces" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/textLight"
+                        android:textSize="20dp"
+                        android:text="Checkpoints"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/imageView"
+                        android:layout_toEndOf="@+id/imageView"
+                        android:id="@+id/textView2" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider7"
+                    android:layout_margin="10dp"
+                    android:layout_width="fill_parent"
+                    android:layout_below="@+id/route_title"
+                    android:layout_height="0.5dp"
+                    android:background="@color/textLightest"/>
+
+                <ListView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="-10dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/list_of_checks">
+
+                </ListView>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/history_box"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/white_dropshadow"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/textLight"
+                    android:textSize="20dp"
+                    android:layout_margin="10dp"
+                    android:text="Recent destinations"
+                    android:id="@+id/textView" />
+
+                <View
+                    android:id="@+id/divider0"
+                    android:layout_margin="10dp"
+                    android:layout_width="fill_parent"
+                    android:layout_below="@+id/dailyStats"
+                    android:layout_height="0.5dp"
+                    android:background="@color/textLightest"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/history1"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/history1_text"
+                        android:textColor="@color/textLight"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true" />
+
+                </RelativeLayout>
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_margin="10dp"
+                    android:layout_width="fill_parent"
+                    android:layout_below="@+id/dailyStats"
+                    android:layout_height="0.5dp"
+                    android:background="@color/textLightest"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:id="@+id/history2"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/history2_text"
+                        android:textColor="@color/textLight"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true" />
+                </RelativeLayout>
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_margin="10dp"
+                    android:layout_width="fill_parent"
+                    android:layout_below="@+id/dailyStats"
+                    android:layout_height="0.5dp"
+                    android:background="@color/textLightest"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/history3"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/history3_text"
+                        android:textColor="@color/textLight"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true" />
+                </RelativeLayout>
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/final_route_box"
-        android:layout_width="match_parent"
-        android:layout_height="125dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/white_dropshadow"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="10dp"
-                android:background="#00ffffff"
-                android:id="@+id/imageView3"
-                android:src="@android:drawable/ic_menu_mapmode"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:textColor="@color/textLight"
-                android:textSize="20dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="10dp"
-                android:text="Final destination"
-                android:layout_toRightOf="@+id/imageView3"
-                android:layout_toEndOf="@+id/imageView3"
-                android:id="@+id/route_title" />
-            </LinearLayout>
-
-
-
-        <View
-            android:id="@+id/divider4"
-            android:layout_margin="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/route_title"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/final_destination_text_box"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:layout_marginLeft="50dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:width="230dp"
-                android:id="@+id/final_destination_text"
-                android:textColor="@color/textLight"
-                android:textStyle="bold"
-                android:textSize="14dp"
-                android:layout_centerVertical="true"/>
-
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:id="@+id/navigate_button"
-                android:background="#00ffffff"
-                android:src="@android:drawable/ic_menu_send" />
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/checks"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/white_dropshadow"
-        android:orientation="vertical">
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="#00ffffff"
-                android:layout_margin="10dp"
-                android:id="@+id/imageView"
-                android:src="@android:drawable/ic_menu_myplaces" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:textColor="@color/textLight"
-                android:textSize="20dp"
-                android:text="Checkpoints"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@+id/imageView"
-                android:layout_toEndOf="@+id/imageView"
-                android:id="@+id/textView2" />
-
-            </LinearLayout>
-
-        <View
-            android:id="@+id/divider7"
-            android:layout_margin="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/route_title"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="10dp"
-            android:id="@+id/list_of_checks">
-
-            </ListView>
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/history_box"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/white_dropshadow"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:textColor="@color/textLight"
-            android:textSize="20dp"
-            android:layout_margin="10dp"
-            android:text="Recent destinations"
-            android:id="@+id/textView" />
-
-        <View
-            android:id="@+id/divider0"
-            android:layout_margin="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/dailyStats"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/history1"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:id="@+id/history1_text"
-                android:textColor="@color/textLight"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-        </RelativeLayout>
-        <View
-            android:id="@+id/divider1"
-            android:layout_margin="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/dailyStats"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:id="@+id/history2"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:id="@+id/history2_text"
-                android:textColor="@color/textLight"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-        </RelativeLayout>
-        <View
-            android:id="@+id/divider2"
-            android:layout_margin="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/dailyStats"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:id="@+id/history3"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:id="@+id/history3_text"
-                android:textColor="@color/textLight"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-        </RelativeLayout>
-    </LinearLayout>
-
-
-
+    </ScrollView>
 </LinearLayout>
