@@ -9,6 +9,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.method.KeyListener;
+import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -146,6 +148,8 @@ public class RouteActivity extends Activity implements IEventListener{
                     //TODO remove from list view
                     adapter.remove(((TextView)view).getText());
                     adapter.notifyDataSetChanged();
+
+                    list.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 120*strings.size()));
                 }
             }
         });
@@ -311,6 +315,7 @@ public class RouteActivity extends Activity implements IEventListener{
                     strings.add(checkpoint.getText() + "");
                     adapter.notifyDataSetChanged();
 
+                    list.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 120*strings.size()));
 
                     checkpoint.setText("");
 
