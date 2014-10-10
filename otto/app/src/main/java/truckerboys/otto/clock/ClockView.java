@@ -25,7 +25,7 @@ import truckerboys.otto.planner.TimeLeft;
  */
 public class ClockView extends Fragment {
     View rootView;
-    TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, recStopName, firstAltStopName, secAltStopName;
+    TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, recStopName, firstAltStopName, secAltStopName, recStopTitle;
     ImageView recStopImage, firstAltStopImage, secAltStopImage;
     RelativeLayout recStopClick, firstAltStopClick, secAltStopClick;
 
@@ -57,6 +57,8 @@ public class ClockView extends Fragment {
         timeLeft.setText("04:22");
         timeLeftExtended = (TextView) rootView.findViewById(R.id.clockETAExtended);
 
+        recStopTitle = (TextView) rootView.findViewById(R.id.recStopTitle);
+
         recStopETA = (TextView) rootView.findViewById(R.id.recStopETA);
         firstAltStopETA = (TextView) rootView.findViewById(R.id.firstAltStopETA);
         secAltStopETA = (TextView) rootView.findViewById(R.id.secAltStopETA);
@@ -68,6 +70,36 @@ public class ClockView extends Fragment {
         recStopImage = (ImageView) rootView.findViewById(R.id.recStopImage);
         firstAltStopImage = (ImageView) rootView.findViewById(R.id.firstAltStopImage);
         secAltStopImage = (ImageView) rootView.findViewById(R.id.secAltStopImage);
+
+        recStopClick = (RelativeLayout) rootView.findViewById(R.id.recStop);
+        firstAltStopClick = (RelativeLayout) rootView.findViewById(R.id.firstAltStop);
+        secAltStopClick = (RelativeLayout) rootView.findViewById(R.id.secAltStop);
+
+        View.OnClickListener stopClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String tag = ((RelativeLayout)view).getTag().toString();
+                //TODO: Add sending events
+                if(tag.equalsIgnoreCase("recStop")){
+                    recStopTitle.setText("Chosen stop");
+                }
+                if(tag.equalsIgnoreCase("firstAltStop")){
+                    recStopTitle.setText("Chosen stop");
+                    RestStop temp = recStop;
+                    recStop = firstAltStop;
+                    firstAltStop = temp;
+                }
+                if(tag.equalsIgnoreCase("secAltStop")){
+                    recStopTitle.setText("Chosen stop");
+                    RestStop temp = recStop;
+                    recStop = secAltStop;
+                    secAltStop = temp;
+                }
+            }
+        };
+        recStopClick.setOnClickListener(stopClickListener);
+        firstAltStopClick.setOnClickListener(stopClickListener);
+        secAltStopClick.setOnClickListener(stopClickListener);
 
         variablesSet = true;
     }
@@ -157,8 +189,7 @@ public class ClockView extends Fragment {
                 .appendSeparator(":")
                 .appendMinutes()
                 .toFormatter();
-        String result = minutesAndSeconds.print(period);
-        return result;
+        return minutesAndSeconds.print(period);
     }
 
 }

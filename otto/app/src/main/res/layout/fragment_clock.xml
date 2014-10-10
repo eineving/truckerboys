@@ -65,7 +65,7 @@
         android:paddingTop="5dp">
 
         <TextView
-            android:id="@+id/optimizedstopTitle"
+            android:id="@+id/recStopTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -86,6 +86,7 @@
 
         <RelativeLayout
             android:id="@+id/recStop"
+            android:tag="recStop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -137,7 +138,7 @@
         android:paddingTop="5dp">
 
         <TextView
-            android:id="@+id/nextStopsTitle"
+            android:id="@+id/altStopsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -156,6 +157,7 @@
 
         <RelativeLayout
             android:id="@+id/firstAltStop"
+            android:tag="firstAltStop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -207,6 +209,7 @@
 
         <RelativeLayout
             android:id="@+id/secAltStop"
+            android:tag="secAltStop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
