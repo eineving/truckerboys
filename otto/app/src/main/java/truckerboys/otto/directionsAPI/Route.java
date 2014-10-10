@@ -20,8 +20,8 @@ public class Route {
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
     private ArrayList<MapLocation> checkpoints;
-    private ArrayList<GasStation> gasStations;
-    private ArrayList<RestLocation> restLocations;
+    private ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
+    private ArrayList<RestLocation> restLocations = new ArrayList<RestLocation>();
 
 
 
