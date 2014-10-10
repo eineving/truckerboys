@@ -96,7 +96,7 @@ public class TripPlanner {
         Log.w("NBRofCloseLocations", closeLocations.size() + "");
 
         //Just calculating the ten best matches from Google
-        for (int i = 0; i < 10 || i < closeLocations.size(); i++) {
+        for (int i = 0; i < 10 && i < closeLocations.size(); i++) {
             try {
                 //Checks if the restLocation is a possible stop and is faster than the previous
                 Route temp = directionsProvider.getRoute(startLocation, finalDestination, new MapLocation(closeLocations.get(i)));
@@ -158,33 +158,6 @@ public class TripPlanner {
      */
     public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) {
         return getNewRoute(startLocation, endLocation, null);
-    }
-
-    //TODO Method is no longer needed
-
-    /**
-     * Calculates the optimal times to take a break depending on the ETA to the destination
-     * and the driving regulations.
-     *
-     * @param ETA The ETA to the final destination.
-     * @return
-     */
-    private List<Duration> getOptimalBreaks(Duration ETA) {
-        ArrayList<Duration> breaks = new ArrayList<Duration>();
-
-        Duration legTL = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
-        Duration totalTL = ETA;
-
-        while (ETA.isLongerThan(legTL)) {
-            breaks.add(legTL.minus(Duration.standardMinutes(10)));
-            totalTL = totalTL.minus(legTL);
-            // How do we predict the allowed time for future sessions
-            //The code below will not work as intended.
-            legTL = Duration.standardHours(4).plus(Duration.standardMinutes(30));
-        }
-
-        //Should not only return times of the breaks but also the duration of the breaks.
-        return breaks;
     }
 
     /**
