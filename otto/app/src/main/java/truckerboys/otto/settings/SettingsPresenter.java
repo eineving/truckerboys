@@ -26,14 +26,14 @@ public class SettingsPresenter implements IEventListener{
         EventTruck.getInstance().subscribe(this);
     }
 
-    public void setListeners(Switch sound, Switch display, Switch unit) {
+    public void setListeners(Switch sound, Switch display) {
 
-        unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        /*unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 unitsChanged(b);
             }
-        });
+        });*/
 
         sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
