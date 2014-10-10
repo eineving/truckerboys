@@ -19,10 +19,16 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.utils.eventhandler.EventTruck;
@@ -43,6 +49,9 @@ public class RouteActivity extends Activity implements IEventListener{
     private RoutePresenter routePresenter;
     private RouteModel routeModel = new RouteModel();
 
+    private ListView list;
+    private ArrayList<String> strings;
+
     private AutoCompleteTextView search;
     private AutoCompleteTextView checkpoint;
     // Geocoder to use when sending a location with the eventTruck
@@ -54,8 +63,7 @@ public class RouteActivity extends Activity implements IEventListener{
     private TextView history2Text;
     private TextView history3Text;
     private TextView finalDestination;
-    private TextView finalCheckpoints;
-    private TextView checkpointResultText;
+    // private TextView finalCheckpoints;
 
     private ImageButton navigate;
     private ImageButton addButton1;
@@ -63,16 +71,15 @@ public class RouteActivity extends Activity implements IEventListener{
 
     private LinearLayout resultsBox;
     private LinearLayout historyBox;
-    private LinearLayout searchBox;
-    private LinearLayout checkpointResultBox;
     private RelativeLayout history1;
     private RelativeLayout history2;
     private RelativeLayout history3;
 
+    private String tempLocation = "temp";
+
 
     InputMethodManager keyboard;
 
-    private ContentProvider suggestionProvider = new SuggestionProvider();
 
     public static final String HISTORY = "History_file";
 
@@ -93,11 +100,9 @@ public class RouteActivity extends Activity implements IEventListener{
 
         // Sets ui components
         historyBox = (LinearLayout) findViewById(R.id.history_box);
-        resultsBox = (LinearLayout) findViewById(R.id.results_box);
-        resultsBox.setX(historyBox.getX());
+        // resultsBox.setX(historyBox.getX());
+        list = (ListView) findViewById(R.id.list_of_checks);
 
-        searchBox = (LinearLayout) findViewById(R.id.search_box);
-        checkpointResultBox = (LinearLayout) findViewById(R.id.checkpoint_result_box);
 
         history1 = (RelativeLayout) findViewById(R.id.history1);
         history2 = (RelativeLayout) findViewById(R.id.history2);
@@ -111,11 +116,7 @@ public class RouteActivity extends Activity implements IEventListener{
         search = (AutoCompleteTextView) findViewById(R.id.search_text_view);
         checkpoint = (AutoCompleteTextView) findViewById(R.id.checkpoint_text);
 
-        result = (TextView) findViewById(R.id.result_text_view);
-        checkpointResultText = (TextView) findViewById(R.id.checkpoint_result_text);
-
         finalDestination = (TextView) findViewById(R.id.final_destination_text);
-        finalCheckpoints = (TextView) findViewById(R.id.final_checkpoints_text);
 
         navigate = (ImageButton) findViewById(R.id.navigate_button);
         addButton1 = (ImageButton) findViewById(R.id.add_button1);
@@ -130,25 +131,34 @@ public class RouteActivity extends Activity implements IEventListener{
         search.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_list_item_1));
         checkpoint.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_list_item_1));
 
+        strings = new ArrayList<String>();
+        final ArrayAdapter adapter = new ArrayAdapter(this, R.layout.text_list_item, strings);
+
+        list.setAdapter(adapter);
+
+
+        list.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if(routeModel.getCheckpoints().contains(((TextView)view).getText())){
+                    routeModel.getCheckpoints().remove(((TextView)view).getText());
+                    //TODO remove from list view
+                    adapter.remove(((TextView)view).getText());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
 
         // Handles when user selects an item from the drop-down menu
         search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-
-                result.setText(search.getText());
                 addButton1.setVisibility(View.VISIBLE);
-                result.clearFocus();
 
                 // Hides keyboard
-                keyboard.hideSoftInputFromWindow(result.getWindowToken(), 0);
-
-                LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(resultsBox.getWidth(), 150);
-                layout.setMargins(30, 30, 30, 0);
-
-                resultsBox.setLayoutParams(layout);
-                ((PlacesAutoCompleteAdapter)search.getAdapter()).clear();
+                keyboard.hideSoftInputFromWindow(search.getWindowToken(), 0);
 
             }
         });
@@ -158,17 +168,12 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                checkpointResultText.setText(checkpoint.getText());
                 addButton2.setVisibility(View.VISIBLE);
                 checkpoint.clearFocus();
 
                 // Hides keyboard
                 keyboard.hideSoftInputFromWindow(checkpoint.getWindowToken(), 0);
 
-                LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(checkpointResultBox.getWidth(), 150);
-                layout.setMargins(30, 30, 30, 0);
-
-                checkpointResultBox.setLayoutParams(layout);
                 ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).clear();
 
             }
@@ -192,24 +197,25 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
 
+                if(i == KeyEvent.KEYCODE_BACK) {
+                    finish();
+                }
+
                 // If "done" on keyboard is clicked set search result to most accurate item
                 if (i == 66 && search != null && search.getAdapter() != null) {
 
-                    if(!search.getAdapter().isEmpty() && !search.getAdapter().getItem(0).toString().equals(result.getText())
+                    System.out.println("COMPARING: " + tempLocation + " AND " + finalDestination.getText().toString() + "************");
+
+                    if(!search.getAdapter().isEmpty() && !tempLocation.equals(finalDestination.getText().toString())
                             && !search.getAdapter().getItem(0).toString().equals(finalDestination.getText())) {
 
                         search.setText(search.getAdapter().getItem(0).toString());
-                        result.setText(search.getAdapter().getItem(0).toString());
                         search.clearFocus();
                         addButton1.setVisibility(View.VISIBLE);
 
                         // Hides keyboard
-                        keyboard.hideSoftInputFromWindow(result.getWindowToken(), 0);
+                        keyboard.hideSoftInputFromWindow(search.getWindowToken(), 0);
 
-                        LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(resultsBox.getWidth(), 150);
-                        layout.setMargins(30, 30, 30, 0);
-
-                        resultsBox.setLayoutParams(layout);
                     }
 
                 }
@@ -228,17 +234,12 @@ public class RouteActivity extends Activity implements IEventListener{
                     if(!checkpoint.getAdapter().isEmpty()) {
 
                         checkpoint.setText(checkpoint.getAdapter().getItem(0).toString());
-                        checkpointResultText.setText(checkpoint.getAdapter().getItem(0).toString());
                         checkpoint.clearFocus();
                         addButton2.setVisibility(View.VISIBLE);
 
                         // Hides keyboard
                         keyboard.hideSoftInputFromWindow(checkpoint.getWindowToken(), 0);
 
-                        LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(checkpointResultBox.getWidth(), 150);
-                        layout.setMargins(30, 30, 30, 0);
-
-                        checkpointResultBox.setLayoutParams(layout);
                         ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).clear();
 
                     }
@@ -279,52 +280,43 @@ public class RouteActivity extends Activity implements IEventListener{
         });
 
         // When the user clicks the destination selected
-        resultsBox.setOnClickListener(new View.OnClickListener() {
+        addButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finalDestination != null && result != null) {
-                    finalDestination.setText(result.getText());
+                if(finalDestination != null && search != null) {
+                    finalDestination.setText(search.getText());
+                    tempLocation = search.getText().toString();
 
-                    result.setText("");
+
+                    addButton1.setVisibility(View.INVISIBLE);
                     search.setText("");
-
-                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(resultsBox.getWidth(), 1);
-                    layout.setMargins(30, 30, 30, 0);
-
-                    resultsBox.setLayoutParams(layout);
-
-                    ((PlacesAutoCompleteAdapter)search.getAdapter()).insert("",0);
-                    ((PlacesAutoCompleteAdapter)search.getAdapter()).add("");
                 }
             }
         });
 
         // When the user clicks the checkpoint selected
-        checkpointResultBox.setOnClickListener(new View.OnClickListener() {
+        addButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finalCheckpoints != null && checkpointResultText != null) {
-                    finalCheckpoints.setText(checkpointResultText.getText());
+                if(checkpoint != null) {
+
                     addButton2.setVisibility(View.INVISIBLE);
 
+
+                    // Add it to models list of checkpoints
+                    routeModel.getCheckpoints().add(checkpoint.getText() + "");
+                    strings.add(checkpoint.getText() + "");
+                    adapter.notifyDataSetChanged();
+
+
                     checkpoint.setText("");
-                    checkpointResultText.setText("");
-
-                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(checkpointResultBox.getWidth(), 1);
-                    layout.setMargins(30, 30, 30, 0);
-
-                    checkpointResultBox.setLayoutParams(layout);
-
-                    ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).insert("",0);
-                    ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).add("");
 
                 }
             }
         });
 
+
     }
-
-
 
 
     @Override
