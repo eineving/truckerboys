@@ -1,7 +1,10 @@
 package truckerboys.otto.placeSuggestion;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
 
 public interface IPlacesAutoComplete {
@@ -10,7 +13,7 @@ public interface IPlacesAutoComplete {
      * @param input user input
      * @return suggested addresses
      */
-    public List<String> getSuggestedAddresses(String input);
+    public List<String> getSuggestedAddresses(String input) throws InvalidRequestException, NoConnectionException;
 
     /**
      *
@@ -19,5 +22,5 @@ public interface IPlacesAutoComplete {
      * @param currentLocation location to focus the searches from
      * @return suggested addresses
      */
-    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation);
+    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation) throws InvalidRequestException, ExecutionException, InterruptedException, NoConnectionException;
 }

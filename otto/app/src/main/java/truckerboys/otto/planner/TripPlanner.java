@@ -161,7 +161,7 @@ public class
      * @param route route to measure from
      * @return list of all gas stations within 3km from points in the route
      */
-    private ArrayList<GasStation> getGasSationsAlongRoute(Route route) {
+    private ArrayList<GasStation> getGasSationsAlongRoute(Route route) throws NoConnectionException {
         ArrayList<GasStation> list = new ArrayList<GasStation>();
         for (LatLng position : route.getOverviewPolyline()) {
 

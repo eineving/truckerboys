@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
@@ -22,5 +23,5 @@ public interface IPlaces {
      * @param position target position to calculate from
      * @return gas stations nearby given positions
      */
-    public ArrayList<GasStation> getNearbyGasStations(LatLng position);
+    public ArrayList<GasStation> getNearbyGasStations(LatLng position) throws NoConnectionException;
 }
