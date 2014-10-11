@@ -54,10 +54,23 @@ public class
             optimalRoute = directRoute;
         }
 
+        //If there is no time left on this session
+        else if(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().isEqual(Duration.ZERO)) {
+            //TODO implement finding closest stop in the right direction
+        }
+
         //If the location is within reach this day but not this session
         else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft()) &&
                 directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-            optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
+
+            //If the ETA/2 is longer than time left on session
+            if(directRoute.getEta().dividedBy(2).isLongerThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())){
+                optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().dividedBy(2));
+            }else {
+                optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
+            }
+
+
         }
 
         //If the location is not within reach this day (drive maximum distance)
@@ -135,6 +148,12 @@ public class
                 } else {
                     bottomIndex = (topIndex + bottomIndex) / 2;
                 }
+
+                //Just to be safe
+                if(topIndex == bottomIndex){
+                    break;
+                }
+
                 etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
                         new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
             }
