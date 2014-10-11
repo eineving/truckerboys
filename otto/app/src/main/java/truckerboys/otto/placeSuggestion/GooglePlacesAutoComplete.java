@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutionException;
 
 import truckerboys.otto.placesAPI.GooglePlacesJSONDecoder;
 import truckerboys.otto.utils.GoogleRequesterHandler;
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
 
 public class GooglePlacesAutoComplete implements IPlacesAutoComplete {
@@ -14,12 +16,12 @@ public class GooglePlacesAutoComplete implements IPlacesAutoComplete {
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
 
     @Override
-    public List<String> getSuggestedAddresses(String input) {
+    public List<String> getSuggestedAddresses(String input) throws InvalidRequestException, NoConnectionException {
         return getSuggestedAddresses(input, null);
     }
 
     @Override
-    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation) {
+    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
         String response;
         Log.w("Input", input);
 
@@ -37,17 +39,18 @@ public class GooglePlacesAutoComplete implements IPlacesAutoComplete {
         request += "&key=" + GOOGLE_KEY;
         Log.w("Request", request);
 
+
         try {
             response = new GoogleRequesterHandler().execute(request).get();
-            Log.w("Response", response);
-            return GooglePlacesJSONDecoder.getAutoCompleteList(response);
-
+        }catch (ExecutionException e) {
+            e.printStackTrace();
+            throw new NoConnectionException(e.getMessage());
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            throw new NoConnectionException(e.getMessage());
         }
-        return null;
+        Log.w("Response", response);
+        return GooglePlacesJSONDecoder.getAutoCompleteList(response);
     }
 
     /**

@@ -14,6 +14,8 @@ import truckerboys.otto.placeSuggestion.IPlacesAutoComplete;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 
 
 /**
@@ -64,7 +66,15 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
 
                 if(charSequence != null) {
                     // Retrieves autocomplete results from TripPlanner class
-                    resultList = (ArrayList<String>) suggestionsProvider.getSuggestedAddresses(charSequence.toString());
+                    try {
+                        resultList = (ArrayList<String>) suggestionsProvider.getSuggestedAddresses(charSequence.toString());
+                    } catch (InvalidRequestException e) {
+                        e.printStackTrace();
+                        //TODO Implement catch
+                    } catch (NoConnectionException e) {
+                        //TODO Implement catch
+                        e.printStackTrace();
+                    }
 
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import truckerboys.otto.utils.GoogleRequesterHandler;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
@@ -18,7 +19,7 @@ public class GooglePlaces implements IPlaces {
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
 
     @Override
-    public ArrayList<GasStation> getNearbyGasStations(LatLng position) {
+    public ArrayList<GasStation> getNearbyGasStations(LatLng position) throws NoConnectionException {
         String response;
 
         String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&&radius=3000types=gas_station" + "&key=" + GOOGLE_KEY;
@@ -29,10 +30,11 @@ public class GooglePlaces implements IPlaces {
 
         } catch (InterruptedException e) {
             e.printStackTrace();
+            throw new NoConnectionException(e.getMessage());
         } catch (ExecutionException e) {
             e.printStackTrace();
+            throw new NoConnectionException(e.getMessage());
         }
-        return null;
     }
 
 
