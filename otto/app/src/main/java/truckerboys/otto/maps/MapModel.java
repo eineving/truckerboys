@@ -17,6 +17,8 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.NewDestination;
 import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
@@ -34,11 +36,20 @@ public class MapModel implements IEventListener{
         Runnable updateRoute = new Runnable() {
             @Override
             public void run() {
+
                 if(LocationHandler.isConnected()) {
-                    eventTruck.newEvent(new UpdatedRouteEvent(
-                                    tripPlanner.calculateRoute(LocationHandler.getCurrentLocation(),
-                                    originalRoute.getFinalDestination()
-                                    )));
+                    try {
+                        eventTruck.newEvent(new UpdatedRouteEvent(
+                                        tripPlanner.calculateRoute(LocationHandler.getCurrentLocation(),
+                                        originalRoute.getFinalDestination()
+                                        )));
+                    } catch (InvalidRequestException e) {
+                        //TODO Create proper catch
+                        e.printStackTrace();
+                    } catch (NoConnectionException e) {
+                        //TODO Create proper catch
+                        e.printStackTrace();
+                    }
                 }
             }
         };
@@ -52,13 +63,21 @@ public class MapModel implements IEventListener{
             //TODO Check if outside current route, calculate new route.
         }
         if(event.isType(NewDestination.class)) {
-            originalRoute
-                    = tripPlanner.
-                    calculateRoute(
-                    new MapLocation(LocationHandler.getCurrentLocation()), //Start location
-                    new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
-                            ((NewDestination) event).getLocation().getLongitude())) //End location
-            );
+            try {
+                originalRoute
+                        = tripPlanner.
+                        calculateRoute(
+                        new MapLocation(LocationHandler.getCurrentLocation()), //Start location
+                        new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
+                                ((NewDestination) event).getLocation().getLongitude())) //End location
+                );
+            } catch (InvalidRequestException e) {
+                //TODO Create proper catch
+                e.printStackTrace();
+            } catch (NoConnectionException e) {
+                //TODO Create proper catch
+                e.printStackTrace();
+            }
             EventTruck.getInstance().newEvent(new ChangedRouteEvent(originalRoute));
         }
     }

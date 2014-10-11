@@ -13,11 +13,14 @@ import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
-public class TripPlanner {
+public class
+        TripPlanner {
     private final Duration MARGINAL = Duration.standardMinutes(10);
     private User user;
     private IRegulationHandler regulationHandler;
@@ -41,45 +44,37 @@ public class TripPlanner {
      * @param checkpoints   Checkpoints to visit before the end location
      * @return optimized route with POIs along the route (null if connection to Google is not established)
      */
-    public Route getNewRoute(MapLocation startLocation, MapLocation endLocation, MapLocation... checkpoints) {
+    public Route getNewRoute(MapLocation startLocation, MapLocation endLocation, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
         Route optimalRoute = null;
-        try {
-            Route directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
 
-            //Returns the direct route if ETA is shorter than the time you have left to drive
-            if (directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
-                optimalRoute = directRoute;
-            }
+        Route directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
 
-            //If the location is within reach this day but not this session
-            else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft()) &&
-                    directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-                optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
-            }
-
-            //If the location is not within reach this day (drive maximum distance)
-            else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-                optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
-            }
-
-            //TODO Really return null if connections is not made?
-            if (optimalRoute == null) {
-                return null;
-            }
-
-            //Adds POIs along route to Route object
-            for (GasStation temp : getGasSationsAlongRoute(optimalRoute)) {
-                optimalRoute.addGasStationAlongRoute(temp);
-            }
-            for (RestLocation temp : getRestLocationsAlongRoute(optimalRoute)) {
-                optimalRoute.addRestLocationAlongRoute(temp);
-            }
-            return optimalRoute;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        //Returns the direct route if ETA is shorter than the time you have left to drive
+        if (directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
+            optimalRoute = directRoute;
         }
+
+        //If the location is within reach this day but not this session
+        else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft()) &&
+                directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+            optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
+        }
+
+        //If the location is not within reach this day (drive maximum distance)
+        else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+            optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
+        }
+
+        //Adds POIs along route to Route object
+        for (GasStation temp : getGasSationsAlongRoute(optimalRoute)) {
+            optimalRoute.addGasStationAlongRoute(temp);
+        }
+        for (RestLocation temp : getRestLocationsAlongRoute(optimalRoute)) {
+            optimalRoute.addRestLocationAlongRoute(temp);
+        }
+        return optimalRoute;
     }
+
 
     /**
      * Get optimized route with one rest location as a checkpoint.
@@ -143,7 +138,7 @@ public class TripPlanner {
                 etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
                         new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
             }
-            return coordinates.get((topIndex+bottomIndex)/2);
+            return coordinates.get((topIndex + bottomIndex) / 2);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -156,7 +151,7 @@ public class TripPlanner {
      * @param startLocation The location that the route should start from.
      * @param endLocation   The location that the route should end at.
      */
-    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) {
+    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) throws InvalidRequestException, NoConnectionException {
         return getNewRoute(startLocation, endLocation, null);
     }
 
