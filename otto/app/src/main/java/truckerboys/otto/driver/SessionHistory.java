@@ -33,25 +33,25 @@ public class SessionHistory {
      * @return True if driver is currently driving.
      */
     public boolean isDriving(){
-        return sessions.get(0).getSessionType() == SessionType.DRIVING;
+        return sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.DRIVING;
     }
 
     /**
-     * Checks if there exists a rest-session longer or equal to a specified time in
-     * an interval [now, backLimit]
+     * Checks if there exists a rest-session longer or equal to a specified time going back to
+     * total driving time adding up to specified value.
      *
      * @param restTime The length of the time to check for
-     * @param backLimit The length of the interval to check back to.
+     * @param drivingTime The length of the driving time to add upp to.
      * @return True if break exists
      */
-    public boolean existRestLonger(Duration restTime, Duration backLimit){
+    public boolean existRestLonger(Duration restTime, Duration drivingTime){
 
         //Loop through all sessions
         for(Session session : sessions){
             //If session is of type RESTING
             if(session.getSessionType() == SessionType.RESTING){
                 //If break is longer than specified and within interval
-                if(!session.getDuration().isShorterThan(restTime) && session.getEndTime().getMillis() >= backLimit.getMillis()){
+                if(!session.getDuration().isShorterThan(restTime) && (getActiveTimeSince(new Instant(session.getEndTime())).isShorterThan(drivingTime))){
                     return true;
                 }
             }
@@ -67,7 +67,7 @@ public class SessionHistory {
      * @throws CurrentlyNotOnRestException if driver currently isn't on a break.
      */
     public Duration getTimeSinceRestStart() throws CurrentlyNotOnRestException {
-        if(sessions.get(0).getSessionType() == SessionType.RESTING) {
+        if(sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.RESTING) {
             return sessions.get(0).getDuration();
         }
 
@@ -245,7 +245,7 @@ public class SessionHistory {
         for(int i = 0; i < sessions.size(); i++){
             session = sessions.get(i);
             //If session is of type rest.
-            if(session.getSessionType() == SessionType.RESTING){
+            if(session != null && session.getSessionType() == SessionType.RESTING){
                 //If the session is longer than or equal to 9 hours.
                 if(!session.getDuration().isShorterThan(REDUCED_DAILY_REST)){
 
@@ -308,7 +308,7 @@ public class SessionHistory {
         for(int i = 0; i < sessions.size(); i++){
             session = sessions.get(i);
             //Look through all rests sessions
-            if(session.getSessionType() == SessionType.RESTING){
+            if(session != null && session.getSessionType() == SessionType.RESTING){
                 //If we found a reduced (or standard) weekly rest.
                 if(!session.getDuration().isShorterThan(REDUCED_WEEKLY_REST)){
                     weeklyRest1 = session.getDuration();
@@ -342,9 +342,6 @@ public class SessionHistory {
                 }
             }
         }
-        // TODO If there has never been any weekly breaks, this isn't valid. Since code will break in getNumberOfExtendedDaysThisWeek()
-        //      More specifically it will throw and exception and therefor getNumberOfExtendedDaysThisWeek() will have no week to check
-        //      if days are in. It will therefor never return numberOfExtendedDays if driver has never taken a weekly break.
 
         throw new NoValidBreakFound("No valid weekly break was found.");
     }
@@ -361,7 +358,7 @@ public class SessionHistory {
 
         for(int i = 0; i < sessions.size(); i++){
             session = sessions.get(i);
-            if(session.getEndTime().isBefore(getLatestWeeklyRestEndTime(sessions))){
+            if(session != null && session.getEndTime().isBefore(getLatestWeeklyRestEndTime(sessions))){
                 subSessions = sessions.subList(i, sessions.size() - 1);
             }
         }

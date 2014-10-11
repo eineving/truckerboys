@@ -123,18 +123,7 @@ public class EURegulationHandler implements IRegulationHandler {
         //Cap maxTimeAllowed based on the max time for one week according to regulation.
         maxTimeAllowedThisWeek = (maxTimeAllowedThisWeek.isLongerThan(MAX_WEEKLY_LENGTH) ? MAX_WEEKLY_LENGTH : maxTimeAllowedThisWeek);
 
-        //Calculate TimeLeft
-        Duration TL = new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak())));
-
-        //Avoid negative timeLeft
-        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
-
-
-        Duration TLThisTwoWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
-        //Cap week
-        TL = (TL.isLongerThan(TLThisTwoWeek) ? TL : TLThisTwoWeek);
-
-        return new TimeLeft(TL, ZERO_DURATION);
+        return new TimeLeft(new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak()))), Duration.ZERO);
     }
 
     @Override
