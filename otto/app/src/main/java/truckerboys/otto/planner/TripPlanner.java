@@ -137,6 +137,10 @@ public class
             optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
         }
 
+        if (optimalRoute != null) {
+            optimalRoute.setTimeLeftOnSession(regulationHandler.getThisSessionTL(user.getHistory()));
+        }
+        
         return optimalRoute;
     }
 

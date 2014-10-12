@@ -6,6 +6,7 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
+import truckerboys.otto.planner.TimeLeft;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
@@ -22,6 +23,7 @@ public class Route {
     private ArrayList<MapLocation> checkpoints;
     private MapLocation recommendedStop;
     private ArrayList<MapLocation> alternativeStops;
+    private TimeLeft timeLeftOnSession;
 
 
     /**
@@ -120,5 +122,14 @@ public class Route {
      */
     public void setAlternativeStops(ArrayList<MapLocation> alternativeStops) {
         this.alternativeStops = alternativeStops;
+    }
+
+
+    public TimeLeft getTimeLeftOnSession() {
+        return timeLeftOnSession;
+    }
+
+    public void setTimeLeftOnSession(TimeLeft timeLeftOnSession) {
+        this.timeLeftOnSession = timeLeftOnSession;
     }
 }
