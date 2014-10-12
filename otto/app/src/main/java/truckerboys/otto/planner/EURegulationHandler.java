@@ -3,10 +3,8 @@ package truckerboys.otto.planner;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import java.util.List;
-
-import truckerboys.otto.driver.CurrentlyNotOnBreakException;
-import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.CurrentlyNotOnRestException;
+import truckerboys.otto.driver.NoValidBreakFound;
 import truckerboys.otto.driver.SessionHistory;
 
 /**
@@ -14,9 +12,9 @@ import truckerboys.otto.driver.SessionHistory;
  */
 public class EURegulationHandler implements IRegulationHandler {
 
-    private final Duration ZERO_DURATION = new Duration(0);
-
     private final Duration MAX_SESSION_LENGTH = Duration.standardMinutes(270);
+
+    private final Duration ZERO_DURATION = new Duration(0);
 
     private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
     private final Duration STANDARD_SESSION_REST = Duration.standardMinutes(45);
@@ -51,20 +49,20 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getNextSessionTL(SessionHistory history) {
-        return null;
-    }
-
-    @Override
     public TimeLeft getThisDayTL(SessionHistory history) {
 
-        //First check maximum TL today before you have to take a break, so that you will
-        //have time to finish your break before the 24h time limit runs out.
-        Instant maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
-
-
-        if(history.getNumberOfReducedDailyRestsThisWeek()<2){
-            maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
+        //Get latest daily break, if no break was found. We are in first week ever. Search all sessions.
+        Instant maxTimeMarker;
+        try {
+            //Check maximum TL today before you have to take a break, so that you will
+            //have time to finish your break before the 24h time limit runs out.
+            if (history.getNumberOfReducedDailyRestsThisWeek() < 3) {
+                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
+            } else {
+                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
+            }
+        } catch (NoValidBreakFound e) {
+            maxTimeMarker = Instant.now().plus(Duration.standardHours(24));
         }
 
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
@@ -81,31 +79,38 @@ public class EURegulationHandler implements IRegulationHandler {
         TL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : TL);
 
         //Check that the TL wont breach the 24h limit
-        if(new Instant().plus(TL).isAfter(maxTimeMarker)){
-            TL = new Duration(new Instant(),maxTimeMarker);
+        if (new Instant().plus(TL).isAfter(maxTimeMarker)) {
+            TL = new Duration(new Instant(), maxTimeMarker);
         }
 
         //The same thing as above but do it as the max day is 10 hours and calculate the difference.
-        if (history.getNumberOfExtendedDaysThisWeek() < 2) {
+        if (history.getNumberOfExtendedDaysThisWeek() < 3) {
             //If you are allowed to take an extended day.
 
             extendedTL = MAX_DAY_LENGTH_EXTENDED.minus(timeSinceDailyBreak);
             extendedTL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : extendedTL);
 
-            //Calculate the difference of the TL and the extendedTL which will be the net extended time.
+            //Calculate the difference of the TL and the extendedTL which will be the next extended time.
             extendedTL = extendedTL.minus(TL);
 
             //Avoid negative extendedTL
-            TL = (extendedTL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : extendedTL);
+            extendedTL = (extendedTL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : extendedTL);
+
+            //Check that the TL + extendedTL wont breach the 24h limit
+            if (new Instant().plus(TL).plus(extendedTL).isAfter(maxTimeMarker)) {
+                Duration timeUntilMarker = new Duration(new Instant(), maxTimeMarker);
+                if (timeUntilMarker.isShorterThan(TL)) {
+                    TL = timeUntilMarker;
+                    extendedTL = Duration.ZERO;
+                } else {
+                    extendedTL = timeUntilMarker.minus(TL);
+                }
+            }
         }
 
         return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, extendedTL) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }
 
-    @Override
-    public TimeLeft getNextDayTL(SessionHistory history) {
-        return null;
-    }
 
     @Override
     public TimeLeft getThisWeekTL(SessionHistory history) {
@@ -117,17 +122,7 @@ public class EURegulationHandler implements IRegulationHandler {
         //Cap maxTimeAllowed based on the max time for one week according to regulation.
         maxTimeAllowedThisWeek = (maxTimeAllowedThisWeek.isLongerThan(MAX_WEEKLY_LENGTH) ? MAX_WEEKLY_LENGTH : maxTimeAllowedThisWeek);
 
-        //Calculate TimeLeft
-        Duration TL = new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak())));
-
-        //Avoid negative timeLeft
-        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
-        Duration TLThisTwoWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
-
-        //Cap week
-        TL = (TL.isLongerThan(TLThisTwoWeek) ? TL : TLThisTwoWeek);
-
-        return new TimeLeft(TL, ZERO_DURATION);
+        return new TimeLeft(new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak()))), Duration.ZERO);
     }
 
     @Override
@@ -141,8 +136,10 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getThisTwoWeekTL(SessionHistory history) {
-        //Calculate TimeLeft
-        Duration TL = new Duration(MAX_TWOWEEK_LENGTH.minus((history.getActiveTimeSinceWeeklyBreakTwoWeeksAgo())));
+        Duration TL = MAX_TWOWEEK_LENGTH.minus(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
+
+        //Cap week mx time
+        TL = (TL.isShorterThan(MAX_WEEKLY_LENGTH) ? TL : MAX_WEEKLY_LENGTH);
 
         //Avoid negative timeLeft
         TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
@@ -157,9 +154,9 @@ public class EURegulationHandler implements IRegulationHandler {
     }
 
     @Override
-    public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnBreakException {
+    public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnRestException {
         //If currently on break
-        if(!history.isDriving()) {
+        if (!history.isDriving()) {
             if (getThisWeekTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive this week. */ {
                 //TODO Logic for weekly break time
             }
@@ -170,16 +167,16 @@ public class EURegulationHandler implements IRegulationHandler {
 
             //TODO Rasten kan ersättas med dygns eller veckovila
             //Check if there was a break of atleast 15 minutes in the last 4 hours 30 minutes.
-            if (history.existBreakLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
+            if (history.existRestLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
                 //Return "30 minutes" - "current break time"
-                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceBreakStart()), Duration.ZERO);
+                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceRestStart()), Duration.ZERO);
             } else /* else check time left until current break is 45 minutes long. */ {
                 //Return "45 minutes" - "current break time"
-                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceBreakStart()), Duration.ZERO);
+                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
             }
 
         } else {
-            throw new CurrentlyNotOnBreakException("Driver currently isn't on a break, can't call getTimeLeftOnBreak");
+            throw new CurrentlyNotOnRestException("Driver currently isn't on a break, can't call getTimeLeftOnBreak");
             //TODO Alternatively return new TimeLeft(Duration.ZERO, Duration.ZERO);
         }
     }

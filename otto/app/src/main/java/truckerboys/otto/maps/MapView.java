@@ -69,6 +69,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     }
 
+    //TODO What happens if googleMap isn't initiated correctly. (Check all methods making sure that the app doesn't crash.)
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = super.onCreateView(inflater, container, savedInstanceState);
@@ -194,7 +196,11 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
         if (detail == RouteDetail.DETAILED) {
-            currentRoutePolyline.setPoints(route.getDetailedPolyline());
+            currentRoutePolyline.
+                    setPoints(
+                            route.
+                                    getDetailedPolyline()
+                    );
             currentDetail = RouteDetail.DETAILED;
         } else {
             currentRoutePolyline.setPoints(route.getOverviewPolyline());

@@ -9,8 +9,17 @@ public class TimeLeft {
    private Duration timeLeft, extendedTime;
 
     public TimeLeft(Duration timeLeft, Duration supplementTime) {
-        this.timeLeft = timeLeft;
-        this.extendedTime = supplementTime;
+        if(timeLeft.isShorterThan(Duration.ZERO)){
+            this.timeLeft = Duration.ZERO;
+        } else {
+            this.timeLeft = timeLeft;
+        }
+
+        if(supplementTime.isShorterThan(Duration.ZERO)){
+            this.extendedTime = Duration.ZERO;
+        } else {
+            this.extendedTime = supplementTime;
+        }
 
     }
 

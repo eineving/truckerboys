@@ -105,6 +105,9 @@ public class
 
         //TODO Implement check if gas is enough for this session
 
+        System.out.println("timeLeft: " + regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().getMillis());
+        System.out.println("timeLeft Extended: " + regulationHandler.getThisDayTL(user.getHistory()).getExtendedTimeLeft().getMillis());
+
         //Returns the direct route if ETA is shorter than the time you have left to drive
         if (directRoute.getEta().isShorterThan(sessionTimeLeft)) {
             optimalRoute = directRoute;
@@ -195,38 +198,36 @@ public class
      * @param timeLeft    ETA that the coordinate should be close to.
      * @return The coordinate that matches time left the best.
      */
-    private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) {
-        try {
-            ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
+    private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) throws InvalidRequestException, NoConnectionException {
+        ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
 
-            int topIndex = coordinates.size() - 1;
-            int bottomIndex = 0;
+        int topIndex = coordinates.size() - 1;
+        int bottomIndex = 0;
 
-            Duration etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                    new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+        Duration etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
+                new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
 
 
-            while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(2))) ||
-                    etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(2)))) {
-                if (etaToCoordinate.isLongerThan(timeLeft)) {
-                    topIndex = (topIndex + bottomIndex) / 2;
-                } else {
-                    bottomIndex = (topIndex + bottomIndex) / 2;
-                }
+        while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(2))) ||
+                etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(2)))) {
+            if (etaToCoordinate.isLongerThan(timeLeft)) {
+                topIndex = (topIndex + bottomIndex) / 2;
+            } else {
+                bottomIndex = (topIndex + bottomIndex) / 2;
+            }
 
-                //Just to be safe
+            //Just to be safe
+            if (topIndex == bottomIndex) {
                 if (topIndex == bottomIndex) {
                     break;
                 }
 
                 etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
                         new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+                System.out.println(etaToCoordinate.getMillis());
             }
-            return coordinates.get((topIndex + bottomIndex) / 2);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+        return coordinates.get((topIndex + bottomIndex) / 2);
     }
 
     /**
@@ -235,7 +236,8 @@ public class
      * @param startLocation The location that the route should start from.
      * @param endLocation   The location that the route should end at.
      */
-    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) throws InvalidRequestException, NoConnectionException {
+    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) throws
+            InvalidRequestException, NoConnectionException {
         return getNewRoute(startLocation, endLocation, null);
     }
 
@@ -246,7 +248,8 @@ public class
      * @param list     List that might contain given locataion
      * @return True if list contains a location with the same coordinates as the location
      */
-    private boolean locationExistsInList(MapLocation location, ArrayList<? extends MapLocation> list) {
+    private boolean locationExistsInList(MapLocation location, ArrayList<? extends
+            MapLocation> list) {
         for (MapLocation temp : list) {
             if (temp.getLatitude() == location.getLatitude() && temp.getLongitude() == location.getLongitude()) {
                 return true;
@@ -254,4 +257,4 @@ public class
         }
         return false;
     }
-}   
+}

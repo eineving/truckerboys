@@ -14,7 +14,6 @@ public class SessionHistory {
 
     //TODO: Regulation 9.1
 
-    private final Duration ZERO_DURATION = new Duration(0);
     private final Duration STANDARD_DAY_SESSION = Duration.standardHours(9);
 
     private final Duration STANDARD_DAILY_REST = Duration.standardHours(11);
@@ -23,28 +22,36 @@ public class SessionHistory {
     private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
     private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
 
-    private final Instant NO_RECORD_FOUND = new Instant(0);
-
     /**
      * The list of past sessions, sorted with the last session first.
      */
     private List<Session> sessions = new ArrayList<Session>();
 
+
     /**
-     * Checks if there exists a break longer or equal to a specified time in
-     * an interval [now, backLimit]
+     * Returns weither the driver is currently driving or not.
+     * @return True if driver is currently driving.
+     */
+    public boolean isDriving(){
+        return sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.DRIVING;
+    }
+
+    /**
+     * Checks if there exists a rest-session longer or equal to a specified time going back to
+     * total driving time adding up to specified value.
      *
-     * @param breakTime The length of the time to check for
-     * @param backLimit The length of the interval to check back to.
+     * @param restTime The length of the time to check for
+     * @param drivingTime The length of the driving time to add upp to.
      * @return True if break exists
      */
-    public boolean existBreakLonger(Duration breakTime, Duration backLimit){
-        //Loop through all sessions and check break time between each one.
-        for(int i = 0; i < sessions.size(); i++){
-            //If previous session ended before (or same time as) limit end.
-            if(sessions.get(i-1).getEndTime().getMillis() >= backLimit.getMillis()) {
-                //If "start-time (current session)" - "end-time (previous session)" >= breakTime
-                if (sessions.get(i).getStartTime().getMillis() - sessions.get(i - 1).getEndTime().getMillis() >= breakTime.getMillis()) {
+    public boolean existRestLonger(Duration restTime, Duration drivingTime){
+
+        //Loop through all sessions
+        for(Session session : sessions){
+            //If session is of type RESTING
+            if(session.getSessionType() == SessionType.RESTING){
+                //If break is longer than specified and within interval
+                if(!session.getDuration().isShorterThan(restTime) && (getActiveTimeSince(new Instant(session.getEndTime())).isShorterThan(drivingTime))){
                     return true;
                 }
             }
@@ -53,38 +60,18 @@ public class SessionHistory {
         return false;
     }
 
-    /**
-     * Returns weither the driver is currently driving or not.
-     * @return True if driver is currently driving.
-     */
-    public boolean isDriving(){
-        return sessions.get(0).isActive();
-    }
-
-    /**
+    /*
      * Get the duration since current break was started.
-     * @return Duration since break was started.
-     * @throws CurrentlyNotOnBreakException if driver currently isn't on a break.
-     */
-    public Duration getTimeSinceBreakStart() throws CurrentlyNotOnBreakException{
-        if(!isDriving()) {
-            //Current time in millis minus the time in millis since last active session ended.
-            return new Duration((new Instant().getMillis()) - sessions.get(1).getEndTime().getMillis());
-        }
-
-        throw new CurrentlyNotOnBreakException();
-    }
-
-    /**
-     * Returns the active time since the driver last took a break.
      *
-     * @return Duration since last break, Duration.ZERO if not on break.
+     * @return Duration since break was started.
+     * @throws CurrentlyNotOnRestException if driver currently isn't on a break.
      */
-    public Duration getActiveTimeSinceLastBreak(){
-        if(isDriving()){
+    public Duration getTimeSinceRestStart() throws CurrentlyNotOnRestException {
+        if(sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.RESTING) {
             return sessions.get(0).getDuration();
         }
-        return Duration.ZERO;
+
+        throw new CurrentlyNotOnRestException();
     }
 
     /**
@@ -104,34 +91,33 @@ public class SessionHistory {
     /**
      * Returns the total driving time since the a specified instant in time.
      *
-     * @param start the instant where to start calculations driving time.
-     * @return the total driving time since Instant start.
+     * @param start The instant where to start calculations driving time.
+     * @return The total driving time since Instant start.
      */
     public Duration getActiveTimeSince(Instant start) {
 
         Duration time = new Duration(0);
 
+        //Loop all sessions
+        for(Session session : sessions){
+            //Session is driving and has start-time after 'start'
+            if(session.getSessionType() == SessionType.DRIVING){
 
-        //Loop through the sessions and add the durations.
-        //If the first sessions is active, add the time so far, dealt by the property of session it self.
-        for (int i = 0; i < sessions.size(); i++) {
-            if (sessions.get(i).getStartTime().isBefore(start)) {
-                time = time.plus(sessions.get(i).getDuration());
-            }
-            if (sessions.get(i + 1).getEndTime().isBefore(start)) {
-                time = time.plus(new Duration(start, sessions.get(i + 1).getEndTime()));
-            }
+                if(session.getStartTime().isAfter(start)) {
+                    //Add whole session to time
+                    time = time.plus(session.getDuration());
+                } else if(session.getStartTime().isBefore(start) && session.getEndTime().isAfter(start)) {
+                    //Add the time from 'start' to end to time.
+                    time = time.plus(new Duration(start, session.getEndTime()));
+                }
 
-            //Need to check for last index to avoid outofbounds exception.
-            if (i == sessions.size() - 1) {
-                break;
             }
         }
         return time;
     }
 
     /**
-     * Returns the sum of the duration of all past sessions until a break longer than the specified duration.
+     * Returns the sum of the duration of all past sessions until a rest-session longer than the specified duration.
      *
      * @param duration the break length which to search for.
      * @return the total time since a break longer than specified.
@@ -139,22 +125,18 @@ public class SessionHistory {
     public Duration getActiveTimeSinceBreakLongerThan(Duration duration) {
         Duration time = new Duration(0);
 
-        if (!sessions.get(0).isActive()) {
-            //If more time than the specified duration has passed since the last session.
-            if (new Duration(sessions.get(0).getEndTime(), new Instant()).isLongerThan(duration)) {
-                return time;
+        for(Session session : sessions){
+            if(session.getSessionType() == SessionType.RESTING){
+                if(session.getDuration().isLongerThan(duration)){
+                    return time;
+                }
+            } else {
+                if(session.getSessionType() == SessionType.DRIVING){
+                    time = time.plus(session.getDuration());
+                }
             }
         }
 
-        //Loop through the sessions and add the durations up to the first break longer than duration.
-        for (int i = 0; i < sessions.size(); i++) {
-            time = time.plus(sessions.get(i).getDuration());
-
-            //Need to check for last index to avoid outofbounds exception.
-            if (i == sessions.size() - 1 || new Duration(sessions.get(i + 1).getEndTime(), sessions.get(i).getStartTime()).isLongerThan(duration)) {
-                break; // If we find a long enough break we will break the loop;
-            }
-        }
         return time;
     }
 
@@ -164,44 +146,45 @@ public class SessionHistory {
      * @return number of extended days.
      */
     public int getNumberOfExtendedDaysThisWeek() {
-
         int numberOfExtendedDays = 0;
-        Duration time = new Duration(ZERO_DURATION);
+        // Boolean making sure the loop doesn't register 2 extended days if the
+        // driver didn't take a daily break inbetween them
+        boolean breakBetweenExtendedDays = true;
 
+        //The time driven a specific day (the day that the loop is currently on)
+        Duration dailyTime = Duration.ZERO;
 
-        for (int i = 0; i < sessions.size() - 1; i++) {
-            Duration tempBreak = new Duration(sessions.get(i).getStartTime(), sessions.get(i + 1).getEndTime());
-
-            //Add each session's duration until we find a daily rest.
-            time = time.plus(sessions.get(i).getDuration());
-
-            //Look for a daily rest otherwise continue to the next session in the list.
-            if (tempBreak.isLongerThan(REDUCED_DAILY_REST) && tempBreak.isShorterThan(REDUCED_WEEKLY_REST)) {
-
-                //If the total time up until the daily rest is greater than 9h, declare it as a Extended day.
-                if (time.isLongerThan(STANDARD_DAY_SESSION)) {
-                    numberOfExtendedDays++;
-                    //TODO catch days longer than allowed and report?
-                }
-
-            }
-            //Look for the start of the week.
-            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime(sessions)) ||
-                    sessions.get(i).getStartTime().isBefore(getLatestWeeklyRestEndTime(sessions))) {
-
-                //check the total time of the previous day (the first day that week) and terminate.
-                if (time.isLongerThan(STANDARD_DAY_SESSION)) {
-                    numberOfExtendedDays++;
-                    //TODO catch days longer than allowed and report?
-                }
-                return numberOfExtendedDays;
-            }
-
-            //Reset time and start over with the next day.
-            time = new Duration(ZERO_DURATION);
+        //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
+        Instant latestWeeklyBreak;
+        try {
+            latestWeeklyBreak = getLatestWeeklyRestEndTime(sessions);
+        } catch (NoValidBreakFound e) {
+            latestWeeklyBreak = new Instant(0);
         }
-        //No weekly break where found. Means that the history contains no weekly breaks yet.
-        //So terminate with what we found so far.
+
+        for(Session session : sessions){
+            //If 'session' is in this week (since "if after LAST weeks end", we're in this week.)
+            if(latestWeeklyBreak.isBefore(session.getStartTime())){
+
+                //If session was a driving-session
+                if(session.getSessionType() == SessionType.DRIVING){
+                    //Add this sessions time to dailyTime
+                    dailyTime = dailyTime.plus(session.getDuration());
+                } else if(session.getSessionType() == SessionType.RESTING && session.getDuration().isLongerThan(REDUCED_DAILY_REST)) {
+                    if(getNumberOfReducedDailyRestsThisWeek() < 3 || !session.getDuration().isShorterThan(STANDARD_DAILY_REST)) {
+                        //If we found a daily (or weekly) rest; reset time.
+                        dailyTime = Duration.ZERO;
+                        breakBetweenExtendedDays = true;
+                    }
+                }
+
+                if(dailyTime.isLongerThan(STANDARD_DAY_SESSION) && breakBetweenExtendedDays){
+                    numberOfExtendedDays++;
+                    breakBetweenExtendedDays = false;
+                }
+            }
+        }
+
         return numberOfExtendedDays;
     }
 
@@ -214,31 +197,30 @@ public class SessionHistory {
         //TODO: Regulation 7.2.2
         int numberOfReducedDailyRests = 0;
 
-        if (!sessions.get(0).isActive()) {
-
-            //If the time since last session is a reduced daily break.
-            Duration ongoingBreak = new Duration(sessions.get(0).getEndTime(), new Instant());
-            if (ongoingBreak.isLongerThan(REDUCED_DAILY_REST) && ongoingBreak.isShorterThan(STANDARD_DAILY_REST)) {
-                numberOfReducedDailyRests++;
-            }
+        //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
+        Instant latestWeeklyBreak;
+        try {
+            latestWeeklyBreak = getLatestWeeklyRestEndTime(sessions);
+        } catch (NoValidBreakFound e) {
+            latestWeeklyBreak = new Instant(0);
         }
-        //Loop through the sessions to find breaks longer than 9h and shorter than 11h.
-        //Stop when you find a weekly break.
-        for (int i = 0; i < sessions.size() - 2; i++) {
 
-            Duration tempBreak = new Duration(sessions.get(i).getStartTime(), sessions.get(i + 1).getEndTime());
-            if (tempBreak.isLongerThan(REDUCED_DAILY_REST) && tempBreak.isShorterThan(STANDARD_DAILY_REST)) {
-                //TODO Check for split daily break, regulation 7.2.2
-                numberOfReducedDailyRests++;
-            }
-            //Look for weekly rests.
-            //If the current session in the loop is before the latest weekly rest.
-            if (getLatestWeeklyRestEndTime(sessions).isAfter(sessions.get(i + 1).getEndTime())) {
-                return numberOfReducedDailyRests;
+        for(Session session : sessions){
+            //If 'session' is in this week (since "if after LAST weeks end", we're in this week.)
+            if(latestWeeklyBreak.isBefore(session.getStartTime())) {
+                if (session.getSessionType() == SessionType.RESTING) {
+                    //If it's longer than 9 hours and shorter than 11 hours it's a reduced daily rest.
+                    if (session.getDuration().isLongerThan(REDUCED_DAILY_REST) && session.getDuration().isShorterThan(STANDARD_DAILY_REST)) {
+                        //We also need to make sure the rest isn't in progress.
+                        numberOfReducedDailyRests++;
+                        //TODO Check for split daily break, regulation 7.2.2
+                    }
+                }
             }
         }
 
         return numberOfReducedDailyRests;
+
     }
 
     /**
@@ -250,111 +232,118 @@ public class SessionHistory {
      * <p/>
      * If there have been no valid weekly breaks the method will return epoch.
      *
-     * @return the instant of the last daily break end.
+     * @return The instant of the last daily break end.
+     * @throws NoValidBreakFound When no valid weekly breaks could be found in the session history.
      */
-    public Instant getLatestDailyRestEndTime() {
+    public Instant getLatestDailyRestEndTime() throws NoValidBreakFound {
 
         //Find a dailybreak and return the end time.
         //If its a break longer than 11h no further actions is needed
         //but if its reduced (9h) we need to check that its valid.
+        Session session;
 
-        Duration dailyRest;
+        for(int i = 0; i < sessions.size(); i++){
+            session = sessions.get(i);
+            //If session is of type rest.
+            if(session != null && session.getSessionType() == SessionType.RESTING){
+                //If the session is longer than or equal to 9 hours.
+                if(!session.getDuration().isShorterThan(REDUCED_DAILY_REST)){
 
-        //Find the two previous daily rest, normal or reduced.
-        //Check which if the first one is normal or reduced.
-        for (int i = 0; i < sessions.size() - 1; i++) {
-            dailyRest = new Duration(sessions.get(i + 1).getEndTime(), sessions.get(i).getStartTime());
-            if (dailyRest.isLongerThan(REDUCED_DAILY_REST)) {
-
-                //The last rest found, check if its Standard or longer.
-                if (dailyRest.isLongerThan(STANDARD_DAILY_REST)) {
-                    return new Instant(sessions.get(i).getStartTime());
-                } else {
-                    //if its not, its a reduced one, check if its valid.
-                    //simply check how many reduced already occurred this week.
-                    if (getNumberOfReducedDailyRestsThisWeek() < 2) {
-                        return new Instant(sessions.get(i).getStartTime());
+                    //If the rest is a standard daily rest.
+                    if(!session.getDuration().isShorterThan(STANDARD_DAILY_REST)){
+                        return new Instant(session.getEndTime());
                     } else {
-                        //if its not valid we need to find the last valid one.
+                        //If not, it's a reduced one, check if that's valid. Since we can only have 3 per week.
+                        if(getNumberOfReducedDailyRestsThisWeek() < 3) {
+                            return new Instant(session.getEndTime());
+                        } else /* It's not valid, check for the last valid one */ {
 
-                        int validReducedBreakIn = getNumberOfReducedDailyRestsThisWeek() - 2;
-                        for (int j = i + 1; j < sessions.size() - 1; j++) {
-                            //Find the next break, if its a normal one then return that.
-                            //If its not continue until we find one or until we find the last valid reduced on.
-                            //TODO: Catch violation?
+                            Session temp_session;
+                            int validReducedBreakIn = getNumberOfReducedDailyRestsThisWeek() - 3;
+                            for(int j = i; j < sessions.size(); j++){
 
-                            dailyRest = new Duration(sessions.get(j + 1).getEndTime(), sessions.get(j).getStartTime());
-                            if (dailyRest.isLongerThan(STANDARD_DAILY_REST)) {
-                                return new Instant(sessions.get(j).getStartTime());
-                            } else {
-                                //
-                                validReducedBreakIn--;
-                                if (validReducedBreakIn == 0) {
-                                    //last valid reduced break found
-                                    return new Instant(sessions.get(j).getStartTime());
+                                temp_session = sessions.get(j);
+                                //If session is a resting-session
+                                if(temp_session.getSessionType() == SessionType.RESTING){
+
+                                    //If session is a standard daily rest, we can return that.
+                                    if(temp_session.getDuration().isLongerThan(STANDARD_DAILY_REST)){
+                                        return new Instant(temp_session.getEndTime());
+                                    } else {
+                                        //If not, count down untill we have a valid reduced daily break.
+                                        validReducedBreakIn--;
+                                        if(validReducedBreakIn <= 0){
+                                            return new Instant(temp_session.getEndTime());
+                                        }
+                                    }
                                 }
+
                             }
-
                         }
-
                     }
+
                 }
             }
         }
-        //No valid daily break found
-        return NO_RECORD_FOUND;
+
+        throw new NoValidBreakFound("No valid daily-break was found");
     }
 
     /**
      * Returns the instant of which the last weekly break ended.
-     * If there have been no valid weekly breaks the method will return epoch.
+     * If there have been no valid weekly breaks the method will throw exception
      *
      * @return the instant of the last weekly break end.
+     * @throws NoValidBreakFound When no valid weekly breaks could be found in the session history.
      */
-    public Instant getLatestWeeklyRestEndTime(List<Session> sessions) {
+    public Instant getLatestWeeklyRestEndTime(List<Session> sessions) throws NoValidBreakFound{
         //TODO: Regulation 9.6
         //TODO: Regulation 10
 
         Duration weeklyRest1;
         Duration weeklyRest2;
 
-        //Find the two previous weekly rest, normal or reduced.
-        //Check which if the first one is normal or reduced.
-        for (int i = 0; i < sessions.size() - 1; i++) {
-            weeklyRest1 = new Duration(sessions.get(i + 1).getEndTime(), sessions.get(i).getStartTime());
-            if (weeklyRest1.isLongerThan(REDUCED_WEEKLY_REST)) {
-                //One weekly rest found, find the next one...
+        Session session;
 
-                for (int j = i + 1; i < sessions.size() - 1; j++) {
-                    weeklyRest2 = new Duration(sessions.get(i + 1).getEndTime(), sessions.get(i).getStartTime());
-                    if (weeklyRest2.isLongerThan(REDUCED_WEEKLY_REST)) {
-                        //Rest two found.
+        for(int i = 0; i < sessions.size(); i++){
+            session = sessions.get(i);
+            //Look through all rests sessions
+            if(session != null && session.getSessionType() == SessionType.RESTING){
+                //If we found a reduced (or standard) weekly rest.
+                if(!session.getDuration().isShorterThan(REDUCED_WEEKLY_REST)){
+                    weeklyRest1 = session.getDuration();
 
-                        //If the first is a normal then no further actions is needed.
-                        if (weeklyRest1.isLongerThan(STANDARD_WEEKLY_REST)) {
-                            return new Instant(sessions.get(i).getStartTime());
-                        }
-                        //if its not but second one is no further actions is needed.
-                        else if (weeklyRest2.isLongerThan(STANDARD_WEEKLY_REST)) {
-                            return new Instant(sessions.get(i).getStartTime());
-                        } else {
-                            //Both the two contended rests are reduced ones and there for weeklyRest1 is not valid .
-                            //Should only happen if the driver chooses to ignore the app.
-                            //Check if weeklyRest2 is valid by examine "weeklyRest3"
-                            i = j;
-                            weeklyRest1 = weeklyRest2;
+                    Session temp_session;
+                    for(int j = i + 1; j < sessions.size(); j++) {
+                        temp_session = sessions.get(j);
+                        if(!temp_session.getDuration().isShorterThan(REDUCED_WEEKLY_REST)){
+                            weeklyRest2 = temp_session.getDuration();
+                            //Found second weekly rest.
+
+                            if(!weeklyRest1.isShorterThan(STANDARD_WEEKLY_REST)){
+                                //First week was a non-reduced weekly rest
+                                return new Instant(session.getEndTime());
+                            } else if(!weeklyRest2.isShorterThan(STANDARD_WEEKLY_REST)){
+                                //Second week was a non-reduced weekly rest
+                                //If the weekly break after last standard one is reduced, return that.
+                                return new Instant(session.getEndTime());
+                            } else {
+                                // None of the two last weeks were standard weekly-rests.
+                                // The driver therefor broke a regulation. But we still need to find
+                                // The last valid weekly break.
+
+                                session = sessions.get(j);
+                                weeklyRest1 = weeklyRest2;
+                            }
                         }
                     }
 
+                    return new Instant(session.getEndTime());
                 }
-                //Only one rest found or only one valid.
-                //return that one.
-                return new Instant(sessions.get(i).getStartTime());
             }
         }
-        //No weekly rests found
-        //return epoch, think about this a bit more, don't forget javadoc.
-        return NO_RECORD_FOUND;
+
+        throw new NoValidBreakFound("No valid weekly break was found.");
     }
 
     /**
@@ -363,14 +352,17 @@ public class SessionHistory {
      *
      * @return the instant of the weekly break two weeks ago end.
      */
-    public Instant getWeeklyRestEndTimeTwoWeeksAgo() {
+    public Instant getWeeklyRestEndTimeTwoWeeksAgo() throws NoValidBreakFound {
         List<Session> subSessions = new ArrayList<Session>();
+        Session session;
 
-        for (int i = 0; i < sessions.size() - 1; i++) {
-            if (sessions.get(i).getStartTime().equals(getLatestWeeklyRestEndTime(sessions))) {
-                subSessions = sessions.subList(i+1, sessions.size() - 1);
+        for(int i = 0; i < sessions.size(); i++){
+            session = sessions.get(i);
+            if(session != null && session.getEndTime().isBefore(getLatestWeeklyRestEndTime(sessions))){
+                subSessions = sessions.subList(i, sessions.size() - 1);
             }
         }
+
         return getLatestWeeklyRestEndTime(subSessions);
     }
 
@@ -380,7 +372,15 @@ public class SessionHistory {
      * @return the driving time since the last daily break.
      */
     public Duration getActiveTimeSinceLastDailyBreak() {
-        return getActiveTimeSince(getLatestDailyRestEndTime());
+        //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
+        Instant latestDailyBreak;
+        try {
+            latestDailyBreak = getLatestDailyRestEndTime();
+        } catch (NoValidBreakFound e) {
+            latestDailyBreak = new Instant(0);
+        }
+
+        return getActiveTimeSince(latestDailyBreak);
 
     }
 
@@ -390,10 +390,26 @@ public class SessionHistory {
      * @return the total driving time
      */
     public Duration getActiveTimeSinceLastWeeklyBreak() {
-        return getActiveTimeSince(getLatestWeeklyRestEndTime(sessions));
+
+        //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
+        Instant latestWeeklyBreak;
+        try {
+            latestWeeklyBreak = getLatestWeeklyRestEndTime(sessions);
+        } catch (NoValidBreakFound e) {
+            latestWeeklyBreak = new Instant(0);
+        }
+
+        return getActiveTimeSince(latestWeeklyBreak);
     }
 
     public Duration getActiveTimeSinceWeeklyBreakTwoWeeksAgo() {
-        return getActiveTimeSince(getWeeklyRestEndTimeTwoWeeksAgo());
+        //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
+        Instant latestWeeklyBreak;
+        try {
+            latestWeeklyBreak = getWeeklyRestEndTimeTwoWeeksAgo();
+        } catch (NoValidBreakFound e) {
+            latestWeeklyBreak = new Instant(0);
+        }
+        return getActiveTimeSince(latestWeeklyBreak);
     }
 }

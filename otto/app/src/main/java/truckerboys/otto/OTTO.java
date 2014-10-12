@@ -6,6 +6,7 @@ import java.util.List;
 import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.clock.ClockView;
 import truckerboys.otto.directionsAPI.GoogleDirections;
+import truckerboys.otto.driver.TachographHandler;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.home.HomeView;
 import truckerboys.otto.maps.MapView;
@@ -29,12 +30,14 @@ public class OTTO {
     private IRegulationHandler regulationHandler;
 
     private User user;
-
+    private TachographHandler tachographHandler;
 
     public OTTO() {
         regulationHandler = new EURegulationHandler();
         user = User.getInstance();
         tripPlanner = new TripPlanner(regulationHandler, new GoogleDirections(), new GooglePlaces(), user);
+
+        tachographHandler = new TachographHandler(user);
 
         createPresenters();
     }
