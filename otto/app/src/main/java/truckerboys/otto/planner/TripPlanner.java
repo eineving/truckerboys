@@ -13,6 +13,8 @@ import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.GasStation;
@@ -66,9 +68,9 @@ public class
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public Route updateChoosenStop(MapLocation chosenStop) throws InvalidRequestException, NoConnectionException {
+    public void updateChoosenStop(MapLocation chosenStop) throws InvalidRequestException, NoConnectionException {
         this.chosenStop = chosenStop;
-        return getCalculatedRoute();
+        EventTruck.getInstance().newEvent(new ChangedRouteEvent(getCalculatedRoute()));
     }
 
     /**
