@@ -140,7 +140,7 @@ public class
         if (optimalRoute != null) {
             optimalRoute.setTimeLeftOnSession(regulationHandler.getThisSessionTL(user.getHistory()));
         }
-        
+
         return optimalRoute;
     }
 
@@ -174,8 +174,10 @@ public class
             //Temporary creation
             LinkedList<MapLocation> tempList = new LinkedList<MapLocation>();
             tempList.add(new MapLocation(closeLocations.get(i)));
-            for (MapLocation location : checkpoints) {
-                tempList.add(location);
+            if (checkpoints != null) {
+                for (MapLocation location : checkpoints) {
+                    tempList.add(location);
+                }
             }
 
             //Checks if the restLocation is a possible stop and is faster than the previous
@@ -225,11 +227,11 @@ public class
                 if (topIndex == bottomIndex) {
                     break;
                 }
-
-                etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                        new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
-                System.out.println(etaToCoordinate.getMillis());
             }
+            etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
+                    new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+            System.out.println(etaToCoordinate.getMillis());
+
         }
         return coordinates.get((topIndex + bottomIndex) / 2);
     }
