@@ -1,5 +1,8 @@
 package truckerboys.otto.maps;
 
+import android.location.Address;
+import android.location.Location;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -62,15 +65,42 @@ public class MapModel implements IEventListener{
         if(event.isType(GPSUpdateEvent.class)) {
             //TODO Check if outside current route, calculate new route.
         }
+
         if(event.isType(NewDestination.class)) {
+
+
+                MapLocation[] checkpoints = new MapLocation[((NewDestination)event).getCheckpoints().size()];
+
+                for(Address address : ((NewDestination)event).getCheckpoints()) {
+                    checkpoints[((NewDestination)event).getCheckpoints().indexOf(address)]
+                            = new MapLocation(new LatLng(address.getLatitude(), address.getLongitude()));
+                }
+
+
             try {
-                originalRoute
-                        = tripPlanner.
-                        calculateRoute(
-                        new MapLocation(LocationHandler.getCurrentLocation()), //Start location
-                        new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
-                                ((NewDestination) event).getLocation().getLongitude())) //End location
-                );
+
+                if(!((NewDestination)event).getCheckpoints().isEmpty()) {
+                    originalRoute
+                            = tripPlanner.
+                            getNewRoute(
+                                    new MapLocation(LocationHandler.getCurrentLocation()), //Start location
+                                    new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
+                                            ((NewDestination) event).getLocation().getLongitude())),//End location
+                                             checkpoints  // checkpoints
+
+                            );
+                } else {
+                    originalRoute
+                            = tripPlanner.
+                            getNewRoute(
+                                    new MapLocation(LocationHandler.getCurrentLocation()), //Start location
+                                    new MapLocation(new LatLng(((NewDestination) event).getLocation().getLatitude(),
+                                            ((NewDestination) event).getLocation().getLongitude())) //End location
+
+                            );
+                }
+
+
             } catch (InvalidRequestException e) {
                 //TODO Create proper catch
                 e.printStackTrace();

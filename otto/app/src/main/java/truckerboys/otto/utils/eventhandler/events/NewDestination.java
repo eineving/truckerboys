@@ -2,16 +2,18 @@ package truckerboys.otto.utils.eventhandler.events;
 
 import android.location.Address;
 
+import java.util.ArrayList;
+
 /**
  * Created by root on 2014-10-03.
  */
 public class NewDestination extends Event {
     Address location;
-    Address checkPoint;
+    ArrayList<Address> checkpoints;
 
-    public NewDestination(Address location, Address checkPoint) {
+    public NewDestination(Address location, ArrayList<Address> checkpoints) {
         this.location = location;
-        this.checkPoint = checkPoint;
+        this.checkpoints = checkpoints;
     }
 
     public NewDestination(Address location) {
@@ -22,7 +24,7 @@ public class NewDestination extends Event {
         return location;
     }
 
-    public Address getCheckPoint() {
-        return checkPoint;
+    public ArrayList<Address> getCheckpoints() {
+        return checkpoints;
     }
 }

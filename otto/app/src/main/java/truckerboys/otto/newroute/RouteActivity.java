@@ -190,7 +190,7 @@ public class RouteActivity extends Activity implements IEventListener{
                 if(finalDestination != null && coder != null && routePresenter != null) {
                     if(finalDestination.getText() != null && !finalDestination.getText().equals("")){
 
-                        routePresenter.sendLocation("" + finalDestination.getText().toString(), coder);
+                        routePresenter.sendLocation("" + finalDestination.getText().toString(), routeModel.getCheckpoints(), coder);
 
                         if(history != null) {
                             routePresenter.saveHistory(history, "" + finalDestination.getText().toString());
@@ -263,7 +263,7 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history1Text.getText(), coder);
+                routePresenter.sendLocation("" + history1Text.getText(), new ArrayList<String>(), coder);
             }
         });
 
@@ -272,7 +272,7 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history2Text.getText(), coder);
+                routePresenter.sendLocation("" + history2Text.getText(), new ArrayList<String>(), coder);
 
             }
         });
@@ -282,7 +282,7 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history3Text.getText(), coder);
+                routePresenter.sendLocation("" + history3Text.getText(), new ArrayList<String>(), coder);
 
             }
         });
