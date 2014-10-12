@@ -2,6 +2,8 @@ package truckerboys.otto.utils.positions;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.joda.time.Duration;
+
 import java.util.List;
 
 /**
@@ -17,10 +19,12 @@ public class RestLocation extends MapLocation {
      * @param name name of the rest location
      * @param type type of rest location
      */
-    public RestLocation(LatLng latLng, String name, List<String> type) {
+    public RestLocation(LatLng latLng,String address, Duration eta, String name, List<String> type) {
         super(latLng);
         this.name=name;
         this.type=type;
+        setEta(eta);
+        setAddress(address);
     }
 
     /**

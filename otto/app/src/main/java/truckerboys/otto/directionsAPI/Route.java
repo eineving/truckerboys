@@ -20,9 +20,8 @@ public class Route {
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
     private ArrayList<MapLocation> checkpoints;
-    private ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
-    private ArrayList<RestLocation> restLocations = new ArrayList<RestLocation>();
-
+    private MapLocation recommendedStop;
+    private ArrayList<MapLocation> alternativeStops;
 
 
     /**
@@ -92,34 +91,34 @@ public class Route {
     }
 
     /**
-     * Get gas stations along route
-     * @return gas stations along route
+     * Get the recommended stop for the route.
+     * @return recommended stop.
      */
-    public ArrayList<GasStation> getGasStationsAlongRoute() {
-        return gasStations;
+    public MapLocation getRecommendedStop() {
+        return recommendedStop;
     }
 
     /**
-     * Get rest locations along route
-     * @return rest locations along route
+     * Set the recommended stop for the route.
+     * @param recommendedStop the recommended stop for the route.
      */
-    public ArrayList<RestLocation> getRestLocationsAlongRoute() {
-        return restLocations;
+    public void setRecommendedStop(MapLocation recommendedStop) {
+        this.recommendedStop = recommendedStop;
     }
 
     /**
-     * Add gas station along route
-     * @param gasStation a gas station close to the route
+     * Get the alternative stops for this route.
+     * @return alternative stops.
      */
-    public void addGasStationAlongRoute(GasStation gasStation){
-        gasStations.add(gasStation);
+    public ArrayList<MapLocation> getAlternativeStops() {
+        return alternativeStops;
     }
 
     /**
-     * Add rest location along the route
-     * @param restLocation a rest location close to the route
+     * Set the alternative stops for this route.
+     * @param alternativeStops the alternative stops for the route.
      */
-    public void addRestLocationAlongRoute(RestLocation restLocation){
-        restLocations.add(restLocation);
+    public void setAlternativeStops(ArrayList<MapLocation> alternativeStops) {
+        this.alternativeStops = alternativeStops;
     }
 }

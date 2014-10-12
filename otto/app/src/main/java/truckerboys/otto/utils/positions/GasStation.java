@@ -2,6 +2,8 @@ package truckerboys.otto.utils.positions;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.joda.time.Duration;
+
 /**
  * Representing a gas station
  */
@@ -13,9 +15,11 @@ public class GasStation extends MapLocation {
      * @param coordinate coordinates
      * @param name name of the gas station
      */
-    public GasStation(LatLng coordinate, String name) {
+    public GasStation(LatLng coordinate,String address, Duration eta, String name ) {
         super(coordinate);
         this.name = name;
+        setAddress(address);
+        setEta(eta);
     }
 
     /**
