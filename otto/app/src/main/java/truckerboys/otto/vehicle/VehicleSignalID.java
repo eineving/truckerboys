@@ -20,7 +20,8 @@ public class VehicleSignalID {
 
     public static final int FUEL_LEVEL_1 = AutomotiveSignalId.FMS_FUEL_LEVEL_1;
     public static final int FUEL_RATE = AutomotiveSignalId.FMS_FUEL_RATE;
-
+    public static final int FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE = AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE;
+    public static final int KM_PER_LITER = AutomotiveSignalId.FMS_INSTANTANEOUS_FUEL_ECONOMY;
 
     public static final int WHEEL_BASED_SPEED = AutomotiveSignalId.FMS_WHEEL_BASED_SPEED;
 }

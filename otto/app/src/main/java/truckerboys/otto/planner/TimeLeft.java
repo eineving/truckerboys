@@ -6,11 +6,20 @@ import org.joda.time.Duration;
  * Created by Andreas Pegelow on 2014-09-22.
  */
 public class TimeLeft {
-    Duration timeLeft, extendedTime;
+   private Duration timeLeft, extendedTime;
 
     public TimeLeft(Duration timeLeft, Duration supplementTime) {
-        this.timeLeft = timeLeft;
-        this.extendedTime = supplementTime;
+        if(timeLeft.isShorterThan(Duration.ZERO)){
+            this.timeLeft = Duration.ZERO;
+        } else {
+            this.timeLeft = timeLeft;
+        }
+
+        if(supplementTime.isShorterThan(Duration.ZERO)){
+            this.extendedTime = Duration.ZERO;
+        } else {
+            this.extendedTime = supplementTime;
+        }
 
     }
 

@@ -1,18 +1,29 @@
 package truckerboys.otto.stats;
 
 import truckerboys.otto.driver.User;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
+import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
+import truckerboys.otto.utils.eventhandler.events.UpdateSessionHistoryEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class StatsModel {
-    private User user;
-    private double timeToday, distanceToday, fuelToday, fuelByDistanceToday;
+public class StatsModel{
+    private long timeDrivenToday;
+    private long timeDrivenTotal;
+    private double timeToday, fuelToday, distanceByFuel;
     private double timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal;
     private int violations;
 
     private String fuelUnit = "L";
     private String distanceUnit = "Km";
+
+    public StatsModel() {
+
+    }
 
     /**
      * Restores statistics
@@ -23,14 +34,15 @@ public class StatsModel {
     public void setStats(double[] statsToday, double[] statsTotal, int violations) {
 
         timeToday = statsToday[0];
-        distanceToday = statsToday[1];
-        fuelToday = statsToday[2];
-        fuelByDistanceToday = statsToday[3];
+        // distanceToday = statsToday[1];
+        // fuelToday = statsToday[2];
+        distanceByFuel = statsToday[3];
 
         timeTotal = statsTotal[0];
+        timeDrivenTotal = (int)statsTotal[0];
         distanceTotal = statsTotal[1];
         fuelTotal = statsTotal[2];
-        fuelByDistanceTotal = statsTotal[3];
+        // fuelByDistanceTotal = statsTotal[3];
 
         this.violations = violations;
     }
@@ -45,12 +57,14 @@ public class StatsModel {
             fuelUnit = "Gallon";
             distanceUnit = "Miles";
 
-            fuelToday = fuelToday * 0.264172052;
+            // fuelToday = fuelToday * 0.264172052;
             fuelTotal = fuelTotal * 0.264172052;
-            distanceToday = distanceToday * 0.621371192;
+
+            // distanceToday = distanceToday * 0.621371192;
             distanceTotal = distanceTotal * 0.621371192;
-            fuelByDistanceToday = fuelByDistanceToday * 0.264172052 / 0.621371192;
-            fuelByDistanceTotal = fuelByDistanceTotal * 0.264172052 / 0.621371192;
+
+            distanceByFuel = distanceByFuel / 0.264172052 * 0.621371192;
+            // fuelByDistanceTotal = fuelByDistanceTotal * 0.264172052 / 0.621371192;
 
         } else {
             // TODO convert ints to Liters and Km
@@ -58,28 +72,29 @@ public class StatsModel {
             distanceUnit = "Km";
 
             fuelTotal = fuelTotal / 0.264172052;
-            fuelToday = fuelToday / 0.264172052;
-            distanceToday = distanceToday / 0.621371192;
+            // fuelToday = fuelToday / 0.264172052;
+
+
+            // distanceToday = distanceToday / 0.621371192;
             distanceTotal = distanceTotal / 0.621371192;
-            fuelByDistanceToday = fuelByDistanceToday / 0.264172052 * 0.621371192;
-            fuelByDistanceTotal = fuelByDistanceTotal / 0.264172052 * 0.621371192;
+            distanceByFuel = distanceByFuel * 0.264172052 / 0.621371192;
+            // fuelByDistanceTotal = fuelByDistanceTotal / 0.264172052 * 0.621371192;
         }
+
+
     }
+
 
     public double getTimeToday() {
         return timeToday;
-    }
-
-    public double getDistanceToday() {
-        return distanceToday;
     }
 
     public double getFuelToday() {
         return fuelToday;
     }
 
-    public double getfuelByDistanceToday() {
-        return fuelByDistanceToday;
+    public double getDistanceByFuel() {
+        return distanceByFuel;
     }
 
     public double getFuelTotal() {
@@ -87,8 +102,9 @@ public class StatsModel {
     }
 
 
+
     public double getDistanceTotal() {
-        return timeTotal;
+        return distanceTotal;
     }
 
     public double getfuelByDistanceTotal() {
@@ -102,4 +118,5 @@ public class StatsModel {
     public int getViolations() {
         return violations;
     }
+
 }

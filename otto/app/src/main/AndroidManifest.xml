@@ -3,7 +3,7 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:icon="@drawable/maps_no_text"
+        android:icon="@drawable/mapsnotext"
         android:theme="@style/AppTheme">
 
 
@@ -16,13 +16,20 @@
             android:value="AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk"/>
 
         <activity
-            android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             </activity>
+
+        <activity
+            android:name=".newroute.RouteActivity"
+            android:windowSoftInputMode="stateVisible">
+        </activity>
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>
