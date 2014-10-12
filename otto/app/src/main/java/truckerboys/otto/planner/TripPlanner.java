@@ -49,6 +49,9 @@ public class
 
         Route directRoute = directionsProvider.getRoute(startLocation, endLocation, checkpoints);
 
+        System.out.println("timeLeft: " + regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().getMillis());
+        System.out.println("timeLeft Extended: " + regulationHandler.getThisDayTL(user.getHistory()).getExtendedTimeLeft().getMillis());
+
         //Returns the direct route if ETA is shorter than the time you have left to drive
         if (directRoute.getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
             optimalRoute = directRoute;
@@ -65,13 +68,6 @@ public class
             optimalRoute = getOptimizedRoute(startLocation, directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
         }
 
-        //Adds POIs along route to Route object
-        for (GasStation temp : getGasSationsAlongRoute(optimalRoute)) {
-            optimalRoute.addGasStationAlongRoute(temp);
-        }
-        for (RestLocation temp : getRestLocationsAlongRoute(optimalRoute)) {
-            optimalRoute.addRestLocationAlongRoute(temp);
-        }
         return optimalRoute;
     }
 
@@ -135,8 +131,15 @@ public class
                 } else {
                     bottomIndex = (topIndex + bottomIndex) / 2;
                 }
+
+                //Just to be safe
+                if(topIndex == bottomIndex){
+                    break;
+                }
+
                 etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
                         new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+                System.out.println(etaToCoordinate.getMillis());
             }
             return coordinates.get((topIndex + bottomIndex) / 2);
         } catch (Exception e) {
