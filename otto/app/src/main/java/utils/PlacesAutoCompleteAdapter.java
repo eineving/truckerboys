@@ -61,10 +61,11 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
 
                 FilterResults filterResults = new FilterResults();
 
-                // Removes all white spaces
-                charSequence = ((String)charSequence).replaceAll("\\s", "");
-
                 if(charSequence != null) {
+
+                    // Removes all white spaces
+                    charSequence = ((String)charSequence).replaceAll("\\s", "");
+
                     // Retrieves autocomplete results from TripPlanner class
                     try {
                         resultList = (ArrayList<String>) suggestionsProvider.getSuggestedAddresses(charSequence.toString());

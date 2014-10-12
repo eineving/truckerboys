@@ -133,6 +133,7 @@ public class RouteActivity extends Activity implements IEventListener{
         search.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_list_item_1));
         checkpoint.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_list_item_1));
 
+        // Sets arraylist for checkpoints
         strings = new ArrayList<String>();
         final ArrayAdapter adapter = new ArrayAdapter(this, R.layout.text_list_item, strings);
 
@@ -149,7 +150,7 @@ public class RouteActivity extends Activity implements IEventListener{
                     adapter.remove(((TextView)view).getText());
                     adapter.notifyDataSetChanged();
 
-                    list.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 120*strings.size()));
+                    list.setLayoutParams(new LinearLayout.LayoutParams(list.getWidth(), 150*strings.size()));
                 }
             }
         });
@@ -315,7 +316,7 @@ public class RouteActivity extends Activity implements IEventListener{
                     strings.add(checkpoint.getText() + "");
                     adapter.notifyDataSetChanged();
 
-                    list.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 120*strings.size()));
+                    list.setLayoutParams(new LinearLayout.LayoutParams(list.getWidth(), 150*strings.size()));
 
                     checkpoint.setText("");
 
