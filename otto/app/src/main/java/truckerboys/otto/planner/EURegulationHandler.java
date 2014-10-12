@@ -162,7 +162,21 @@ public class EURegulationHandler implements IRegulationHandler {
             }
 
             if (getThisDayTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive today. */ {
-                //TODO Logic for daily break time.
+                /* TODO
+                 * Alternativt kan den normala dygnsvilan delas i två perioder. Den första perioden måste vara minst 3 timmar,
+                 * och den kan du placera fitt under arbetspasset. Den sista perioden ska vara minst 9 timmar som avslutning på
+                 * arbetsdagen. Summan av en delad dygnsvila ska vara minst 12 timmar.
+                 */
+
+                //Check if reduced daily rest is allowed this week (If there hasn't been more than 3 of them.)
+                boolean allowReduced = (history.getNumberOfReducedDailyRestsThisWeek() < 3 ? true : false);
+
+                //If reduced is allowed and current rest time is under reduced dailyrest.
+                if(allowReduced && !history.getTimeSinceRestStart().isLongerThan(REDUCED_DAILY_REST)) {
+                    return new TimeLeft(REDUCED_DAILY_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
+                } else /* Reduced daily rest is not allowed or current rest time is more than 9 hours. */ {
+                    return new TimeLeft(STANDARD_DAILY_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
+                }
             }
 
             //TODO Rasten kan ersättas med dygns eller veckovila
