@@ -28,7 +28,7 @@ public class RoutePresenter implements IEventListener {
      * it to an actual address location.
      * @param nameOfLocation the string selected.
      */
-    public void sendLocation(String nameOfLocation, Geocoder coder){
+    public void sendLocation(String nameOfLocation, List<String> checkpoints, Geocoder coder){
 
         int maxResults = 1;
 
@@ -36,12 +36,18 @@ public class RoutePresenter implements IEventListener {
             // Creates an array of addresses (of length 1) based on the string selected
             // and gets the first result
             List<Address> locations = coder.getFromLocationName(nameOfLocation, maxResults);
-            //List<Address> checkPoints = coder.getFromLocationName(nameOfCheckPoint, maxResults);
+
+            ArrayList<Address> checkpointsArray = new ArrayList<Address>();
+
+            for(String checkpoint : checkpoints) {
+
+                checkpointsArray.add((coder.getFromLocationName(checkpoint, maxResults)).get(0));
+            }
 
             if(locations.size() > 0) {
                 Address location = locations.get(0);
                 //Address checkPoint = checkPoints.get(0);
-                EventTruck.getInstance().newEvent(new NewDestination(location));
+                EventTruck.getInstance().newEvent(new NewDestination(location, checkpointsArray));
             }
 
         } catch (IOException e) {
