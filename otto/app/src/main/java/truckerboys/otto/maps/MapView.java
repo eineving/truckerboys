@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -37,7 +38,7 @@ import utils.IView;
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends SupportMapFragment implements IView, IEventListener, GoogleMap.OnCameraChangeListener{
+public class MapView extends SupportMapFragment implements IView, IEventListener, GoogleMap.OnCameraChangeListener {
     private View rootView;
     private GoogleMap googleMap;
     private Marker positionMarker;
@@ -51,8 +52,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private static final float DETAILED_ZOOM_ABOVE = 10;
 
 
-    private int gps_freq = 500; // The frequency of gps updates.
-    private int freq = 25; //The frequency of the interpolation.
+    private static final int GPS_FREQ = 500; // The frequency of gps updates.
+    private static final int INTERPOLATION_FREQ = 25; //The frequency of the interpolation.
     private int index; //The step of the interpolation.
 
     private LinkedList<Double2> positions = new LinkedList<Double2>();
@@ -80,22 +81,23 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         googleMap = getMap();
 
         //If we could receive map from Google, modify freely to our needs.
-        if(googleMap != null) {
+        if (googleMap != null) {
             //Set all gestures disabled, truckdriver shouldn't be able to move the map.
             googleMap.getUiSettings().setAllGesturesEnabled(false);
-            googleMap.getUiSettings().setZoomControlsEnabled(true);
+            googleMap.getUiSettings().setZoomGesturesEnabled(true);
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
 
             //TODO Read from settings if the user wants Hybrid or Normal map type.
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             googleMap.setOnCameraChangeListener(this);
 
             //Set current position and default zoom, tilt and bearing.
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(0,0), 16f, 50, 0)));
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(0, 0), 16f, 50, 0)));
 
             //Initialize position marker to current position and set the arrow icon.
             positionMarker = googleMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow))
-                    .position(new LatLng(0,0))
+                    .position(new LatLng(0, 0))
                     .flat(true));
 
             currentRoutePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.BLUE));
@@ -108,10 +110,11 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     /**
      * Adjust the camera position and bearing to match the location provided.
+     *
      * @param location The location to adjust adjust accordingly to.
      */
-    private void updateCamera(LatLng location, float bearing){
-        if(googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
+    private void updateCamera(LatLng location, float bearing) {
+        if (googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
                             location,
@@ -124,54 +127,48 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     /**
      * Updates the marker for our current position.
-     * @requires to be updated once every 1/freq second to function properly.
+     *
+     * @requires to be updated once every 1/INTERPOLATION_FREQ second to function properly.
      * @requires setupPositionMarker() has been called.
      */
 
-    private void updatePositionMarker(){
-        if(positionMarker != null) { //Make sure we initiated posMaker in onCreateView
-
+    private void updatePositionMarker() {
+        if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
 
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
-            if(positions.size() >= 3){
+            if (positions.size() >= 3) {
 
                 Double2 a = positions.get(0);
                 Double2 b = positions.get(1);
                 Double2 c = positions.get(2);
 
-                Double2 vecA = b.sub(a).div(freq);
-                Double2 vecB = c.sub(b).div(freq);
+                Double2 vecA = b.sub(a).div(INTERPOLATION_FREQ);
+                Double2 vecB = c.sub(b).div(INTERPOLATION_FREQ);
 
                 //The linear interpolations.
                 Double2 ab = a.add(vecA.mul(index));
                 Double2 bc = b.add(vecB.mul(index));
 
                 //The quadratic-interpolation
-                Double2 smooth = ab.add(bc.sub(ab).div(freq).mul(index));
-
+                Double2 smooth = ab.add(bc.sub(ab).div(INTERPOLATION_FREQ).mul(index));
 
                 positionMarker.setPosition(new LatLng(smooth.getX(), smooth.getY()));
-
 
                 //Linear intepolation of the bearing.
                 float rot1 = bearings.get(0);
                 float rot2 = bearings.get(2);
 
-                float step = (rot2 - rot1) / freq;
+                float step = (rot2 - rot1) / INTERPOLATION_FREQ;
 
                 float smoothBearing = rot1 + step * index;
 
                 positionMarker.setRotation(smoothBearing);
 
-
-
-
-
                 index++;
-                index = index % freq;
+                index = index % INTERPOLATION_FREQ;
 
-                if(index == 0){
+                if (index == 0) {
                     //Since we interpolate over 3 values the first 2 has been used when we reach the third.
                     positions.removeFirst();
                     positions.removeFirst();
@@ -184,7 +181,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             }
         }
 
-        updateHandler.postDelayed(updatePos,gps_freq/freq);
+        updateHandler.postDelayed(updatePos, GPS_FREQ / INTERPOLATION_FREQ);
     }
 
     /*
@@ -196,11 +193,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
         if (detail == RouteDetail.DETAILED) {
-            currentRoutePolyline.
-                    setPoints(
-                            route.
-                                    getDetailedPolyline()
-                    );
+            currentRoutePolyline.setPoints(route.getDetailedPolyline());
             currentDetail = RouteDetail.DETAILED;
         } else {
             currentRoutePolyline.setPoints(route.getOverviewPolyline());
@@ -215,7 +208,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
         }
-        if(event.isType(ChangedRouteEvent.class)) {
+        if (event.isType(ChangedRouteEvent.class)) {
             updatePolylineByZoom(((ChangedRouteEvent) event).getRoute(), googleMap.getCameraPosition().zoom);
         }
     }
@@ -236,8 +229,11 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        if(mapPresenter.getOriginalRoute() != null) {
+        if (mapPresenter.getOriginalRoute() != null) {
             updatePolylineByZoom(mapPresenter.getOriginalRoute(), cameraPosition.zoom);
+            updateCamera(new LatLng(LocationHandler.getCurrentLocation().getLatitude(),
+                                    LocationHandler.getCurrentLocation().getLongitude()),
+                        cameraPosition.bearing);
         }
     }
 }
