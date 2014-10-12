@@ -92,7 +92,7 @@ public class Route {
 
     /**
      * Get the recommended stop for the route.
-     * @return recommended stop.
+     * @return recommended stop (null if no stop is recommended).
      */
     public MapLocation getRecommendedStop() {
         return recommendedStop;
