@@ -15,10 +15,8 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
-import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
@@ -183,7 +181,7 @@ public class
         LatLng optimalLatLong;
         ArrayList<RestLocation> closeLocations = new ArrayList<RestLocation>();
 
-        while (closeLocations.size() != 0) {
+        while (closeLocations.size() == 0) {
             optimalLatLong = findLatLngWithinDuration(directRoute, within);
             closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
             Log.w("NBRofCloseLocations", closeLocations.size() + "");
@@ -244,7 +242,6 @@ public class
             } else {
                 bottomIndex = (topIndex + bottomIndex) / 2;
             }
-
             //Just to be safe
             if (topIndex == bottomIndex) {
                 break;
