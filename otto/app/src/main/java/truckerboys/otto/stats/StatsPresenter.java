@@ -51,12 +51,12 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
         double timeToday = stats.getFloat("timeToday", 0);
         // double distanceToday = stats.getFloat("distanceToday", 5); // Implement later
         // double fuelToday = stats.getFloat("fuelToday", 5);
-        double distanceByFuel = stats.getFloat("distanceByFuel", 5);
+        double distanceByFuel = stats.getFloat("distanceByFuel", 0);
 
         // Gets total stats
         double timeTotal = stats.getFloat("timeTotal", 0);
-        double distanceTotal = stats.getFloat("distanceTotal", 5);
-        double fuelTotal = stats.getFloat("fuelTotal", 5);
+        double distanceTotal = stats.getFloat("distanceTotal", 0);
+        double fuelTotal = stats.getFloat("fuelTotal", 0);
         // double fuelByDistanceTotal = stats.getFloat("fuelByDistanceTotal", 5);
 
         // Gets total stats
@@ -80,6 +80,9 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
      */
     public void setStats(double[] statsToday, double[] statsTotal, int violations) {
         // Sets the stats in the model
+        System.out.println("DISTANCE DRIVEN: " + statsTotal[1] + " **********************");
+        System.out.println("FUEL CONSUMPTION: " + statsTotal[2] + " **********************");
+
         model.setStats(statsToday, statsTotal, violations);
 
         // Updates the view with stats
@@ -93,8 +96,9 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
      * @param system metric/imperial - defaults to metric.
      */
     public void setUnits(String system) {
-        model.setUnits(system);
-        view.updateUnits(system);
+        // TODO implement when better switching between units has been set
+        // model.setUnits(system);
+        // view.updateUnits(system);
 
        // double[] statsToday = {model.getTimeToday(), model.getDistanceToday(), model.getFuelToday(), model.getfuelByDistanceToday()};
        // double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};

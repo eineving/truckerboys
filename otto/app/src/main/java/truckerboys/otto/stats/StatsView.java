@@ -64,7 +64,9 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView  = inflater.inflate(R.layout.fragment_stats, container, false);
 
-        VehicleInterface.subscribe(this);
+        // Subscribes to the signals wanted
+        VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER);
+        VehicleInterface.subscribe(this, VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 
         // Creates TextViews from the fragment for daily stats
         timeToday = (TextView) rootView.findViewById(R.id.timeTodayTime);
@@ -146,6 +148,8 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
         editor.commit();
 
+        System.out.println("****** WRITTEN STUFFS ********");
+
     }
 
 
@@ -154,7 +158,8 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
      * This method is to be called from the presenter.
      * @param system metric/imperial
      */
-    public void updateUnits(String system) {
+    public void
+    updateUnits(String system) {
         if(system.equals("imperial")) {
             fuelUnit = ""; // MILES
             distanceUnit = ""; // GALLONS
@@ -181,7 +186,7 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         }
 
         if(distanceByFuel != null) {
-            distanceByFuel.setText(Math.floor(statsToday[1]*100)/100 + " km/L");
+            distanceByFuel.setText(Math.floor(statsToday[3]*100)/100 + " km/L");
         }
 
         if(timeTotal != null) {
@@ -189,12 +194,22 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         }
 
         if(distanceTotal != null ){
+            System.out.println("DISTANCE DRIVEN: " + statsTotal[1] + " **********************");
             distanceTotal.setText(Math.floor(statsTotal[1]*100)/100 + " km");
         }
 
+        /*if(distanceTotal != null) {
+            distanceTotal.setText(Math.floor(34.5223*100)/100 + " km");
+        }*/
+
         if(fuelTotal != null) {
+            System.out.println("FUEL CONSUMPTION: " + statsTotal[2] + " **********************");
             fuelTotal.setText(Math.floor(statsTotal[2]*100)/100 + " L");
         }
+
+        /*if(fuelTotal != null) {
+            fuelTotal.setText(Math.floor(654.3424*100)/100 + " L");
+        }*/
 
 
         // Sets violations
@@ -238,13 +253,13 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
                 // TODO Set total km per liters
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
-                distanceByFuel.setText(kmPerLiter + " km/L");
+                distanceByFuel.setText(Math.floor(kmPerLiter * 100)/100 + " km/L");
 
             case VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE:
 
                 // TODO Set total distance driven
                 Float distance = ((SCSFloat) signal.getData()).getFloatValue();
-                distanceTotal.setText(distance + " km");
+                distanceTotal.setText(Math.floor(distance * 100)/100 + " km");
 
             default:
         }
