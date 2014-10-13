@@ -60,6 +60,10 @@ public class SettingsView extends Fragment implements IView, IEventListener {
         // presenter.setListeners(soundSwitch, displaySwitch, (Switch) rootView.findViewById(R.id.unitSwitch));
         presenter.setListeners(soundSwitch, displaySwitch, tankSize);
 
+        SharedPreferences settings = getActivity().getSharedPreferences(SETTINGS, 0);
+
+        // Reads stored tank size from shared preferences
+        tankSize.setText("" + settings.getInt("tankSize", 200));
 
         // Restores preferences for settings in presenter
         presenter.restorePreferences();
@@ -79,6 +83,20 @@ public class SettingsView extends Fragment implements IView, IEventListener {
         update(sound, presenter.isDisplayActive());
         return rootView;
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Stores the tankSize when on pause
+        SharedPreferences.Editor editor = getActivity().getSharedPreferences(SETTINGS, 0).edit();
+
+        if(tankSize.getText().toString().length() > 0) {
+            editor.putInt("tankSize", Integer.parseInt(tankSize.getText() + ""));
+        }
+
+        editor.commit();
     }
 
 
@@ -107,30 +125,34 @@ public class SettingsView extends Fragment implements IView, IEventListener {
     @Override
     public void performEvent(Event event) {
 
-        if(event.isType(SoundChangedEvent.class)) {
+        if(getActivity() != null) {
+            if(event.isType(SoundChangedEvent.class)) {
 
-            // Checks if sound is on or off and sets systems sound based on this
-            if (((SoundChangedEvent)event).getSound()) {
-                ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            } else {
-                ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            }
-        }
 
-        if(event.isType(SettingsChangedEvent.class)) {
-
-            // Loads settings file
-            SharedPreferences settings = getActivity().getSharedPreferences(SETTINGS, 0);
-
-            // Keeps display alive or not based on settings
-            if(settings.getBoolean("displayAlive", true)) {
-                getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-            } else {
-                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                // Checks if sound is on or off and sets systems sound based on this
+                if (((SoundChangedEvent)event).getSound()) {
+                    ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                } else {
+                    ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                }
 
             }
 
+            if(event.isType(SettingsChangedEvent.class)) {
+
+                // Loads settings file
+                SharedPreferences settings = getActivity().getSharedPreferences(SETTINGS, 0);
+
+                // Keeps display alive or not based on settings
+                if(settings.getBoolean("displayAlive", true)) {
+                    getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                } else {
+                    getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                }
+
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ public class SettingsPresenter implements IEventListener{
         EventTruck.getInstance().subscribe(this);
     }
 
-    public void setListeners(Switch sound, Switch display, EditText tankSize) {
+    public void setListeners(Switch sound, Switch display, final EditText tankSize) {
 
         /*unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -56,7 +56,10 @@ public class SettingsPresenter implements IEventListener{
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 //TODO update model
-                System.out.println("***************PENIS*************");
+                if(!tankSize.getText().toString().equals("") && tankSize.getText() != null) {
+                    model.setTankSize(Integer.parseInt(tankSize.getText() + ""));
+                }
+
                 return false;
             }
         });
