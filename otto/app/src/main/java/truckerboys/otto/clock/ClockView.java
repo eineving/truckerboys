@@ -16,6 +16,9 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
+import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -29,9 +32,9 @@ public class ClockView extends Fragment {
     ImageView recStopImage, firstAltStopImage, secAltStopImage;
     RelativeLayout recStopClick, firstAltStopClick, secAltStopClick;
 
-    RestStop recStop, firstAltStop, secAltStop;
+    MapLocation recStop, firstAltStop, secAltStop;
 
-    Boolean variablesSet = false;
+    Boolean variablesSet = false, showStops = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
     public ClockView() {
@@ -54,7 +57,6 @@ public class ClockView extends Fragment {
      */
     private void initiateVariables() {
         timeLeft = (TextView) rootView.findViewById(R.id.clockETA);
-        timeLeft.setText("04:22");
         timeLeftExtended = (TextView) rootView.findViewById(R.id.clockETAExtended);
 
         recStopTitle = (TextView) rootView.findViewById(R.id.recStopTitle);
@@ -85,13 +87,13 @@ public class ClockView extends Fragment {
                 }
                 if(tag.equalsIgnoreCase("firstAltStop")){
                     recStopTitle.setText("Chosen stop");
-                    RestStop temp = recStop;
+                    MapLocation temp = recStop;
                     recStop = firstAltStop;
                     firstAltStop = temp;
                 }
                 if(tag.equalsIgnoreCase("secAltStop")){
                     recStopTitle.setText("Chosen stop");
-                    RestStop temp = recStop;
+                    MapLocation temp = recStop;
                     recStop = secAltStop;
                     secAltStop = temp;
                 }
@@ -100,6 +102,12 @@ public class ClockView extends Fragment {
         recStopClick.setOnClickListener(stopClickListener);
         firstAltStopClick.setOnClickListener(stopClickListener);
         secAltStopClick.setOnClickListener(stopClickListener);
+
+//        if(!showStops){
+//            setVisibility(TextView.GONE);
+//        }else{
+//            setVisibility(TextView.VISIBLE);
+//        }
 
         variablesSet = true;
     }
@@ -112,28 +120,33 @@ public class ClockView extends Fragment {
     public void setTimeLeft(TimeLeft timeLeft) {
         if (variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
-            timeLE = timeLEPrefix + getTimeAsFormattedString(timeLeft.getTimeLeft().plus(timeLeft.getExtendedTimeLeft()));
+            if(timeLeft.getExtendedTimeLeft().getMillis()>0){
+                timeLE = timeLEPrefix + getTimeAsFormattedString(timeLeft.getExtendedTimeLeft());
+            }else {
+                timeLE = "0";
+            }
         }
     }
 
     /**
-     * Sets the recommended reststop
+     * Sets the recommended stop
      *
-     * @param reststop The new recommended reststop
+     * @param stop The new recommended stop
      */
-    public void setRecommendedRestStop(RestStop reststop) {
-        recStop = reststop;
+    public void setRecommendedStop(MapLocation stop) {
+        recStop = stop;
+        System.out.println("Recommended stop: " + recStop);
     }
 
     /**
-     * Sets the alternative reststops to the given reststops
+     * Sets the alternative stops to the given stops
      *
-     * @param firstAltReststop The first alternative reststop
-     * @param secAltReststop   The second alternative reststop
+     * @param firstAltStop The first alternative stop
+     * @param secAltStop   The second alternative stop
      */
-    public void setAltRestStops(RestStop firstAltReststop, RestStop secAltReststop) {
-        this.firstAltStop = firstAltReststop;
-        this.secAltStop = secAltReststop;
+    public void setAltStops(MapLocation firstAltStop, MapLocation secAltStop) {
+        this.firstAltStop = firstAltStop;
+        this.secAltStop = secAltStop;
     }
 
     /**
@@ -157,20 +170,61 @@ public class ClockView extends Fragment {
     private void setLabels() {
         try {
             timeLeft.setText(timeL);
-            timeLeftExtended.setText(timeLE);
+            if(timeLE.equalsIgnoreCase("0")){
+                timeLeftExtended.setVisibility(TextView.GONE);
+            }else{
+                timeLeftExtended.setText(timeLE);
+                timeLeftExtended.setVisibility(TextView.VISIBLE);
+            }
         } catch (Exception e) {
             System.out.println("Exception " + e.getMessage());
         }
 
-        recStopETA.setText(getTimeAsFormattedString(recStop.getTimeLeft()));
-        recStopName.setText(recStop.getName());
+        if(showStops){
+            setVisibility(TextView.VISIBLE);
+            System.out.println("Visible ");
+        }else{
+            setVisibility(TextView.GONE);
+        }
 
-        firstAltStopETA.setText(getTimeAsFormattedString(firstAltStop.getTimeLeft()));
-        firstAltStopName.setText(firstAltStop.getName());
+        setStopUI(recStop, recStopETA, recStopName, recStopImage);
+        setStopUI(firstAltStop, firstAltStopETA, firstAltStopName, firstAltStopImage);
+        setStopUI(secAltStop, secAltStopETA, secAltStopName, secAltStopImage);
 
-        secAltStopETA.setText(getTimeAsFormattedString(secAltStop.getTimeLeft()));
-        secAltStopName.setText(secAltStop.getName());
+    }
 
+    private void setStopUI(MapLocation stop, TextView eta, TextView name, ImageView image){
+        if(stop==null){
+            return;
+        }
+        eta.setText(getTimeAsFormattedString(stop.getEta()));
+        if(stop instanceof RestLocation){
+            name.setText(((RestLocation) stop).getName());
+            image.setImageResource(R.drawable.reststop);
+        }else if(stop instanceof GasStation){
+            name.setText(((GasStation) stop).getName());
+            image.setImageResource(R.drawable.gasstation);
+        }else{
+            name.setText(stop.getAddress());
+            image.setImageResource(R.drawable.reststop);
+        }
+    }
+
+    private void setVisibility(int visibility){
+        recStopETA.setVisibility(visibility);
+        recStopName.setVisibility(visibility);
+        recStopImage.setVisibility(visibility);
+        firstAltStopETA.setVisibility(visibility);
+        firstAltStopName.setVisibility(visibility);
+        firstAltStopImage.setVisibility(visibility);
+        secAltStopETA.setVisibility(visibility);
+        secAltStopName.setVisibility(visibility);
+        secAltStopImage.setVisibility(visibility);
+    }
+
+    public void showStops(boolean value){
+        showStops = value;
+        System.out.println("Showstops! " + value);
     }
 
     /**

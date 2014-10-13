@@ -47,7 +47,7 @@ public class OTTO {
         mapView.setTripPlanner(tripPlanner);
         views.add(mapView);
 
-        views.add(new ClockPresenter());
+        views.add(new ClockPresenter(tripPlanner));
 
         views.add(new HomeView());
 

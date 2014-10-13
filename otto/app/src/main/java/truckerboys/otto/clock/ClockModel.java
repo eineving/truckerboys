@@ -3,9 +3,12 @@ package truckerboys.otto.clock;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
+import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TimeLeft;
+import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -13,25 +16,24 @@ import truckerboys.otto.planner.TimeLeft;
  */
 public class ClockModel {
 
-    private Instant violationStart, lastTimeUpdate, timeNow;
+    private Instant lastTimeUpdate, timeNow;
 
     private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
-    private RestStop recStop, firstAltStop, secAltStop;
+    private MapLocation recStop, firstAltStop, secAltStop;
     private long timeDifference;
 
-    public ClockModel() {
+    private TripPlanner tripPlanner;
+    private Route route;
 
-        //TODO: Change to real values when Tripplanner is implemented
+    public ClockModel(TripPlanner tripPlanner) {
+
+        this.tripPlanner = tripPlanner;
+
         lastTimeUpdate = new Instant();
-        timeLeftDuration = new Duration(120 * 60 * 1000);
-        timeLeftExtendedDuration = new Duration(60 * 60 * 1000);
+        timeLeftDuration = new Duration(Duration.ZERO);
+        timeLeftExtendedDuration = new Duration(Duration.ZERO);
         timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
-
-        //Placeholders until TripPlanner is fully implemented
-        recStop = new RestStop(new Duration(45 * 60 * 1000), "Name of first stop");
-        firstAltStop = new RestStop(new Duration(110 * 60 * 1000), "Name of second stop");
-        secAltStop = new RestStop(new Duration(140 * 60 * 1000), "Name of third stop");
 
     }
 
@@ -42,42 +44,69 @@ public class ClockModel {
         timeNow = new Instant();
         timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
         timeLeftDuration = timeLeftDuration.minus(timeDifference);
-        timeLeftExtendedDuration = timeLeftDuration.minus(timeDifference);
-        recStop.setTimeLeft(recStop.getTimeLeft().minus(timeDifference));
-        firstAltStop.setTimeLeft(firstAltStop.getTimeLeft().minus(timeDifference));
-        secAltStop.setTimeLeft(secAltStop.getTimeLeft().minus(timeDifference));
+        timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
+        if(recStop!=null)
+        recStop.setEta(recStop.getEta().minus(timeDifference));
+        if(firstAltStop!=null)
+        firstAltStop.setEta(firstAltStop.getEta().minus(timeDifference));
+        if(secAltStop!=null)
+        secAltStop.setEta(secAltStop.getEta().minus(timeDifference));
+
+        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
+
         lastTimeUpdate = timeNow;
     }
 
-    private void processRestStops() {
-        //TODO: Add checking for reststops with TripPlanner
+    private void processChangedRoute() {
+
+        timeLeft = route.getTimeLeftOnSession();
+        timeLeftDuration = timeLeft.getTimeLeft();
+        timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
+
+        recStop = route.getRecommendedStop();
+        if(route.getAlternativeStops()!=null) {
+            Iterator it = route.getAlternativeStops().iterator();
+
+            if (it.hasNext()) {
+                firstAltStop = (MapLocation) it.next();
+            }
+            if (it.hasNext()) {
+                secAltStop = (MapLocation) it.next();
+            }
+        }
+
     }
 
     /**
-     * Returns the recommended reststop
-     * @return The recommended reststop
+     * Returns the recommended stop
+     * @return The recommended stop
      */
-    public RestStop getRecommendedRestStop(){
+    public MapLocation getRecommendedStop(){
         return recStop;
     }
 
     /**
-     * Returns the first alternative reststop
-     * @return The first alternative reststop
+     * Returns the first alternative stop
+     * @return The first alternative stop
      */
-    public RestStop getFirstAltReststop() {
+    public MapLocation getFirstAltStop() {
         return firstAltStop;
     }
 
     /**
-     * Returns the second alternative reststop
-     * @return The second alternative reststop
+     * Returns the second alternative stop
+     * @return The second alternative stop
      */
-    public RestStop getSecondAltReststop() {
+    public MapLocation getSecondAltStop() {
         return secAltStop;
     }
 
     public TimeLeft getTimeLeft() {
-        return new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
+        return timeLeft;
+    }
+
+    public void setRoute(Route newRoute){
+        route = newRoute;
+        processChangedRoute();
     }
 }
