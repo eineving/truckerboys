@@ -24,15 +24,11 @@ import java.util.LinkedList;
 
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
-import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
-import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
-import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
 import utils.IView;
@@ -40,19 +36,13 @@ import utils.IView;
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends SupportMapFragment implements IView, IEventListener {
+public class MapView extends SupportMapFragment implements  IEventListener {
     private View rootView;
     private GoogleMap googleMap;
     private Marker positionMarker;
-    private Polyline currentRoutePolyline;
+    private Polyline routePolyline;
 
-    private MapPresenter mapPresenter;
-    private TripPlanner tripPlanner;
-
-    //Default to detailed route, since zoom default is 16f.
-    private RouteDetail currentDetail = RouteDetail.DETAILED;
     private static final float DETAILED_ZOOM_ABOVE = 10;
-
 
     private static final int GPS_FREQ = 500; // The frequency of gps updates.
     private static final int INTERPOLATION_FREQ = 25; //The frequency of the interpolation.
@@ -73,7 +63,6 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     }
 
     //TODO What happens if googleMap isn't initiated correctly. (Check all methods making sure that the app doesn't crash.)
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = super.onCreateView(inflater, container, savedInstanceState);
@@ -101,20 +90,20 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
                     .position(new LatLng(0, 0))
                     .flat(true));
 
-            currentRoutePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.BLUE));
+            routePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.BLUE));
         }
 
         updatePos.run();
-        mapPresenter = new MapPresenter(this.tripPlanner, googleMap);
         return rootView;
     }
 
     /**
-     * Adjust the camera position and bearing to match the location provided.
+     * Adjust the GoogleMap Camera to the provided LatLng position and bearing.
      *
-     * @param location The location to adjust adjust accordingly to.
+     * @param location The location to move the Camera to.
+     * @param bearing The bearing to adjust the Camera to.
      */
-    private void updateCamera(LatLng location, float bearing) {
+    private void adjustCamera(LatLng location, float bearing) {
         if (googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
@@ -127,12 +116,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     }
 
     /**
-     * Updates the marker for our current position.
+     * Updates the marker for our current position, will also interpolate the position making it
+     * move smoothly across the map between each GPS Update.
      *
      * @requires to be updated once every 1/INTERPOLATION_FREQ second to function properly.
      * @requires setupPositionMarker() has been called.
      */
-
     private void updatePositionMarker() {
         if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
 
@@ -178,7 +167,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
                     bearings.removeFirst();
                 }
 
-                updateCamera(positionMarker.getPosition(), positionMarker.getRotation());
+                adjustCamera(positionMarker.getPosition(), positionMarker.getRotation());
             }
         }
 
@@ -186,20 +175,38 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     }
 
     /*
-     * Paint the route provided to this views Google Map.
-     * @param route The route to paint.
+     * Draws the polyline from the specified route. Depending on what zoomLevel you specify it
+     * will draw an overview of the route or a detailed version.
+     * @param route The route to base the polyline on.
      */
     private void updatePolyline(Route route, float zoomLevel) {
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
         if (detail == RouteDetail.DETAILED) {
-            currentRoutePolyline.setPoints(route.getDetailedPolyline());
-            currentDetail = RouteDetail.DETAILED;
+            routePolyline.setPoints(route.getDetailedPolyline());
         } else {
-            currentRoutePolyline.setPoints(route.getOverviewPolyline());
-            currentDetail = RouteDetail.OVERVIEW;
+            routePolyline.setPoints(route.getOverviewPolyline());
         }
+    }
+
+    /**
+     * Updates the MapView according to the specified Route. CameraPosition will remain the same
+     * as it did before.
+     * @param route The new Route to draw on the Map.
+     */
+    public void updateCamera(Route route){
+        updatePolyline(route, googleMap.getCameraPosition().zoom);
+    }
+
+    /**
+     * Updates the MapView according to the specified Route and CameraPosition.
+     * @param route The new Route to draw on the Map.
+     * @param cameraPosition The CameraPosition to use when displaying the Map.
+     */
+    public void updateCamera(Route route, CameraPosition cameraPosition) {
+        updatePolyline(route, cameraPosition.zoom);
+        adjustCamera(LocationHandler.getCurrentLocationAsLatLng(), cameraPosition.bearing);
     }
 
     @Override
@@ -209,33 +216,14 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
         }
-        if (event.isType(ChangedRouteEvent.class)) {
-            updatePolyline(mapModel.getRoute(), googleMap.getCameraPosition().zoom);
-        }
     }
 
-    @Override
-    public Fragment getFragment() {
-        return this;
-    }
-
-    @Override
-    public String getName() {
-        return "Map";
-    }
-
-    public void setTripPlanner(TripPlanner tripPlanner) {
-        this.tripPlanner = tripPlanner;
-    }
-
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-        if (mapPresenter.getRoute() != null) {
-            updatePolyline(mapPresenter.getRoute(), cameraPosition.zoom);
-            updateCamera(new LatLng(LocationHandler.getCurrentLocation().getLatitude(),
-                                    LocationHandler.getCurrentLocation().getLongitude()),
-                        cameraPosition.bearing);
-        }
+    /**
+     * Returns the GoogleMap object that we receive from google when connecting to Google.
+     * @return The current GoogleMap object.
+     */
+    public GoogleMap getGoogleMap() {
+        return googleMap;
     }
 }
 

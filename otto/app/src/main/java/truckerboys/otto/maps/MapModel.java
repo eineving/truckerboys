@@ -15,9 +15,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
-import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
-import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
@@ -27,7 +25,6 @@ import truckerboys.otto.utils.positions.MapLocation;
  */
 public class MapModel implements IEventListener {
     private TripPlanner tripPlanner;
-    private Route currentRoute;
     private EventTruck eventTruck = EventTruck.getInstance();
 
     public MapModel(final TripPlanner tripPlanner, GoogleMap googleMap) {
@@ -56,16 +53,16 @@ public class MapModel implements IEventListener {
                     }
 
                     //Calculate new route with provided checkpoints
-                    currentRoute = tripPlanner.getNewRoute(
-                            new MapLocation(LocationHandler.getCurrentLocation()),
+                    tripPlanner.setNewRoute(
+                            new MapLocation(LocationHandler.getCurrentLocationAsMapLocation()),
                             new MapLocation(new LatLng(((RouteRequestEvent) event).getFinalDestion().getLatitude(),
                                     ((RouteRequestEvent) event).getFinalDestion().getLongitude())),
                             checkpoints);
 
                 } else /* No checkpoints in new route. */ {
                     //Calculate new route without any checkpoints
-                    currentRoute = tripPlanner.getNewRoute(
-                            new MapLocation(LocationHandler.getCurrentLocation()),
+                    tripPlanner.setNewRoute(
+                            new MapLocation(LocationHandler.getCurrentLocationAsMapLocation()),
                             new MapLocation(new LatLng(((RouteRequestEvent) event).getFinalDestion().getLatitude(),
                                     ((RouteRequestEvent) event).getFinalDestion().getLongitude())));
                 }
@@ -78,15 +75,9 @@ public class MapModel implements IEventListener {
             }
         }
         //endregion
-
-        //region UpdatedRouteEvent (This event is fired when the tripplanner somehow changed the current route.)
-        if(event.isType(ChangedRouteEvent.class)){
-
-        }
-        //endregion
     }
 
-    public Route getCurrentRoute() {
-        return currentRoute;
+    public Route getRoute() {
+        return tripPlanner.getRoute();
     }
 }

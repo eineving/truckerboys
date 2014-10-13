@@ -9,6 +9,7 @@ import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.TachographHandler;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.home.HomeView;
+import truckerboys.otto.maps.MapPresenter;
 import truckerboys.otto.maps.MapView;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
@@ -43,9 +44,7 @@ public class OTTO {
     }
 
     private void createPresenters() {
-        MapView mapView = new MapView();
-        mapView.setTripPlanner(tripPlanner);
-        views.add(mapView);
+        views.add(new MapPresenter(tripPlanner));
 
         views.add(new ClockPresenter());
 
