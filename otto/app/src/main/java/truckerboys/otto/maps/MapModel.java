@@ -1,8 +1,11 @@
 package truckerboys.otto.maps;
 
+import android.location.Address;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,58 +15,79 @@ import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapModel implements IEventListener{
+public class MapModel implements IEventListener {
     private TripPlanner tripPlanner;
-    private Route originalRoute;
+    private Route currentRoute;
     private EventTruck eventTruck = EventTruck.getInstance();
 
     public MapModel(final TripPlanner tripPlanner, GoogleMap googleMap) {
         this.tripPlanner = tripPlanner;
-
-        //TODO Remove this and instead receive new route from RouteActivity.
-        if(originalRoute == null){
-            originalRoute = this.tripPlanner.calculateRoute(
-                    new MapLocation(new LatLng(57.6878618, 11.9777905)), //Start location
-                    new MapLocation(new LatLng(59.326142, 17.9875455)) //End location
-            );
-            EventTruck.getInstance().newEvent(new NewRouteEvent(originalRoute, originalRoute));
-        }
-
-        Runnable updateRoute = new Runnable() {
-            @Override
-            public void run() {
-                if(LocationHandler.isConnected()) {
-                    eventTruck.newEvent(new UpdatedRouteEvent(
-                                    tripPlanner.calculateRoute(LocationHandler.getCurrentLocation(),
-                                    originalRoute.getFinalDestination()
-                                    )));
-                }
-            }
-        };
-        ScheduledThreadPoolExecutor routeExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
-        routeExecutor.scheduleWithFixedDelay(updateRoute, 0, 30, TimeUnit.SECONDS);
+        eventTruck.subscribe(this);
     }
 
     @Override
     public void performEvent(Event event) {
-        if(event.isType(GPSUpdateEvent.class)) {
+        if (event.isType(GPSUpdateEvent.class)) {
             //TODO Check if outside current route, calculate new route.
         }
-        if(event.isType(NewRouteEvent.class)) {
-            originalRoute = ((NewRouteEvent) event).getNewRoute();
+        //region NewRouteEvent (This event is fired when the user requests a new route from RouteActivity.)
+        if (event.isType(RouteRequestEvent.class)) {
+            try {
+                List<Address> adressList = ((RouteRequestEvent) event).getCheckpoints();
+
+                //Check if NewRoute involves any checkpoints.
+                if (!adressList.isEmpty()) {
+
+                    // We get the checkpoints as adresses in NewRouteEvent. Remake them to MapLocations
+                    // making it possible to send them into tripplanner.
+                    MapLocation[] checkpoints = new MapLocation[((RouteRequestEvent) event).getCheckpoints().size()];
+                    for (Address address : adressList) {
+                        checkpoints[adressList.indexOf(address)] = new MapLocation(new LatLng(address.getLatitude(), address.getLongitude()));
+                    }
+
+                    //Calculate new route with provided checkpoints
+                    currentRoute = tripPlanner.getNewRoute(
+                            new MapLocation(LocationHandler.getCurrentLocation()),
+                            new MapLocation(new LatLng(((RouteRequestEvent) event).getFinalDestion().getLatitude(),
+                                    ((RouteRequestEvent) event).getFinalDestion().getLongitude())),
+                            checkpoints);
+
+                } else /* No checkpoints in new route. */ {
+                    //Calculate new route without any checkpoints
+                    currentRoute = tripPlanner.getNewRoute(
+                            new MapLocation(LocationHandler.getCurrentLocation()),
+                            new MapLocation(new LatLng(((RouteRequestEvent) event).getFinalDestion().getLatitude(),
+                                    ((RouteRequestEvent) event).getFinalDestion().getLongitude())));
+                }
+            } catch (InvalidRequestException e) {
+                //TODO Create proper catch
+                e.printStackTrace();
+            } catch (NoConnectionException e) {
+                //TODO Create proper catch
+                e.printStackTrace();
+            }
         }
+        //endregion
+
+        //region UpdatedRouteEvent (This event is fired when the tripplanner somehow changed the current route.)
+        if(event.isType(ChangedRouteEvent.class)){
+
+        }
+        //endregion
     }
 
-    public Route getOriginalRoute(){
-        return originalRoute;
+    public Route getCurrentRoute() {
+        return currentRoute;
     }
 }

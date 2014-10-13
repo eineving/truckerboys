@@ -26,11 +26,14 @@ import java.util.LinkedList;
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.NewRouteEvent;
+import truckerboys.otto.utils.eventhandler.events.UpdatedRouteEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
 import utils.IView;
@@ -38,7 +41,7 @@ import utils.IView;
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends SupportMapFragment implements IView, IEventListener, GoogleMap.OnCameraChangeListener{
+public class MapView extends SupportMapFragment implements IView, IEventListener {
     private View rootView;
     private GoogleMap googleMap;
     private Marker positionMarker;
@@ -86,7 +89,6 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
             //TODO Read from settings if the user wants Hybrid or Normal map type.
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            googleMap.setOnCameraChangeListener(this);
 
             //Set current position and default zoom, tilt and bearing.
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(0,0), 16f, 50, 0)));
@@ -190,7 +192,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
      * Paint the route provided to this views Google Map.
      * @param route The route to paint.
      */
-    private void updateRoutePolyline(Route route, float zoomLevel){
+    private void updatePolyline(Route route, float zoomLevel) {
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
@@ -213,8 +215,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
         }
-        if(event.isType(NewRouteEvent.class)) {
-            updateRoutePolyline(((NewRouteEvent) event).getNewRoute(), googleMap.getCameraPosition().zoom);
+        if (event.isType(ChangedRouteEvent.class)) {
+            updatePolyline(mapModel.getRoute(), googleMap.getCameraPosition().zoom);
         }
     }
 
@@ -234,7 +236,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        updateRoutePolyline(mapPresenter.getCurrentRoute(), cameraPosition.zoom);
+        if (mapPresenter.getRoute() != null) {
+            updatePolyline(mapPresenter.getRoute(), cameraPosition.zoom);
+            updateCamera(new LatLng(LocationHandler.getCurrentLocation().getLatitude(),
+                                    LocationHandler.getCurrentLocation().getLongitude()),
+                        cameraPosition.bearing);
+        }
     }
 }
 

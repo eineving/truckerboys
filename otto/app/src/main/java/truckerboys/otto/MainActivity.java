@@ -8,6 +8,13 @@ import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
 
 import truckerboys.otto.utils.LocationHandler;
+<<<<<<< Updated upstream
+=======
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+>>>>>>> Stashed changes
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
@@ -71,4 +78,14 @@ public class MainActivity extends FragmentActivity {
         super.onStop();
     }
 
+<<<<<<< Updated upstream
+=======
+    @Override
+    public void performEvent(Event event) {
+        // Sets the current page to Map if a new destination is set
+        if(event.isType(RouteRequestEvent.class)) {
+            viewPager.setCurrentItem(0);
+        }
+    }
+>>>>>>> Stashed changes
 }
