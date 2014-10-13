@@ -17,9 +17,11 @@ import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
+import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 import truckerboys.otto.vehicle.VehicleSignalID;
@@ -241,8 +243,30 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
             editor.commit();
 
         }
+
+
+        if(event.isType(TotalDistanceEvent.class)) {
+            // Update view if new total distance signal is sent
+
+            distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
+
+        }
+
+        if(event.isType(DistanceByFuelEvent.class)) {
+            // Update view if new total distance/fuel signal is sent
+
+            distanceByFuel.setText(((DistanceByFuelEvent)event).getDistanceByFuel() + " km/L");
+
+        }
     }
 
+    /**
+     * Listens to signals from the truck and sends
+     * a new Event trough the EventTruck.
+     * This method can't update the view by it self
+     * due to thread unsafety.
+     * @param signal the signal sent from the truck.
+     */
     @Override
     public void receive(AutomotiveSignal signal) {
        // TODO Get fuel consumption
@@ -251,17 +275,18 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
             case VehicleSignalID.KM_PER_LITER:
 
-                // TODO Set total km per liters
+                // Gets the total distance by fuel and updates the listeners
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
-                distanceByFuel.setText(Math.floor(kmPerLiter * 100)/100 + " km/L");
+
+                EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
 
             case VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE:
 
-                // TODO Set total distance driven
+                // Gets the total distance and updates the listeners
                 Float distance = ((SCSFloat) signal.getData()).getFloatValue();
-                distanceTotal.setText(Math.floor(distance * 100)/100 + " km");
 
-            default:
+                EventTruck.getInstance().newEvent(new TotalDistanceEvent(Math.floor(distance * 100)/100));
+
         }
 
     }
