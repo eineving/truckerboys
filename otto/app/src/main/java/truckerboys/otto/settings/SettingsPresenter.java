@@ -2,7 +2,10 @@ package truckerboys.otto.settings;
 
 
 import android.content.SharedPreferences;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
@@ -26,7 +29,7 @@ public class SettingsPresenter implements IEventListener{
         EventTruck.getInstance().subscribe(this);
     }
 
-    public void setListeners(Switch sound, Switch display) {
+    public void setListeners(Switch sound, Switch display, EditText tankSize) {
 
         /*unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -46,6 +49,15 @@ public class SettingsPresenter implements IEventListener{
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 displayChanged(b);
+            }
+        });
+
+        tankSize.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                //TODO update model
+                System.out.println("***************PENIS*************");
+                return false;
             }
         });
     }

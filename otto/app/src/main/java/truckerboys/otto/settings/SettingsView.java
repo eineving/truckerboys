@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Switch;
 
 import truckerboys.otto.R;
@@ -34,6 +35,7 @@ public class SettingsView extends Fragment implements IView, IEventListener {
     private Switch soundSwitch;
     private Switch displaySwitch;
     private SettingsPresenter presenter;
+    private EditText tankSize;
 
     public static final String SETTINGS = "Settings_file";
 
@@ -51,11 +53,12 @@ public class SettingsView extends Fragment implements IView, IEventListener {
         // Creates switches from the fragment
         soundSwitch = (Switch) rootView.findViewById(R.id.soundSwitch);
         displaySwitch = (Switch) rootView.findViewById(R.id.displaySwitch);
+        tankSize = (EditText) rootView.findViewById(R.id.tankEditText);
 
         // Sets listeners in presenter
         // TODO Remove unit switch in final design
         // presenter.setListeners(soundSwitch, displaySwitch, (Switch) rootView.findViewById(R.id.unitSwitch));
-        presenter.setListeners(soundSwitch, displaySwitch);
+        presenter.setListeners(soundSwitch, displaySwitch, tankSize);
 
 
         // Restores preferences for settings in presenter
