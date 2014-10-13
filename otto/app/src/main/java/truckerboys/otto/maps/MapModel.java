@@ -27,7 +27,7 @@ public class MapModel implements IEventListener {
     private TripPlanner tripPlanner;
     private EventTruck eventTruck = EventTruck.getInstance();
 
-    public MapModel(final TripPlanner tripPlanner, GoogleMap googleMap) {
+    public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
         eventTruck.subscribe(this);
     }

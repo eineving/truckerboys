@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class RouteRequestEvent extends Event {
     Address finalDestion;
-    ArrayList<Address> checkpoints;
+    ArrayList<Address> checkpoints = new ArrayList<Address>();
 
     public RouteRequestEvent(Address finalDestination, List<Address> checkpoints) {
         this.finalDestion = finalDestination;

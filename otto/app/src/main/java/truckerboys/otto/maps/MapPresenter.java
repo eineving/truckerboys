@@ -25,8 +25,9 @@ public class MapPresenter implements GoogleMap.OnCameraChangeListener, IEventLis
 
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
-        this.mapModel = new MapModel(tripPlanner, mapView.getGoogleMap());
-        this.mapView.getGoogleMap().setOnCameraChangeListener(this);
+        this.mapView.setOnCameraChangeListener(this);
+
+        this.mapModel = new MapModel(tripPlanner);
     }
 
     public Route getRoute(){

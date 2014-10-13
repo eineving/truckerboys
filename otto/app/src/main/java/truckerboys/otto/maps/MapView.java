@@ -58,9 +58,13 @@ public class MapView extends SupportMapFragment implements  IEventListener {
         }
     };
 
-    public MapView() {
+    private GoogleMap.OnCameraChangeListener onCameraChangeListener;
 
+    public void setOnCameraChangeListener(GoogleMap.OnCameraChangeListener onCameraChangeListener) {
+        this.onCameraChangeListener = onCameraChangeListener;
     }
+
+    public MapView() { }
 
     //TODO What happens if googleMap isn't initiated correctly. (Check all methods making sure that the app doesn't crash.)
     @Override
@@ -73,6 +77,8 @@ public class MapView extends SupportMapFragment implements  IEventListener {
 
         //If we could receive map from Google, modify freely to our needs.
         if (googleMap != null) {
+            googleMap.setOnCameraChangeListener(onCameraChangeListener);
+
             //Set all gestures disabled, truckdriver shouldn't be able to move the map.
             googleMap.getUiSettings().setAllGesturesEnabled(false);
             googleMap.getUiSettings().setZoomGesturesEnabled(true);
