@@ -4,32 +4,36 @@ package truckerboys.otto.settings;
 import android.content.SharedPreferences;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-
 import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  * Presenter handling logic between settingsView and settingsModel
  */
-public class SettingsPresenter{
+public class SettingsPresenter implements IEventListener{
     private SettingsModel model;
 
     private SharedPreferences settings;
 
-    public SettingsPresenter( SharedPreferences settings){
+    public SettingsPresenter(SharedPreferences settings){
         this.model = new SettingsModel();
         this.settings = settings;
+
+        EventTruck.getInstance().subscribe(this);
     }
 
-    public void setListeners(Switch sound, Switch display, Switch unit) {
+    public void setListeners(Switch sound, Switch display) {
 
-        unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        /*unit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 unitsChanged(b);
             }
-        });
+        });*/
 
         sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -56,9 +60,6 @@ public class SettingsPresenter{
 
         settingsEditor.putBoolean("displayAlive", b);
 
-
-        // if b == true call view.getActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // if b == false call view.getActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Commit the changes
         settingsEditor.commit();
@@ -95,24 +96,13 @@ public class SettingsPresenter{
 
     /**
      * Method to run when sound switched is changed
-     * @param b on/off
+     * @param sound on/off
      */
-    public void soundChanged(boolean b) {
+    public void soundChanged(boolean sound) {
 
-        // Writes preferences to the settings and stats file
-        SharedPreferences.Editor settingsEditor = settings.edit();
+        // Fire an event with new sound mode on/off
+        EventTruck.getInstance().newEvent(new SoundChangedEvent(sound));
 
-        settingsEditor.putBoolean("sound", b);
-
-        // if b == true call ((AudioManager)view.getActivity().this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        // if b == false call ((AudioManager)view.getActivity().this.getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
-
-
-        // Commit the changes
-        settingsEditor.commit();
-
-        // Read new value metric/imperial from parameters
-        EventTruck.getInstance().newEvent(new SettingsChangedEvent());
     }
 
     /**
@@ -120,24 +110,21 @@ public class SettingsPresenter{
      * the user statistics and the user settings
      */
     public void restorePreferences() {
-        boolean sound = settings.getBoolean("sound", true); // true is the value to be returned if no "sound"-value exists
+        //boolean sound = settings.getBoolean("sound", true); // true is the value to be returned if no "sound"-value exists
+
+        // TODO: Load sound from system sound
         boolean displayAlive = settings.getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
 
-        setSettings(sound, displayAlive);
+        setSettings(displayAlive);
     }
 
     /**
      * Method for setting the restored settings in the
      * model and updating the view
-     * @param sound on/off
      * @param displayAlive on/off
      */
-    public void setSettings(boolean sound, boolean displayAlive) {
-        model.setSettings(sound, displayAlive);
-    }
-
-    public boolean isSoundOn(){
-        return model.getSound();
+    public void setSettings(boolean displayAlive) {
+        model.setSettings(displayAlive);
     }
 
     public boolean isDisplayActive(){
@@ -148,4 +135,11 @@ public class SettingsPresenter{
         return model;
     }
 
+    @Override
+    public void performEvent(Event event) {
+        if(event.isType(SoundChangedEvent.class)) {
+
+        }
+
+    }
 }

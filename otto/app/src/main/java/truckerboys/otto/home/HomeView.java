@@ -7,10 +7,9 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 
 import truckerboys.otto.R;
-import truckerboys.otto.RouteActivity;
+import truckerboys.otto.newroute.RouteActivity;
 import utils.IView;
 
 /**
@@ -19,12 +18,12 @@ import utils.IView;
 public class HomeView extends Fragment implements IView {
     private View rootView;
     private HomePresenter presenter;
-    private ImageButton newRouteButton;
-    private ImageButton continueRouteButton;
-    private ImageButton mapsButton;
-    private ImageButton clockButton;
-    private ImageButton statsButton;
-    private ImageButton settingsButton;
+    private View newRouteButton;
+    private View continueRouteButton;
+    private View mapsButton;
+    private View clockButton;
+    private View statsButton;
+    private View settingsButton;
 
     public HomeView(){
         presenter = new HomePresenter();
@@ -42,12 +41,12 @@ public class HomeView extends Fragment implements IView {
     }
 
     public void defineButtons() {
-        newRouteButton = (ImageButton) rootView.findViewById(R.id.newRouteButton);
-        continueRouteButton = (ImageButton) rootView.findViewById(R.id.continueRouteButton);
-        mapsButton = (ImageButton) rootView.findViewById(R.id.mapsButton);
-        clockButton = (ImageButton) rootView.findViewById(R.id.clockButton);
-        statsButton = (ImageButton) rootView.findViewById(R.id.statsButton);
-        settingsButton = (ImageButton) rootView.findViewById(R.id.settingsButton);
+        newRouteButton = rootView.findViewById(R.id.newRouteButton);
+        continueRouteButton = rootView.findViewById(R.id.continueRouteButton);
+        mapsButton = rootView.findViewById(R.id.mapsButton);
+        clockButton = rootView.findViewById(R.id.clockButton);
+        statsButton = rootView.findViewById(R.id.statsButton);
+        settingsButton = rootView.findViewById(R.id.settingsButton);
 
         asignListeners();
     }
@@ -63,27 +62,28 @@ public class HomeView extends Fragment implements IView {
                 Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
                 getActivity().startActivity(newRouteIntent);
 
+
             }
         });
 
         continueRouteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
             }
         });
 
         mapsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
             }
         });
 
         clockButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(2);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
             }
         });
 
@@ -97,7 +97,7 @@ public class HomeView extends Fragment implements IView {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(5);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(4);
             }
         });
 

@@ -2,6 +2,8 @@ package truckerboys.otto.utils.positions;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.joda.time.Duration;
+
 import java.util.List;
 
 /**

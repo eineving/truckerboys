@@ -1,9 +1,6 @@
 package truckerboys.otto.planner;
 
-import org.joda.time.*;
-import java.util.List;
-
-import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.SessionHistory;
 
 /**
@@ -15,55 +12,23 @@ public interface IRegulationHandler {
     /**
      * Time left to drive this session
      *
-     * @param history       All sessions from at least 30 days back
+     * @param history All sessions from at least 30 days back
      * @return Time left to drive this session
      */
     public TimeLeft getThisSessionTL(SessionHistory history);
 
     /**
-     * Maximum time to drive the next session
-     *
-     * @param history       All sessions from at least 30 days back
-     * @return maximum time to drive the next session
-     */
-    public TimeLeft getNextSessionTL(SessionHistory history);
-
-    //End Single Sessions
-
-    //Day
-
-    /**
      * Time left to drive this day
      *
-     * @param history       All sessions from at least 30 days back.
+     * @param history All sessions from at least 30 days back.
      * @return Time left to drive this day
      */
     public TimeLeft getThisDayTL(SessionHistory history);
 
-
-    /**
-     * Maximum time to drive the next day
-     *
-     * @param history       All sessions from at least 30 days back
-     * @return maximum time to drive the next day
-     */
-    public TimeLeft getNextDayTL(SessionHistory history);
-
-    /**
-     * Maximum time to drive the next day
-     *
-     * @param history All sessions from at least 30 days back
-     * @return maximum time to drive the next day
-     */
-    public TimeLeft getNextDayTL(List<Session> history);
-    //End Day
-
-    //Week
-
     /**
      * Time left to drive this week
      *
-     * @param history       All sessions from at least 30 days back
+     * @param history All sessions from at least 30 days back
      * @return Time left to drive this week
      */
     public TimeLeft getThisWeekTL(SessionHistory history);
@@ -71,7 +36,7 @@ public interface IRegulationHandler {
     /**
      * Maximum time to drive the next week
      *
-     * @param history       All sessions from at least 30 days back
+     * @param history All sessions from at least 30 days back
      * @return maximum time to drive the next week
      */
     public TimeLeft getNextWeekTL(SessionHistory history);
@@ -104,5 +69,5 @@ public interface IRegulationHandler {
      * @param history All sessions from at least 30 days back
      * @return The time left before you are allowed to drive again.
      */
-    public TimeLeft getTimeLeftOnBreak(SessionHistory history);
+    public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnRestException;
 }

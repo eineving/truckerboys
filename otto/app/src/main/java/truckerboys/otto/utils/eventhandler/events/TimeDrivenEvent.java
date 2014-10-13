@@ -1,0 +1,22 @@
+package truckerboys.otto.utils.eventhandler.events;
+
+/**
+ * Created by root on 2014-10-08.
+ */
+public class TimeDrivenEvent extends Event {
+    double timeToday;
+    double timeTotal;
+
+    public TimeDrivenEvent(double timeToday, double timeTotal) {
+        this.timeToday = timeToday;
+        this.timeTotal = timeTotal;
+    }
+
+    public double getTimeToday() {
+        return timeToday;
+    }
+
+    public double getTimeTotal() {
+        return timeTotal;
+    }
+}

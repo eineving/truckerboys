@@ -11,30 +11,62 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <ImageButton
-            android:layout_margin="40dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/newRouteButton"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_column="6"
-            android:src="@drawable/newroute2"
-            android:scaleType="centerInside"
-            android:background="#00ffffff"
             android:clickable="true"
-            android:onClick="jumpToNewRoute"
-            android:layout_gravity="center_vertical" />
+            android:id="@+id/newRouteButton">
 
-        <ImageButton
-            android:layout_margin="40dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/continueRouteButton"
-            android:layout_column="21"
-            android:src="@drawable/continueroute2"
-            android:scaleType="centerInside"
-            android:background="#00ffffff"
+            <ImageView
+                android:layout_margin="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/newroutenotext"
+                android:scaleType="centerInside"
+                android:background="#00ffffff"
+                android:layout_gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/textLight"
+                android:layout_marginTop="-20dp"
+                android:text="New Route"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="22"
             android:clickable="true"
-            android:layout_gravity="center_vertical" />
+            android:id="@+id/continueRouteButton">
+
+            <ImageView
+                android:layout_margin="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/continueroutenotext"
+                android:scaleType="centerInside"
+                android:background="#00ffffff"
+                android:layout_gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/textLight"
+                android:layout_marginTop="-20dp"
+                android:text="Continue Route"/>
+
+        </LinearLayout>
 
     </TableRow>
 
@@ -44,27 +76,58 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <ImageButton
-            android:layout_margin="40dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/mapsButton"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_column="6"
-            android:src="@drawable/maps2"
-            android:scaleType="centerInside"
-            android:background="#00ffffff"
-            android:clickable="true" />
+            android:clickable="true"
+            android:id="@+id/mapsButton">
 
-        <ImageButton
-            android:layout_margin="40dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/clockButton"
-            android:layout_column="21"
-            android:src="@drawable/clock2"
-            android:scaleType="centerInside"
-            android:background="#00ffffff"
-            android:clickable="true" />
+            <ImageView
+                android:layout_margin="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/mapsnotext"
+                android:scaleType="centerInside"
+                android:background="#00ffffff"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/textLight"
+                android:layout_marginTop="-20dp"
+                android:text="Maps"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="22"
+            android:clickable="true"
+            android:id="@+id/clockButton">
+
+            <ImageView
+                android:layout_margin="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/clocknotext"
+                android:scaleType="centerInside"
+                android:background="#00ffffff"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/textLight"
+                android:layout_marginTop="-20dp"
+                android:text="Clock"/>
+
+        </LinearLayout>
 
     </TableRow>
 
@@ -74,28 +137,60 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <ImageButton
-            android:layout_margin="40dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/statsButton"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_column="6"
-            android:src="@drawable/stats2"
-            android:scaleType="centerInside"
-            android:background="#00ffffff"
-            android:clickable="true" />
+            android:clickable="true"
+            android:id="@+id/statsButton">
 
-        <ImageButton
-            android:layout_margin="40dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/settingsButton"
-            android:layout_column="21"
-            android:src="@drawable/settings2"
-            android:scaleType="centerInside"
-            android:focusable="true"
-            android:background="#00ffffff"
-            android:clickable="true" />
+            <ImageView
+                android:layout_margin="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/statsnotext"
+                android:scaleType="centerInside"
+                android:background="#00ffffff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/textLight"
+                android:layout_marginTop="-20dp"
+                android:text="Statistics"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="22"
+            android:clickable="true"
+            android:id="@+id/settingsButton">
+
+            <ImageView
+                android:layout_margin="45dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/settingsnotext"
+                android:scaleType="centerInside"
+                android:focusable="true"
+                android:background="#00ffffff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="14dp"
+                android:textColor="@color/textLight"
+                android:layout_marginTop="-20dp"
+                android:text="Settings"/>
+
+        </LinearLayout>
 
     </TableRow>
 

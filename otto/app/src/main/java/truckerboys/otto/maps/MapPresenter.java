@@ -11,7 +11,7 @@ import truckerboys.otto.planner.TripPlanner;
  */
 public class MapPresenter implements GoogleMap.OnCameraChangeListener {
     private MapModel mapModel;
-    private MapView mapView
+    private MapView mapView;
 
     public MapPresenter(TripPlanner tripPlanner, GoogleMap googleMap){
         this.mapModel = new MapModel(tripPlanner, googleMap);

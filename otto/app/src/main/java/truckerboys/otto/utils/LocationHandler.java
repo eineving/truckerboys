@@ -46,6 +46,8 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         //Request new location updates to this LocationListener.
         locationClient.requestLocationUpdates(locationRequest, this);
 
+        this.currentLocation = new MapLocation(locationClient.getLastLocation());
+
         //Define that the LocationHandler is connected to the GPS.
         connected = true;
     }

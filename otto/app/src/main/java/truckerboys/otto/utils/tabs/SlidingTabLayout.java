@@ -32,6 +32,11 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
+import com.swedspot.vil.distraction.DriverDistractionLevel;
+
+import truckerboys.otto.vehicle.IDistractionListener;
+import truckerboys.otto.vehicle.VehicleInterface;
+
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
  * the user's scroll progress.
@@ -48,7 +53,7 @@ import android.widget.TextView;
  * The views used as tabs can be customized by calling {@link #setCustomTabView(int, int)},
  * providing the layout ID of your custom layout.
  */
-public class SlidingTabLayout extends HorizontalScrollView {
+public class SlidingTabLayout extends HorizontalScrollView implements IDistractionListener{
 
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
@@ -102,6 +107,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         mTabStrip = new SlidingTabStrip(context);
         addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
+        VehicleInterface.subscribeToDistractionChange(this);
     }
 
     /**
@@ -290,7 +297,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         @Override
         public void onPageSelected(int position) {
-            if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
+           if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
                 scrollToTab(position, 0);
             }
@@ -311,6 +318,35 @@ public class SlidingTabLayout extends HorizontalScrollView {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * Gets called when the distraction level of the truck driver changes.
+     * Updates the ViewPager that changes has happened to the adapter of the tabs.
+     * This method is the only code added to this class that was originally designed by Google.
+     * @param driverDistractionLevel The distraction level
+     */
+    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
+        if(driverDistractionLevel.getLevel()>1) {
+            Runnable setAdapter = new Runnable() {
+                @Override
+                public void run() {
+                    mViewPager.setAdapter(mViewPager.getAdapter());
+                    mViewPager.setCurrentItem(0);
+                    mViewPager.getAdapter().notifyDataSetChanged();
+                }
+            };
+            getRootView().post(setAdapter);
+        }else{
+            Runnable setAdapter = new Runnable() {
+                @Override
+                public void run() {
+                    mViewPager.setAdapter(mViewPager.getAdapter());
+                    mViewPager.getAdapter().notifyDataSetChanged();
+                }
+            };
+            getRootView().post(setAdapter);
         }
     }
 

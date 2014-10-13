@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.joda.time.Duration;
@@ -12,54 +14,35 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
-import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
- *
+ * <p/>
  * The viewclass for the clock that handles the UI.
  * It also runs the timer for the clock.
  */
-public class ClockView extends Fragment implements IView{
+public class ClockView extends Fragment {
     View rootView;
-    TextView timeLeft, timeLeftExtended, stopTL1, stopTL2, stopTL3, stopN1, stopN2, stopN3;
-    ArrayList<RestStop> stops = new ArrayList<RestStop>();
+    TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, recStopName, firstAltStopName, secAltStopName, recStopTitle;
+    ImageView recStopImage, firstAltStopImage, secAltStopImage;
+    RelativeLayout recStopClick, firstAltStopClick, secAltStopClick;
+
+    RestStop recStop, firstAltStop, secAltStop;
+
     Boolean variablesSet = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
-    ClockPresenter presenter;
+    public ClockView() {
 
-    public ClockView(){
-        presenter = new ClockPresenter();
-
-        setRestStops(presenter.getRestStops());
-
-        ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor)
-                Executors.newScheduledThreadPool(1);
-
-        Runnable update = new Runnable(){
-            public void run(){
-                presenter.update();
-                setTimeLeft(presenter.getTimeLeft());
-                updateUI();
-            }
-        };
-        sch.scheduleWithFixedDelay(update, 5, 5, TimeUnit.SECONDS); // The timer
 
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView  = inflater.inflate(R.layout.fragment_clock, container, false);
+        rootView = inflater.inflate(R.layout.fragment_clock, container, false);
 
         initiateVariables();
 
@@ -69,47 +52,98 @@ public class ClockView extends Fragment implements IView{
     /**
      * Initiates the UI components of the view.
      */
-    private void initiateVariables(){
-        timeLeft = (TextView) rootView.findViewById(R.id.clockText);
+    private void initiateVariables() {
+        timeLeft = (TextView) rootView.findViewById(R.id.clockETA);
         timeLeft.setText("04:22");
-        timeLeftExtended = (TextView) rootView.findViewById(R.id.clockExtendedText);
-        stopTL1 = (TextView) rootView.findViewById(R.id.timeStop1);
-        stopTL2 = (TextView) rootView.findViewById(R.id.timeStop2);
-        stopTL3 = (TextView) rootView.findViewById(R.id.timeStop3);
-        stopN1 = (TextView) rootView.findViewById(R.id.nameStop1);
-        stopN2 = (TextView) rootView.findViewById(R.id.nameStop2);
-        stopN3 = (TextView) rootView.findViewById(R.id.nameStop3);
+        timeLeftExtended = (TextView) rootView.findViewById(R.id.clockETAExtended);
+
+        recStopTitle = (TextView) rootView.findViewById(R.id.recStopTitle);
+
+        recStopETA = (TextView) rootView.findViewById(R.id.recStopETA);
+        firstAltStopETA = (TextView) rootView.findViewById(R.id.firstAltStopETA);
+        secAltStopETA = (TextView) rootView.findViewById(R.id.secAltStopETA);
+
+        recStopName = (TextView) rootView.findViewById(R.id.recStopName);
+        firstAltStopName = (TextView) rootView.findViewById(R.id.firstAltStopName);
+        secAltStopName = (TextView) rootView.findViewById(R.id.secAltStopName);
+
+        recStopImage = (ImageView) rootView.findViewById(R.id.recStopImage);
+        firstAltStopImage = (ImageView) rootView.findViewById(R.id.firstAltStopImage);
+        secAltStopImage = (ImageView) rootView.findViewById(R.id.secAltStopImage);
+
+        recStopClick = (RelativeLayout) rootView.findViewById(R.id.recStop);
+        firstAltStopClick = (RelativeLayout) rootView.findViewById(R.id.firstAltStop);
+        secAltStopClick = (RelativeLayout) rootView.findViewById(R.id.secAltStop);
+
+        View.OnClickListener stopClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String tag = ((RelativeLayout)view).getTag().toString();
+                //TODO: Add sending events + method for handling clickevents
+                if(tag.equalsIgnoreCase("recStop")){
+                    recStopTitle.setText("Chosen stop");
+                }
+                if(tag.equalsIgnoreCase("firstAltStop")){
+                    recStopTitle.setText("Chosen stop");
+                    RestStop temp = recStop;
+                    recStop = firstAltStop;
+                    firstAltStop = temp;
+                }
+                if(tag.equalsIgnoreCase("secAltStop")){
+                    recStopTitle.setText("Chosen stop");
+                    RestStop temp = recStop;
+                    recStop = secAltStop;
+                    secAltStop = temp;
+                }
+            }
+        };
+        recStopClick.setOnClickListener(stopClickListener);
+        firstAltStopClick.setOnClickListener(stopClickListener);
+        secAltStopClick.setOnClickListener(stopClickListener);
 
         variablesSet = true;
     }
 
     /**
      * Set the time remaining until regulations are broken.
+     *
      * @param timeLeft The remaining time
      */
-    public void setTimeLeft(TimeLeft timeLeft){
-        if(variablesSet) {
+    public void setTimeLeft(TimeLeft timeLeft) {
+        if (variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
-            timeLE = timeLEPrefix + getTimeAsFormattedString(timeLeft.getExtendedTimeLeft());
+            timeLE = timeLEPrefix + getTimeAsFormattedString(timeLeft.getTimeLeft().plus(timeLeft.getExtendedTimeLeft()));
         }
     }
 
     /**
-     * Sets the reststops to the given list of reststops
-     * @param restStops The new RestStops
+     * Sets the recommended reststop
+     *
+     * @param reststop The new recommended reststop
      */
-    public void setRestStops(ArrayList<RestStop> restStops){
-        stops = restStops;
+    public void setRecommendedRestStop(RestStop reststop) {
+        recStop = reststop;
+    }
+
+    /**
+     * Sets the alternative reststops to the given reststops
+     *
+     * @param firstAltReststop The first alternative reststop
+     * @param secAltReststop   The second alternative reststop
+     */
+    public void setAltRestStops(RestStop firstAltReststop, RestStop secAltReststop) {
+        this.firstAltStop = firstAltReststop;
+        this.secAltStop = secAltReststop;
     }
 
     /**
      * Updates the UI
      */
-    public void updateUI(){
+    public void updateUI() {
 
-        if(variablesSet){
-            Runnable updateUI = new Runnable(){
-                public void run(){
+        if (variablesSet) {
+            Runnable updateUI = new Runnable() {
+                public void run() {
                     setLabels();
                 }
             };
@@ -118,39 +152,34 @@ public class ClockView extends Fragment implements IView{
     }
 
     /**
-     * Sets the labels of the reststops.
+     * Sets the labels of the time until violation and the reststops.
      */
-    private void setLabels(){
+    private void setLabels() {
         try {
             timeLeft.setText(timeL);
             timeLeftExtended.setText(timeLE);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Exception " + e.getMessage());
         }
-        Iterator it = stops.iterator();
-        if(it.hasNext()) {
-            RestStop stop = (RestStop) it.next();
-            stopTL1.setText(getTimeAsFormattedString(stop.getTimeLeft()));
-            stopN1.setText(stop.getName());
-        }
-        if(it.hasNext()) {
-            RestStop stop = (RestStop) it.next();
-            stopTL2.setText(getTimeAsFormattedString(stop.getTimeLeft()));
-            stopN2.setText(stop.getName());
-        }
-        if(it.hasNext()) {
-            RestStop stop = (RestStop) it.next();
-            stopTL3.setText(getTimeAsFormattedString(stop.getTimeLeft()));
-            stopN3.setText(stop.getName());
-        }
+
+        recStopETA.setText(getTimeAsFormattedString(recStop.getTimeLeft()));
+        recStopName.setText(recStop.getName());
+
+        firstAltStopETA.setText(getTimeAsFormattedString(firstAltStop.getTimeLeft()));
+        firstAltStopName.setText(firstAltStop.getName());
+
+        secAltStopETA.setText(getTimeAsFormattedString(secAltStop.getTimeLeft()));
+        secAltStopName.setText(secAltStop.getName());
+
     }
 
     /**
      * Takes a duration and returns a formatted string as such "HH:MM"
+     *
      * @param time The duration to format.
      * @return A formatted string in the form of "HH:MM"
      */
-    private String getTimeAsFormattedString(Duration time){
+    private String getTimeAsFormattedString(Duration time) {
 
         Period period = time.toPeriod();
         PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
@@ -160,17 +189,7 @@ public class ClockView extends Fragment implements IView{
                 .appendSeparator(":")
                 .appendMinutes()
                 .toFormatter();
-        String result = minutesAndSeconds.print(period);
-        return result;
+        return minutesAndSeconds.print(period);
     }
 
-    @Override
-    public Fragment getFragment() {
-        return this;
-    }
-
-    @Override
-    public String getName() {
-        return "Clock";
-    }
 }

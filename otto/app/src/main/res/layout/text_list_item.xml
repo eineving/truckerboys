@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:textColor="@color/textLight"
+    android:textSize="14dp"
+    android:padding="5dp"
+    android:textStyle="bold"
+    android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
+    android:text="Göteborg"
+    android:layout_height="match_parent">
+
+</TextView>

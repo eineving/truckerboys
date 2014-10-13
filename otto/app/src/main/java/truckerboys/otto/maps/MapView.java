@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,8 +54,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
     private static final float DETAILED_ZOOM_ABOVE = 10;
 
 
-    private int gps_freq = 500; // The frequency of gps updates.
-    private int freq = 25; //The frequency of the interpolation.
+    private static final int GPS_FREQ = 500; // The frequency of gps updates.
+    private static final int INTERPOLATION_FREQ = 25; //The frequency of the interpolation.
     private int index; //The step of the interpolation.
 
     private LinkedList<Double2> positions = new LinkedList<Double2>();
@@ -73,6 +72,8 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     }
 
+    //TODO What happens if googleMap isn't initiated correctly. (Check all methods making sure that the app doesn't crash.)
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = super.onCreateView(inflater, container, savedInstanceState);
@@ -82,21 +83,22 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         googleMap = getMap();
 
         //If we could receive map from Google, modify freely to our needs.
-        if(googleMap != null) {
+        if (googleMap != null) {
             //Set all gestures disabled, truckdriver shouldn't be able to move the map.
             googleMap.getUiSettings().setAllGesturesEnabled(false);
-            googleMap.getUiSettings().setZoomControlsEnabled(true);
+            googleMap.getUiSettings().setZoomGesturesEnabled(true);
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
 
             //TODO Read from settings if the user wants Hybrid or Normal map type.
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
             //Set current position and default zoom, tilt and bearing.
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(0,0), 16f, 50, 0)));
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(0, 0), 16f, 50, 0)));
 
             //Initialize position marker to current position and set the arrow icon.
             positionMarker = googleMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow))
-                    .position(new LatLng(0,0))
+                    .position(new LatLng(0, 0))
                     .flat(true));
 
             currentRoutePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.BLUE));
@@ -109,10 +111,11 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     /**
      * Adjust the camera position and bearing to match the location provided.
+     *
      * @param location The location to adjust adjust accordingly to.
      */
-    private void updateCamera(LatLng location, float bearing){
-        if(googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
+    private void updateCamera(LatLng location, float bearing) {
+        if (googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
                             location,
@@ -125,54 +128,48 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
 
     /**
      * Updates the marker for our current position.
-     * @requires to be updated once every 1/freq second to function properly.
+     *
+     * @requires to be updated once every 1/INTERPOLATION_FREQ second to function properly.
      * @requires setupPositionMarker() has been called.
      */
 
-    private void updatePositionMarker(){
-        if(positionMarker != null) { //Make sure we initiated posMaker in onCreateView
-
+    private void updatePositionMarker() {
+        if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
 
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
-            if(positions.size() >= 3){
+            if (positions.size() >= 3) {
 
                 Double2 a = positions.get(0);
                 Double2 b = positions.get(1);
                 Double2 c = positions.get(2);
 
-                Double2 vecA = b.sub(a).div(freq);
-                Double2 vecB = c.sub(b).div(freq);
+                Double2 vecA = b.sub(a).div(INTERPOLATION_FREQ);
+                Double2 vecB = c.sub(b).div(INTERPOLATION_FREQ);
 
                 //The linear interpolations.
                 Double2 ab = a.add(vecA.mul(index));
                 Double2 bc = b.add(vecB.mul(index));
 
                 //The quadratic-interpolation
-                Double2 smooth = ab.add(bc.sub(ab).div(freq).mul(index));
-
+                Double2 smooth = ab.add(bc.sub(ab).div(INTERPOLATION_FREQ).mul(index));
 
                 positionMarker.setPosition(new LatLng(smooth.getX(), smooth.getY()));
-
 
                 //Linear intepolation of the bearing.
                 float rot1 = bearings.get(0);
                 float rot2 = bearings.get(2);
 
-                float step = (rot2 - rot1) / freq;
+                float step = (rot2 - rot1) / INTERPOLATION_FREQ;
 
                 float smoothBearing = rot1 + step * index;
 
                 positionMarker.setRotation(smoothBearing);
 
-
-
-
-
                 index++;
-                index = index % freq;
+                index = index % INTERPOLATION_FREQ;
 
-                if(index == 0){
+                if (index == 0) {
                     //Since we interpolate over 3 values the first 2 has been used when we reach the third.
                     positions.removeFirst();
                     positions.removeFirst();
@@ -185,7 +182,7 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
             }
         }
 
-        updateHandler.postDelayed(updatePos,gps_freq/freq);
+        updateHandler.postDelayed(updatePos, GPS_FREQ / INTERPOLATION_FREQ);
     }
 
     /*
@@ -196,15 +193,12 @@ public class MapView extends SupportMapFragment implements IView, IEventListener
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
-        //If change level of detail or route was never set.
-        if(currentDetail != detail || currentRoutePolyline.getPoints().size() < 1) {
-            if (detail == RouteDetail.DETAILED) {
-                currentRoutePolyline.setPoints(route.getDetailedPolyline());
-                currentDetail = RouteDetail.DETAILED;
-            } else {
-                currentRoutePolyline.setPoints(route.getOverviewPolyline());
-                currentDetail = RouteDetail.OVERVIEW;
-            }
+        if (detail == RouteDetail.DETAILED) {
+            currentRoutePolyline.setPoints(route.getDetailedPolyline());
+            currentDetail = RouteDetail.DETAILED;
+        } else {
+            currentRoutePolyline.setPoints(route.getOverviewPolyline());
+            currentDetail = RouteDetail.OVERVIEW;
         }
     }
 

@@ -6,7 +6,10 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
+import truckerboys.otto.planner.TimeLeft;
+import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RestLocation;
 
 /**
  * Created by Daniel on 2014-09-24.
@@ -18,6 +21,10 @@ public class Route {
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
     private ArrayList<MapLocation> checkpoints;
+    private MapLocation recommendedStop;
+    private ArrayList<MapLocation> alternativeStops;
+    private TimeLeft timeLeftOnSession;
+
 
     /**
      *
@@ -83,5 +90,46 @@ public class Route {
      */
     public ArrayList<MapLocation> getCheckpoints() {
         return checkpoints;
+    }
+
+    /**
+     * Get the recommended stop for the route.
+     * @return recommended stop (null if no stop is recommended).
+     */
+    public MapLocation getRecommendedStop() {
+        return recommendedStop;
+    }
+
+    /**
+     * Set the recommended stop for the route.
+     * @param recommendedStop the recommended stop for the route.
+     */
+    public void setRecommendedStop(MapLocation recommendedStop) {
+        this.recommendedStop = recommendedStop;
+    }
+
+    /**
+     * Get the alternative stops for this route.
+     * @return alternative stops.
+     */
+    public ArrayList<MapLocation> getAlternativeStops() {
+        return alternativeStops;
+    }
+
+    /**
+     * Set the alternative stops for this route.
+     * @param alternativeStops the alternative stops for the route.
+     */
+    public void setAlternativeStops(ArrayList<MapLocation> alternativeStops) {
+        this.alternativeStops = alternativeStops;
+    }
+
+
+    public TimeLeft getTimeLeftOnSession() {
+        return timeLeftOnSession;
+    }
+
+    public void setTimeLeftOnSession(TimeLeft timeLeftOnSession) {
+        this.timeLeftOnSession = timeLeftOnSession;
     }
 }

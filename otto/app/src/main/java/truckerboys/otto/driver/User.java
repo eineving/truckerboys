@@ -26,11 +26,11 @@ public class User {
     /**
      * Starts a new Session.
      */
-    public void startNewSession(){
-        if(currentSession.isActive()){
+    public void startNewSession(SessionType type){
+        if(currentSession != null && currentSession.isActive()){
             endSession();
         }
-        currentSession = new Session();
+        currentSession = new Session(type);
         history.addSession(currentSession);
     }
 
