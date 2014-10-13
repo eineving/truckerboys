@@ -75,7 +75,7 @@ public class
     /**
      * Returns a route to the same destination with chosen stop added to map
      *
-     * @param chosenStop Where the driver wants to take a break.
+     * @param chosenStop Where the driver wants to take  a break.
      * @return Optimum route for the given preferences
      * @throws InvalidRequestException
      * @throws NoConnectionException
@@ -246,7 +246,7 @@ public class
             }
 
             //Just to be safe
-            if (topIndex == bottomIndex) {
+            if (topIndex - bottomIndex < 2) {
                 break;
             }
             etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
