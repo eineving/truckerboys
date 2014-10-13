@@ -196,7 +196,6 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         }
 
         if(distanceTotal != null ){
-            System.out.println("DISTANCE DRIVEN: " + statsTotal[1] + " **********************");
             distanceTotal.setText(Math.floor(statsTotal[1]*100)/100 + " km");
         }
 
@@ -205,7 +204,6 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         }*/
 
         if(fuelTotal != null) {
-            System.out.println("FUEL CONSUMPTION: " + statsTotal[2] + " **********************");
             fuelTotal.setText(Math.floor(statsTotal[2]*100)/100 + " L");
         }
 

@@ -224,6 +224,9 @@ public class
                 bottomIndex = (topIndex + bottomIndex) / 2;
             }
 
+            Log.w("findLatLng", "topIndex " + topIndex);
+            Log.w("findLatLng", "bottomIndex " + bottomIndex);
+
             //Just to be safe
             if (topIndex == bottomIndex) {
                 if (topIndex == bottomIndex) {

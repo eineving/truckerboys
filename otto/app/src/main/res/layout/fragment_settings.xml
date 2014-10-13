@@ -45,6 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/divider0"
+        android:gravity="center"
         android:text="Sounds"
         android:layout_alignBottom="@+id/soundSwitch"
         android:layout_alignParentLeft="true"
@@ -76,12 +77,62 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Keep display alive"
+        android:gravity="center"
         android:layout_alignBottom="@+id/displaySwitch"
         android:layout_below="@+id/divider1"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <View
+        android:id="@+id/divider2"
+        android:layout_marginTop="10dp"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/displaySwitch"
+        android:layout_height="1dp"
+        android:background="@color/textLightest"/>
 
+    <TextView
+        android:id="@+id/tankText"
+        android:textColor="@color/textLight"
+        android:textSize="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Fuel tank size"
+        android:gravity="center"
+        android:layout_alignBottom="@+id/tankEditText"
+        android:layout_below="@+id/divider2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/fuelUnit"
+        android:textColor="@color/textLight"
+        android:textSize="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="L"
+        android:gravity="center"
+        android:layout_alignBottom="@+id/tankEditText"
+        android:layout_below="@+id/divider2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:id="@+id/tankEditText"
+        android:layout_height="wrap_content"
+        android:layout_width="95dp"
+        android:layout_below="@+id/divider2"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="200"
+        android:gravity="center" 
+        android:inputType="number"
+        android:textColor="@color/textLight"
+        android:textSize="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <!--<View
         android:id="@+id/divider2"
