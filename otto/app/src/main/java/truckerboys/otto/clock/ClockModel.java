@@ -38,7 +38,7 @@ public class ClockModel {
     }
 
     /**
-     * Updates the ETAs of the stops and until violation
+     * Updates the ETAs of the stops and the time left until violation
      */
     public void update() {
         timeNow = new Instant();
@@ -57,6 +57,10 @@ public class ClockModel {
         lastTimeUpdate = timeNow;
     }
 
+    /**
+     * Sets the time left until violation and the stops.
+     * Called when the route is changed.
+     */
     private void processChangedRoute() {
 
         timeLeft = route.getTimeLeftOnSession();
@@ -101,10 +105,18 @@ public class ClockModel {
         return secAltStop;
     }
 
+    /**
+     * Returns the time left until violation
+     * @return The time left until violation
+     */
     public TimeLeft getTimeLeft() {
         return timeLeft;
     }
 
+    /**
+     * Sets the route in clock
+     * @param newRoute The route
+     */
     public void setRoute(Route newRoute){
         route = newRoute;
         processChangedRoute();

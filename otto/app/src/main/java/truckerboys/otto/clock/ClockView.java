@@ -104,9 +104,9 @@ public class ClockView extends Fragment {
         secAltStopClick.setOnClickListener(stopClickListener);
 
 //        if(!showStops){
-//            setVisibility(TextView.GONE);
+//            setVisibilityOfStops(TextView.GONE);
 //        }else{
-//            setVisibility(TextView.VISIBLE);
+//            setVisibilityOfStops(TextView.VISIBLE);
 //        }
 
         variablesSet = true;
@@ -181,10 +181,10 @@ public class ClockView extends Fragment {
         }
 
         if(showStops){
-            setVisibility(TextView.VISIBLE);
+            setVisibilityOfStops(TextView.VISIBLE);
             System.out.println("Visible ");
         }else{
-            setVisibility(TextView.GONE);
+            setVisibilityOfStops(TextView.GONE);
         }
 
         setStopUI(recStop, recStopETA, recStopName, recStopImage);
@@ -193,6 +193,13 @@ public class ClockView extends Fragment {
 
     }
 
+    /**
+     * A help method to set the UI of the stops.
+     * @param stop The stop to read from
+     * @param eta The TextView representing the ETA
+     * @param name The TextView representing the name
+     * @param image The ImageView with the image
+     */
     private void setStopUI(MapLocation stop, TextView eta, TextView name, ImageView image){
         if(stop==null){
             return;
@@ -210,7 +217,11 @@ public class ClockView extends Fragment {
         }
     }
 
-    private void setVisibility(int visibility){
+    /**
+     * Sets the visibility of the stops
+     * @param visibility The visibilty as an constant from the TextView class
+     */
+    private void setVisibilityOfStops(int visibility){
         recStopETA.setVisibility(visibility);
         recStopName.setVisibility(visibility);
         recStopImage.setVisibility(visibility);
