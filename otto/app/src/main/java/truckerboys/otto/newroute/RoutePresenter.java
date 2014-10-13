@@ -15,13 +15,10 @@ import truckerboys.otto.utils.eventhandler.events.NewDestination;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 
 /**
- * Created by root on 2014-10-06.
+ * Created by Mikael Malmqvist on 2014-10-06.
+ * Class for handling some logic for the RouteActivity.
  */
-public class RoutePresenter implements IEventListener {
-
-    public RoutePresenter() {
-        EventTruck.getInstance().subscribe(this);
-    }
+public class RoutePresenter {
 
     /**
      * Sends the selected address (string) to the EventTruck by converting
@@ -91,8 +88,4 @@ public class RoutePresenter implements IEventListener {
 
     }
 
-    @Override
-    public void performEvent(Event event) {
-
-    }
 }
