@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.automotiveapi.AutomotiveSignalId;
+import android.swedspot.scs.data.SCSFloat;
 
 import com.swedspot.automotiveapi.AutomotiveManager;
 
@@ -14,10 +15,13 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
+import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
+import truckerboys.otto.vehicle.VehicleInterface;
 import truckerboys.otto.vehicle.VehicleSignalID;
 
 /**
@@ -36,6 +40,10 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     public StatsPresenter(StatsView view){
         this.view = view;
         this.model = new StatsModel();
+
+        // Subscribes to the signals wanted
+        VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER);
+        VehicleInterface.subscribe(this, VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 
         EventTruck.getInstance().subscribe(this);
     }
@@ -145,8 +153,33 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
         }
     }
 
+    /**
+     * Listens to signals from the truck and sends
+     * a new Event trough the EventTruck.
+     * This method can't update the view by it self
+     * due to thread unsafety.
+     * @param signal the signal sent from the truck.
+     */
     @Override
     public void receive(AutomotiveSignal signal) {
+
+        switch (signal.getSignalId()) {
+
+            case VehicleSignalID.KM_PER_LITER:
+
+                // Gets the total distance by fuel and updates the listeners
+                Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
+
+                EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
+
+            case VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE:
+
+                // Gets the total distance and updates the listeners
+                Float distance = ((SCSFloat) signal.getData()).getFloatValue();
+
+                EventTruck.getInstance().newEvent(new TotalDistanceEvent(Math.floor(distance * 100)/100));
+
+        }
 
     }
 }

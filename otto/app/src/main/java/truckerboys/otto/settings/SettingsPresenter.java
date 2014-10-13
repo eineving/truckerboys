@@ -23,6 +23,8 @@ public class SettingsPresenter implements IEventListener{
         this.model = new SettingsModel();
         this.settings = settings;
 
+
+
         EventTruck.getInstance().subscribe(this);
     }
 
