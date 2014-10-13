@@ -7,7 +7,7 @@ import truckerboys.otto.driver.User;
  */
 public class SettingsModel {
     private User user;
-    private int tankSize;
+    private int tankSize = 200;
     private boolean displayAlive;
 
     public void setSettings(boolean displayAlive) {
