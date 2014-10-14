@@ -27,9 +27,6 @@ public class ClockPresenter  implements IView, IEventListener {
 
         EventTruck.getInstance().subscribe(this);
 
-//        ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor)
-//                Executors.newScheduledThreadPool(1);
-
         updateHandler = new Handler(Looper.getMainLooper());
         update = new Runnable(){
             public void run(){
@@ -37,13 +34,12 @@ public class ClockPresenter  implements IView, IEventListener {
             }
         };
         updateHandler.postDelayed(update, 1000);
-//        sch.scheduleWithFixedDelay(update, 5, 5, TimeUnit.SECONDS); // The timer
+
     }
     /**
      * Updates the model and view.
      */
     public void update() {
-        System.out.println("Clock update!");
         model.update();
         view.setTimeLeft(model.getTimeLeft());
         view.updateUI();
@@ -66,7 +62,6 @@ public class ClockPresenter  implements IView, IEventListener {
             model.setRoute(((ChangedRouteEvent)event).getRoute());
             view.setRecommendedStop(model.getRecommendedStop());
             view.setAltStops(model.getFirstAltStop(), model.getSecondAltStop());
-            view.showStops(true);
         }
     }
 }

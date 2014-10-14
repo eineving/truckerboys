@@ -80,18 +80,18 @@ public class ClockView extends Fragment {
         View.OnClickListener stopClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String tag = ((RelativeLayout)view).getTag().toString();
+                String tag = ((RelativeLayout) view).getTag().toString();
                 //TODO: Add sending events + method for handling clickevents
-                if(tag.equalsIgnoreCase("recStop")){
+                if (tag.equalsIgnoreCase("recStop")) {
                     recStopTitle.setText("Chosen stop");
                 }
-                if(tag.equalsIgnoreCase("firstAltStop")){
+                if (tag.equalsIgnoreCase("firstAltStop")) {
                     recStopTitle.setText("Chosen stop");
                     MapLocation temp = recStop;
                     recStop = firstAltStop;
                     firstAltStop = temp;
                 }
-                if(tag.equalsIgnoreCase("secAltStop")){
+                if (tag.equalsIgnoreCase("secAltStop")) {
                     recStopTitle.setText("Chosen stop");
                     MapLocation temp = recStop;
                     recStop = secAltStop;
@@ -103,11 +103,9 @@ public class ClockView extends Fragment {
         firstAltStopClick.setOnClickListener(stopClickListener);
         secAltStopClick.setOnClickListener(stopClickListener);
 
-//        if(!showStops){
-//            setVisibilityOfStops(TextView.GONE);
-//        }else{
-//            setVisibilityOfStops(TextView.VISIBLE);
-//        }
+        setStopUI(recStop, recStopETA, recStopName, recStopImage);
+        setStopUI(firstAltStop, firstAltStopETA, firstAltStopName, firstAltStopImage);
+        setStopUI(secAltStop, secAltStopETA, secAltStopName, secAltStopImage);
 
         variablesSet = true;
     }
@@ -120,9 +118,9 @@ public class ClockView extends Fragment {
     public void setTimeLeft(TimeLeft timeLeft) {
         if (variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
-            if(timeLeft.getExtendedTimeLeft().getMillis()>0){
+            if (timeLeft.getExtendedTimeLeft().getMillis() > 0) {
                 timeLE = timeLEPrefix + getTimeAsFormattedString(timeLeft.getExtendedTimeLeft());
-            }else {
+            } else {
                 timeLE = "0";
             }
         }
@@ -135,7 +133,6 @@ public class ClockView extends Fragment {
      */
     public void setRecommendedStop(MapLocation stop) {
         recStop = stop;
-        System.out.println("Recommended stop: " + recStop);
     }
 
     /**
@@ -160,6 +157,7 @@ public class ClockView extends Fragment {
                     setLabels();
                 }
             };
+            if(getActivity()!=null)
             getActivity().runOnUiThread(updateUI);
         }
     }
@@ -168,23 +166,12 @@ public class ClockView extends Fragment {
      * Sets the labels of the time until violation and the reststops.
      */
     private void setLabels() {
-        try {
-            timeLeft.setText(timeL);
-            if(timeLE.equalsIgnoreCase("0")){
-                timeLeftExtended.setVisibility(TextView.GONE);
-            }else{
-                timeLeftExtended.setText(timeLE);
-                timeLeftExtended.setVisibility(TextView.VISIBLE);
-            }
-        } catch (Exception e) {
-            System.out.println("Exception " + e.getMessage());
-        }
-
-        if(showStops){
-            setVisibilityOfStops(TextView.VISIBLE);
-            System.out.println("Visible ");
-        }else{
-            setVisibilityOfStops(TextView.GONE);
+        timeLeft.setText(timeL);
+        if (timeLE.equalsIgnoreCase("0")) {
+            timeLeftExtended.setVisibility(TextView.GONE);
+        } else {
+            timeLeftExtended.setText(timeLE);
+            timeLeftExtended.setVisibility(TextView.VISIBLE);
         }
 
         setStopUI(recStop, recStopETA, recStopName, recStopImage);
@@ -195,33 +182,49 @@ public class ClockView extends Fragment {
 
     /**
      * A help method to set the UI of the stops.
-     * @param stop The stop to read from
-     * @param eta The TextView representing the ETA
-     * @param name The TextView representing the name
+     *
+     * @param stop  The stop to read from
+     * @param eta   The TextView representing the ETA
+     * @param name  The TextView representing the name
      * @param image The ImageView with the image
      */
-    private void setStopUI(MapLocation stop, TextView eta, TextView name, ImageView image){
-        if(stop==null){
+    private void setStopUI(MapLocation stop, TextView eta, TextView name, ImageView image) {
+        if (stop == null) {
+            setStopVisible(false, eta, name, image);
             return;
         }
         eta.setText(getTimeAsFormattedString(stop.getEta()));
-        if(stop instanceof RestLocation){
+        if (stop instanceof RestLocation) {
             name.setText(((RestLocation) stop).getName());
             image.setImageResource(R.drawable.reststop);
-        }else if(stop instanceof GasStation){
+        } else if (stop instanceof GasStation) {
             name.setText(((GasStation) stop).getName());
             image.setImageResource(R.drawable.gasstation);
-        }else{
+        } else {
             name.setText(stop.getAddress());
             image.setImageResource(R.drawable.reststop);
         }
     }
 
     /**
-     * Sets the visibility of the stops
-     * @param visibility The visibilty as an constant from the TextView class
+     * Sets the visibility of the given stop
+     *
+     * @param visible True if visible, false if invisible
+     * @param eta     The ETA TextView
+     * @param name    The name TextView
+     * @param image   The image ImageView
      */
-    private void setVisibilityOfStops(int visibility){
+    private void setStopVisible(boolean visible, TextView eta, TextView name, ImageView image) {
+        int visibility;
+        if (visible) {
+            visibility = TextView.VISIBLE;
+        } else {
+            visibility = TextView.GONE;
+        }
+        eta.setVisibility(visibility);
+        name.setVisibility(visibility);
+        image.setVisibility(visibility);
+
         recStopETA.setVisibility(visibility);
         recStopName.setVisibility(visibility);
         recStopImage.setVisibility(visibility);
@@ -231,11 +234,6 @@ public class ClockView extends Fragment {
         secAltStopETA.setVisibility(visibility);
         secAltStopName.setVisibility(visibility);
         secAltStopImage.setVisibility(visibility);
-    }
-
-    public void showStops(boolean value){
-        showStops = value;
-        System.out.println("Showstops! " + value);
     }
 
     /**
