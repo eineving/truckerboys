@@ -9,7 +9,7 @@ import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
@@ -70,7 +70,7 @@ public class MainActivity extends FragmentActivity implements IEventListener {
     @Override
     public void performEvent(Event event) {
         // Sets the current page to Map if a new destination is set
-        if(event.isType(NewDestination.class)) {
+        if(event.isType(RouteRequestEvent.class)) {
             viewPager.setCurrentItem(0);
         }
     }

@@ -17,7 +17,6 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
@@ -31,11 +30,14 @@ public class
 
 
     //Route preferences
+    private Route activeRoute;
     private MapLocation startLocation;
     private MapLocation finalDestination;
     private MapLocation[] checkpoints;
 
     private MapLocation chosenStop;
+
+    private int nbrOfDirCalls = 0;
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
@@ -52,12 +54,22 @@ public class
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public Route getRoute(MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
+    public void updateRoute(MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
         //TODO also set ETA to alternative route but all this after getRoute
         if (chosenStop != null) {
             chosenStop.setEta(directionsProvider.getETA(currentLocation, chosenStop));
         }
-        return getCalculatedRoute();
+        activeRoute = getCalculatedRoute();
+        EventTruck.getInstance().newEvent(new ChangedRouteEvent());
+    }
+
+    /**
+     * Get the active route
+     *
+     * @return the active route
+     */
+    public Route getRoute() {
+        return activeRoute;
     }
 
     /**
@@ -70,7 +82,8 @@ public class
      */
     public void updateChoosenStop(MapLocation chosenStop) throws InvalidRequestException, NoConnectionException {
         this.chosenStop = chosenStop;
-        EventTruck.getInstance().newEvent(new ChangedRouteEvent(getCalculatedRoute()));
+        activeRoute = getCalculatedRoute();
+        EventTruck.getInstance().newEvent(new ChangedRouteEvent());
     }
 
     /**
@@ -83,12 +96,12 @@ public class
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public Route getNewRoute(MapLocation startLocation, MapLocation finalDestination, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
-        this.startLocation = startLocation;
+    public void setNewRoute(MapLocation startLocation, MapLocation finalDestination, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
+        this.startLocation = new MapLocation(new LatLng(57.6879752,11.9797901));
         this.finalDestination = finalDestination;
         this.checkpoints = checkpoints;
         this.chosenStop = null;
-        return getRoute(startLocation);
+        updateRoute(startLocation);
     }
 
     /**
@@ -104,6 +117,7 @@ public class
         Duration sessionTimeLeft = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
 
         Route directRoute = directionsProvider.getRoute(startLocation, finalDestination, checkpoints);
+        nbrOfDirCalls++;
 
         //TODO Implement check if gas is enough for this session
 
@@ -167,20 +181,41 @@ public class
      */
     private Route getOptimizedRoute(Route directRoute, Duration within) throws InvalidRequestException, NoConnectionException {
         Route optimalRoute = null;
-        LatLng optimalLatLong = findLatLngWithinDuration(directRoute, within);
-        ArrayList<RestLocation> closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
+        LatLng optimalLatLong;
+        ArrayList<MapLocation> closeLocations;
+
+        /*
+        while (closeLocations.size() == 0) {
+            optimalLatLong = findLatLngWithinDuration(directRoute, within);
+            closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
+            Log.w("NBRofCloseLocations", closeLocations.size() + "");
+
+            //If no place is found, search for ten minutes before
+            within = within.minus(Duration.standardMinutes(10));
+        }
+        */
+
+        optimalLatLong = findLatLngWithinDuration(directRoute, within);
+        closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
         Log.w("NBRofCloseLocations", closeLocations.size() + "");
 
-        //Just calculating the ten best matches from Google
-        for (int i = 0; i < 10 && i < closeLocations.size(); i++) {
+        if(closeLocations.size() == 0){
+            MapLocation forcedLocation = new MapLocation(optimalLatLong);
+            forcedLocation.setAddress("Forced location");
+            closeLocations.add(forcedLocation);
+        }
+
+        //Just calculating the five best matches from Google
+        for (int i = 0; i < 5 && i < closeLocations.size(); i++) {
             //Temporary creation
             LinkedList<MapLocation> tempList = new LinkedList<MapLocation>();
-            tempList.add(new MapLocation(closeLocations.get(i)));
+
             if (checkpoints != null) {
                 for (MapLocation location : checkpoints) {
                     tempList.add(location);
                 }
             }
+            tempList.add(new MapLocation(closeLocations.get(i)));
 
             //Checks if the restLocation is a possible stop and is faster than the previous
             Route temp = directionsProvider.getRoute(startLocation, finalDestination, tempList.toArray(new MapLocation[tempList.size()]));
@@ -209,47 +244,39 @@ public class
     private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
 
+        Log.w("PolylineSize", coordinates.size()+ "");
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
+        int currentIndex = (topIndex + bottomIndex) / 2;
 
         Duration etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+                new MapLocation(coordinates.get(currentIndex)));
+        nbrOfDirCalls++;
 
 
-        while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(2))) ||
-                etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(2)))) {
+        while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(5))) ||
+                etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(5)))) {
             if (etaToCoordinate.isLongerThan(timeLeft)) {
-                topIndex = (topIndex + bottomIndex) / 2;
+                topIndex = currentIndex;
             } else {
-                bottomIndex = (topIndex + bottomIndex) / 2;
+                bottomIndex = currentIndex;
             }
 
-            Log.w("findLatLng", "topIndex " + topIndex);
-            Log.w("findLatLng", "bottomIndex " + bottomIndex);
-
+            currentIndex = (topIndex + bottomIndex) / 2;
             //Just to be safe
-            if (topIndex == bottomIndex) {
-                if (topIndex == bottomIndex) {
-                    break;
-                }
+            if (topIndex - bottomIndex < 2) {
+                break;
             }
+            Log.w("findLatLng", "topIndex: " + topIndex);
+            Log.w("findLatLng", "bottomIndex: " + bottomIndex);
             etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                    new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
-            System.out.println(etaToCoordinate.getMillis());
+                    new MapLocation(coordinates.get(currentIndex)));
+            nbrOfDirCalls++;
+            Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
 
         }
-        return coordinates.get((topIndex + bottomIndex) / 2);
-    }
-
-    /**
-     * Calculate a new route based on a start location and end location provided
-     *
-     * @param startLocation The location that the route should start from.
-     * @param endLocation   The location that the route should end at.
-     */
-    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) throws
-            InvalidRequestException, NoConnectionException {
-        return getNewRoute(startLocation, endLocation, null);
+        Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
+        return coordinates.get(currentIndex);
     }
 
     /**

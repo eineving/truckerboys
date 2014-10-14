@@ -22,7 +22,7 @@ import truckerboys.otto.R;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 import utils.PlacesAutoCompleteAdapter;
 
@@ -335,11 +335,9 @@ public class RouteActivity extends Activity implements IEventListener{
     public void performEvent(Event event) {
 
         // When a new destination is selected this activity is to be finished
-        if(event.isType(NewDestination.class)) {
-
+        if(event.isType(RouteRequestEvent.class)) {
             // Sends user back to MainActivity after have chosen the destination
             finish();
-
         }
 
         if(event.isType(RefreshHistoryEvent.class)) {
