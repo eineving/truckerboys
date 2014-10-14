@@ -40,6 +40,7 @@ public class MapView extends SupportMapFragment implements  IEventListener {
     private Marker positionMarker;
     private Polyline routePolyline;
 
+    private RouteDetail currentDetail = RouteDetail.DETAILED;
     private static final float DETAILED_ZOOM_ABOVE = 10;
 
     private static final int GPS_FREQ = 500; // The frequency of gps updates.
@@ -194,10 +195,12 @@ public class MapView extends SupportMapFragment implements  IEventListener {
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
-        if (detail == RouteDetail.DETAILED) {
-            routePolyline.setPoints(route.getDetailedPolyline());
-        } else {
-            routePolyline.setPoints(route.getOverviewPolyline());
+        if(currentDetail != detail) {
+            if (detail == RouteDetail.DETAILED) {
+                routePolyline.setPoints(route.getDetailedPolyline());
+            } else {
+                routePolyline.setPoints(route.getOverviewPolyline());
+            }
         }
     }
 
