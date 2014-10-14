@@ -15,6 +15,7 @@ import org.joda.time.Instant;
 
 import java.util.ArrayList;
 
+import truckerboys.otto.IView;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.SessionType;
@@ -28,7 +29,6 @@ import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
 import truckerboys.otto.vehicle.VehicleSignalID;
-import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
