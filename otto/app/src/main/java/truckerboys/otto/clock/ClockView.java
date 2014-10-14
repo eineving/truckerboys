@@ -5,9 +5,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import org.joda.time.Duration;
 import org.joda.time.Minutes;
@@ -29,24 +32,28 @@ import truckerboys.otto.utils.positions.RestLocation;
  */
 public class ClockView extends Fragment {
     View rootView;
+
+    ViewSwitcher viewSwitcher;
+
     TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, recStopName, firstAltStopName, secAltStopName, recStopTitle;
     ImageView recStopImage, firstAltStopImage, secAltStopImage;
     RelativeLayout recStopClick, firstAltStopClick, secAltStopClick;
+    Button alternativeStopsButton, backButton;
 
     MapLocation recStop, firstAltStop, secAltStop;
 
     Boolean variablesSet = false, showStops = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
-    public ClockView() {
-
-
-    }
-
+    public ClockView() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_clock, container, false);
+
+        viewSwitcher = (ViewSwitcher) rootView.findViewById(R.id.clockViewSwitcher);
+        viewSwitcher.setInAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left));
+        viewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right));
 
         initiateVariables();
 
@@ -103,6 +110,23 @@ public class ClockView extends Fragment {
         recStopClick.setOnClickListener(stopClickListener);
         firstAltStopClick.setOnClickListener(stopClickListener);
         secAltStopClick.setOnClickListener(stopClickListener);
+
+        alternativeStopsButton = (Button) rootView.findViewById(R.id.alternative_stops_button);
+        backButton = (Button) rootView.findViewById(R.id.back_button);
+
+        alternativeStopsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewSwitcher.showNext();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewSwitcher.showPrevious();
+            }
+        });
 
         setStopUI(recStop, recStopETA, recStopName, recStopImage);
         setStopUI(firstAltStop, firstAltStopETA, firstAltStopName, firstAltStopImage);
