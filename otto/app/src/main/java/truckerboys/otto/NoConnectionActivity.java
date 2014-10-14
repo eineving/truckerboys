@@ -1,7 +1,14 @@
 package truckerboys.otto;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.view.View;
+import android.widget.Button;
 
 /**
  * Created by Simon Petersson on 2014-10-14.
@@ -10,6 +17,8 @@ import android.os.Bundle;
  * the app is running.
  */
 public class NoConnectionActivity extends Activity{
+
+    private Button turnOnGPS;
 
     private static NoConnectionActivity noConnectionActivity;
 
@@ -20,6 +29,16 @@ public class NoConnectionActivity extends Activity{
 
         //Make singleton of this activity, making it possible to close it from another activity.
         noConnectionActivity = this;
+
+        turnOnGPS = (Button) findViewById(R.id.activateGPSButton);
+
+        turnOnGPS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Send the user to settings, asking him to turn on GPS.
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        });
     }
 
     @Override
