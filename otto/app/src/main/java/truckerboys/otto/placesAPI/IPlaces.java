@@ -12,16 +12,16 @@ import truckerboys.otto.utils.positions.RestLocation;
 
 public interface IPlaces {
     /**
-     * Get the closest rest locations to given position
-     * @param position target position to calculate from
-     * @return rest locations nearby given positions
+     * Get the closest rest locations to given position (gas stations included).
+     * @param position target position to calculate from.
+     * @return rest locations nearby given positions (gas stations included).
      */
-    public ArrayList<RestLocation> getNearbyRestLocations(LatLng position);
+    public ArrayList<MapLocation> getNearbyRestLocations(LatLng position);
 
     /**
-     * Get the closest gas stations to given position
-     * @param position target position to calculate from
-     * @return gas stations nearby given positions
+     * Get the closest gas stations to given position.
+     * @param position target position to calculate from.
+     * @return gas stations nearby given positions.
      */
     public ArrayList<GasStation> getNearbyGasStations(LatLng position) throws NoConnectionException;
 }

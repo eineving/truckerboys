@@ -9,6 +9,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.maps.model.LatLng;
 
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
@@ -60,7 +61,7 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
     @Override
     public void onLocationChanged(Location location) {
         if(isMoreAccurate(location)) {
-            EventTruck.getInstance().newEvent(new GPSUpdateEvent(new MapLocation(location), getCurrentLocation()));
+            EventTruck.getInstance().newEvent(new GPSUpdateEvent(new MapLocation(location), getCurrentLocationAsMapLocation()));
             this.currentLocation = new MapLocation(location);
         }
     }
@@ -86,7 +87,11 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         return connected;
     }
 
-    public static MapLocation getCurrentLocation() {
+    public static MapLocation getCurrentLocationAsMapLocation() {
         return currentLocation;
+    }
+
+    public static LatLng getCurrentLocationAsLatLng() {
+        return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
     }
 }
