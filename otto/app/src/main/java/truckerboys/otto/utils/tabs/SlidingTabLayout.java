@@ -338,7 +338,8 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                 }
             };
             getRootView().post(setAdapter);
-        }else{
+            mTabStrip.setSelectedIndicatorColors(0xFFE51C23);
+        } else {
             Runnable setAdapter = new Runnable() {
                 @Override
                 public void run() {
@@ -346,6 +347,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                     mViewPager.getAdapter().notifyDataSetChanged();
                 }
             };
+            mTabStrip.setSelectedIndicatorColors(0xFF33B5E5);
             getRootView().post(setAdapter);
         }
     }
