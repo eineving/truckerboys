@@ -23,10 +23,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:focusableInTouchMode="false"
-            android:text="Until violation"
+            android:text="Time to break"
+            android:layout_marginTop="10dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/textLight"
-            android:textSize="45sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/clockETA"
@@ -34,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="-10dp"
+            android:layout_marginTop="-15dp"
             android:text="00:00"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/textDark"
@@ -50,7 +52,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/textLight"
             android:textSize="24sp"
-            android:visibility="invisible" />
+            android:visibility="gone" />
 
     </LinearLayout>
 

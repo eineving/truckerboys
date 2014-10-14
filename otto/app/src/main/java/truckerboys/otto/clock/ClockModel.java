@@ -121,4 +121,8 @@ public class ClockModel {
         route = newRoute;
         processChangedRoute();
     }
+
+    public Route getRoute(){
+        return route;
+    }
 }

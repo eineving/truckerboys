@@ -40,9 +40,11 @@ public class ClockPresenter  implements IView, IEventListener {
      * Updates the model and view.
      */
     public void update() {
-        model.update();
-        view.setTimeLeft(model.getTimeLeft());
-        view.updateUI();
+        if(model.getRoute()!=null) {
+            model.update();
+            view.setTimeLeft(model.getTimeLeft());
+            view.updateUI();
+        }
         updateHandler.postDelayed(update, 5000);
     }
 

@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.joda.time.Duration;
+import org.joda.time.Minutes;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -123,6 +124,11 @@ public class ClockView extends Fragment {
             } else {
                 timeLE = "0";
             }
+            if(timeLeft.getTimeLeft().toStandardMinutes().isLessThan(Minutes.minutes(0))){
+                this.timeLeft.setTextColor(getResources().getColor(R.color.violationred_color));
+            }else if(timeLeft.getTimeLeft().toStandardMinutes().isLessThan(Minutes.minutes(15))){
+                this.timeLeft.setTextColor(getResources().getColor(R.color.warningyellow_color));
+            }
         }
     }
 
@@ -224,16 +230,6 @@ public class ClockView extends Fragment {
         eta.setVisibility(visibility);
         name.setVisibility(visibility);
         image.setVisibility(visibility);
-
-        recStopETA.setVisibility(visibility);
-        recStopName.setVisibility(visibility);
-        recStopImage.setVisibility(visibility);
-        firstAltStopETA.setVisibility(visibility);
-        firstAltStopName.setVisibility(visibility);
-        firstAltStopImage.setVisibility(visibility);
-        secAltStopETA.setVisibility(visibility);
-        secAltStopName.setVisibility(visibility);
-        secAltStopImage.setVisibility(visibility);
     }
 
     /**
