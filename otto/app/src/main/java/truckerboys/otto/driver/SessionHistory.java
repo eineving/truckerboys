@@ -1,10 +1,13 @@
 package truckerboys.otto.driver;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.joda.time.JodaTimePermission;
 
 
 /**
@@ -80,12 +83,21 @@ public class SessionHistory {
      * @param session the past sessions
      */
     public void addSession(Session session) {
-        for (Session s : sessions) {
-            if (session.getEndTime().isAfter(s.getEndTime())) {
-                sessions.add(sessions.indexOf(s), session);
-                break;
+        /*if(sessions.size() > 0) {
+            for (Session s : sessions) {
+                if (session.getEndTime().isAfter(s.getEndTime())) {
+                    sessions.add(sessions.indexOf(s), session);
+                    break;
+                }
             }
-        }
+
+            // TODO Redone the session.add, so it wont overwrite current session in sessions
+        } else {
+            sessions.add(session);
+        }*/
+
+        sessions.add(session);
+        System.out.println(sessions.size() + " IS SIZE OF SESSIONS **********" );
     }
 
     /**
@@ -411,5 +423,13 @@ public class SessionHistory {
             latestWeeklyBreak = new Instant(0);
         }
         return getActiveTimeSince(latestWeeklyBreak);
+    }
+
+    public List<Session> getSessions() {
+        return sessions;
+    }
+
+    public DateTime getDateOfSession(int sessionIndex) {
+        return new DateTime(sessions.get(sessionIndex).getStartTime());
     }
 }

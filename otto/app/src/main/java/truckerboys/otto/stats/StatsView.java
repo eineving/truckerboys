@@ -8,12 +8,16 @@ import android.swedspot.scs.data.SCSFloat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
@@ -37,7 +41,7 @@ import utils.IView;
  * Class for displaying statistics for the user.
  */
 
-public class StatsView extends Fragment implements IView, IEventListener, IVehicleListener {
+public class StatsView extends Fragment implements IEventListener, IVehicleListener {
 
     private View rootView;
     private static final String SETTINGS = "Settings_file";
@@ -54,6 +58,23 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
     // Violation stats
     private TextView violations;
+
+    // History stats
+    private TextView historyDate1;
+    private TextView historyTime1;
+    private TextView historyType1;
+    private TextView historyDate2;
+    private TextView historyTime2;
+    private TextView historyType2;
+    private TextView historyDate3;
+    private TextView historyTime3;
+    private TextView historyType3;
+    private TextView historyDate4;
+    private TextView historyTime4;
+    private TextView historyType4;
+    private TextView historyDate5;
+    private TextView historyTime5;
+    private TextView historyType5;
 
     private String distanceUnit = "";
     private String fuelUnit = "";
@@ -74,6 +95,23 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         // Creates TextViews from the fragment for daily stats
         timeToday = (TextView) rootView.findViewById(R.id.timeTodayTime);
         distanceByFuel = (TextView) rootView.findViewById(R.id.KmByFuel);
+
+        // Session history
+        historyDate1 = (TextView) rootView.findViewById(R.id.history_date_1);
+        historyTime1 = (TextView) rootView.findViewById(R.id.history_time_1);
+        historyType1 = (TextView) rootView.findViewById(R.id.type_of_work_1);
+        historyDate2 = (TextView) rootView.findViewById(R.id.history_date_2);
+        historyTime2 = (TextView) rootView.findViewById(R.id.history_time_2);
+        historyType2 = (TextView) rootView.findViewById(R.id.type_of_work_2);
+        historyDate3 = (TextView) rootView.findViewById(R.id.history_date_3);
+        historyTime3 = (TextView) rootView.findViewById(R.id.history_time_3);
+        historyType3 = (TextView) rootView.findViewById(R.id.type_of_work_3);
+        historyDate4 = (TextView) rootView.findViewById(R.id.history_date_4);
+        historyTime4 = (TextView) rootView.findViewById(R.id.history_time_4);
+        historyType4 = (TextView) rootView.findViewById(R.id.type_of_work_4);
+        historyDate5 = (TextView) rootView.findViewById(R.id.history_date_5);
+        historyTime5 = (TextView) rootView.findViewById(R.id.history_time_5);
+        historyType5 = (TextView) rootView.findViewById(R.id.type_of_work_5);
 
         // Creates TextViews from the fragment for daily stats
         timeTotal = (TextView) rootView.findViewById(R.id.timeTotalTime);
@@ -167,6 +205,36 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
                                ArrayList<String> history3, ArrayList<String> history4,
                                ArrayList<String> history5){
 
+        if(history1.size() > 0) {
+            historyDate1.setText(history1.get(0));
+            historyTime1.setText(history1.get(1));
+            historyType1.setText(history1.get(3));
+        }
+
+        if(history2.size() > 0) {
+            historyDate2.setText(history2.get(0));
+            historyTime2.setText(history2.get(1));
+            historyType2.setText(history2.get(3));
+        }
+
+        if(history3.size() > 0) {
+            historyDate3.setText(history3.get(0));
+            historyTime3.setText(history3.get(1));
+            historyType3.setText(history3.get(3));
+        }
+
+        if(history4.size() > 0) {
+            historyDate4.setText(history4.get(0));
+            historyTime4.setText(history4.get(1));
+            historyType4.setText(history4.get(3));
+        }
+
+        if(history5.size() > 0) {
+            historyDate5.setText(history5.get(0));
+            historyTime5.setText(history5.get(1));
+            historyType5.setText(history5.get(3));
+        }
+
     }
 
     /**
@@ -231,17 +299,6 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
             this.violations.setText("" + violations);
         }
     }
-
-    @Override
-    public Fragment getFragment() {
-        return this;
-    }
-
-    @Override
-    public String getName() {
-        return "Statistics";
-    }
-
 
     @Override
     public void performEvent(Event event) {

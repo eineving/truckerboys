@@ -16,6 +16,7 @@ import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.settings.SettingsView;
+import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.stats.StatsView;
 import utils.IView;
 
@@ -50,7 +51,7 @@ public class OTTO {
 
         views.add(new HomeView());
 
-        views.add(new StatsView());
+        views.add(new StatsPresenter());
 
         views.add(new SettingsView());
     }

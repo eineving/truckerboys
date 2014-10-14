@@ -372,7 +372,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider9"
-            android:text="2014-10-22: "
+            android:text=""
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -383,7 +383,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider9"
-            android:text="3h, 34min"
+            android:text=""
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/history_date_1"/>
 
@@ -396,7 +396,7 @@
             android:textStyle="bold"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="Driving"
+            android:text=""
             android:layout_below="@+id/divider9" />
 
         <ImageView
@@ -427,7 +427,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider10"
-            android:text="2014-10-22: "
+            android:text=""
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -438,7 +438,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider10"
-            android:text="3h, 34min"
+            android:text=""
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/history_date_2"/>
 
@@ -451,7 +451,7 @@
             android:textStyle="bold"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="Driving"
+            android:text=""
             android:layout_below="@+id/divider10" />
 
         <ImageView
@@ -482,7 +482,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider11"
-            android:text="2014-10-22: "
+            android:text=""
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -493,7 +493,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider11"
-            android:text="3h, 34min"
+            android:text=""
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/history_date_3"/>
 
@@ -506,7 +506,7 @@
             android:textStyle="bold"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="Driving"
+            android:text=""
             android:layout_below="@+id/divider11" />
 
         <ImageView
@@ -548,7 +548,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider12"
-            android:text="3h, 34min"
+            android:text=""
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/history_date_4"/>
 
@@ -561,7 +561,7 @@
             android:textStyle="bold"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="Driving"
+            android:text=""
             android:layout_below="@+id/divider12" />
 
         <ImageView
@@ -592,7 +592,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider13"
-            android:text="2014-10-22: "
+            android:text=""
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -604,7 +604,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/divider13"
-            android:text="3h, 34min"
+            android:text=""
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/history_date_5"/>
 
@@ -617,7 +617,7 @@
             android:textStyle="bold"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="Driving"
+            android:text=""
             android:layout_below="@+id/divider13" />
 
         <ImageView
@@ -631,6 +631,7 @@
             android:layout_toLeftOf="@+id/type_of_work_5"
             android:layout_toStartOf="@+id/type_of_work_5"
             android:layout_alignBottom="@+id/history_date_5" />
+
     </RelativeLayout>
 
 
