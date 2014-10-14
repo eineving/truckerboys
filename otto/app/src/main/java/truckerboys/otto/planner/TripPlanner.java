@@ -37,6 +37,8 @@ public class
 
     private MapLocation chosenStop;
 
+    private int nbrOfDirCalls = 0;
+
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
         this.directionsProvider = directionsProvider;
@@ -95,7 +97,7 @@ public class
      * @throws NoConnectionException
      */
     public void setNewRoute(MapLocation startLocation, MapLocation finalDestination, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
-        this.startLocation = startLocation;
+        this.startLocation = new MapLocation(new LatLng(57.6879752,11.9797901));
         this.finalDestination = finalDestination;
         this.checkpoints = checkpoints;
         this.chosenStop = null;
@@ -115,6 +117,7 @@ public class
         Duration sessionTimeLeft = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
 
         Route directRoute = directionsProvider.getRoute(startLocation, finalDestination, checkpoints);
+        nbrOfDirCalls++;
 
         //TODO Implement check if gas is enough for this session
 
@@ -179,8 +182,9 @@ public class
     private Route getOptimizedRoute(Route directRoute, Duration within) throws InvalidRequestException, NoConnectionException {
         Route optimalRoute = null;
         LatLng optimalLatLong;
-        ArrayList<RestLocation> closeLocations = new ArrayList<RestLocation>();
+        ArrayList<MapLocation> closeLocations;
 
+        /*
         while (closeLocations.size() == 0) {
             optimalLatLong = findLatLngWithinDuration(directRoute, within);
             closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
@@ -189,17 +193,29 @@ public class
             //If no place is found, search for ten minutes before
             within = within.minus(Duration.standardMinutes(10));
         }
+        */
+
+        optimalLatLong = findLatLngWithinDuration(directRoute, within);
+        closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
+        Log.w("NBRofCloseLocations", closeLocations.size() + "");
+
+        if(closeLocations.size() == 0){
+            MapLocation forcedLocation = new MapLocation(optimalLatLong);
+            forcedLocation.setAddress("Forced location");
+            closeLocations.add(forcedLocation);
+        }
 
         //Just calculating the five best matches from Google
         for (int i = 0; i < 5 && i < closeLocations.size(); i++) {
             //Temporary creation
             LinkedList<MapLocation> tempList = new LinkedList<MapLocation>();
-            tempList.add(new MapLocation(closeLocations.get(i)));
+
             if (checkpoints != null) {
                 for (MapLocation location : checkpoints) {
                     tempList.add(location);
                 }
             }
+            tempList.add(new MapLocation(closeLocations.get(i)));
 
             //Checks if the restLocation is a possible stop and is faster than the previous
             Route temp = directionsProvider.getRoute(startLocation, finalDestination, tempList.toArray(new MapLocation[tempList.size()]));
@@ -228,30 +244,38 @@ public class
     private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
 
+        Log.w("PolylineSize", coordinates.size()+ "");
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
+        int currentIndex = (topIndex + bottomIndex) / 2;
 
         Duration etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+                new MapLocation(coordinates.get(currentIndex)));
+        nbrOfDirCalls++;
 
 
         while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(5))) ||
                 etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(5)))) {
             if (etaToCoordinate.isLongerThan(timeLeft)) {
-                topIndex = (topIndex + bottomIndex) / 2;
+                topIndex = currentIndex;
             } else {
-                bottomIndex = (topIndex + bottomIndex) / 2;
+                bottomIndex = currentIndex;
             }
+            currentIndex = (topIndex + bottomIndex) / 2;
             //Just to be safe
-            if (topIndex == bottomIndex) {
+            if (topIndex - bottomIndex < 2) {
                 break;
             }
+            Log.w("findLatLng", "topIndex: " + topIndex);
+            Log.w("findLatLng", "bottomIndex: " + bottomIndex);
             etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                    new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
-            System.out.println(etaToCoordinate.getMillis());
+                    new MapLocation(coordinates.get(currentIndex)));
+            nbrOfDirCalls++;
+            Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
 
         }
-        return coordinates.get((topIndex + bottomIndex) / 2);
+        Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
+        return coordinates.get(currentIndex);
     }
 
     /**
