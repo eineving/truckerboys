@@ -5,7 +5,9 @@ import org.joda.time.Instant;
 
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.NoValidBreakFound;
+import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
+import truckerboys.otto.driver.SessionType;
 
 /**
  * Created by Daniel on 2014-09-17.
@@ -167,24 +169,37 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnRestException {
+
         //If currently on break
-        if (!history.isDriving()) {
-            if (getThisWeekTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive this week. */ {
-                //TODO Logic for weekly break time
-            }
+        if (history.isResting()) {
+            SessionHistory tempHistory = new SessionHistory(history.getSessions());
 
-            if (getThisDayTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive today. */ {
-                //TODO Logic for daily break time.
-            }
+            //10 minutes.
+            int i = 10;
+            Session s;
+            while (true) {
+                //Add a rest session, make it longer and longer in each loop.
+                //When the rest is long enough getTLThisSession will return something other than zero.
+                //Then we know the required length off the break.
+                s = new Session(SessionType.RESTING, new Instant(), new Instant().plus(Duration.standardMinutes(i)));
+                //To be a bit more efficient we add 10 minutes each time.
 
-            //TODO Rasten kan ersättas med dygns eller veckovila
-            //Check if there was a break of atleast 15 minutes in the last 4 hours 30 minutes.
-            if (history.existRestLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
-                //Return "30 minutes" - "current break time"
-                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceRestStart()), Duration.ZERO);
-            } else /* else check time left until current break is 45 minutes long. */ {
-                //Return "45 minutes" - "current break time"
-                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
+                tempHistory.addSession(s);
+                if (!getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
+
+                    //And then loop backwards reducing by one minute.
+                    while (true) {
+                        s = new Session(SessionType.RESTING, new Instant(), new Instant().plus(Duration.standardMinutes(i)));
+                        tempHistory.addSession(s);
+                        if (getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
+                            return new TimeLeft(s.getDuration().plus(Duration.standardMinutes(1)), Duration.ZERO);
+                        }
+                        tempHistory.removeLastSession();
+                        i--;
+                    }
+                }
+                tempHistory.removeLastSession();
+                i += 10;
             }
 
         } else {
