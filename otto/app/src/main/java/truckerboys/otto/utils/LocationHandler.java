@@ -1,6 +1,7 @@
 package truckerboys.otto.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -10,6 +11,8 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
+import truckerboys.otto.NoConnectionActivity;
+import truckerboys.otto.newroute.RouteActivity;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.positions.MapLocation;
@@ -30,8 +33,10 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
 
     private static MapLocation currentLocation;
     private static boolean connected = false;
+    private Context context;
 
     public LocationHandler(Context context){
+        this.context = context;
         locationClient = new LocationClient(context, this, this);
         locationClient.connect();
     }
@@ -66,9 +71,7 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     /**
      * Checks if a location is more accurate and trushworthy then the last one that was set in

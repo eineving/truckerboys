@@ -61,8 +61,6 @@ public class HomeView extends Fragment implements IView {
                 //((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
                 Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
                 getActivity().startActivity(newRouteIntent);
-
-
             }
         });
 
