@@ -97,7 +97,8 @@ public class
      * @throws NoConnectionException
      */
     public void setNewRoute(MapLocation startLocation, MapLocation finalDestination, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
-        this.startLocation = new MapLocation(new LatLng(57.6879752,11.9797901));
+        //TODO Remove hard coding
+        this.startLocation = new MapLocation(new LatLng(57.6879752, 11.9797901));
         this.finalDestination = finalDestination;
         this.checkpoints = checkpoints;
         this.chosenStop = null;
@@ -125,9 +126,9 @@ public class
         System.out.println("timeLeft Extended: " + regulationHandler.getThisDayTL(user.getHistory()).getExtendedTimeLeft().getMillis());
 
         //Returns the direct route if ETA is shorter than the time you have left to drive
-        if (directRoute.getEta().isShorterThan(sessionTimeLeft)) {
+        if (directRoute.getEtaToFirstCheckpoint().isShorterThan(sessionTimeLeft)) {
             optimalRoute = directRoute;
-            optimalRoute.setAlternativeStops(calculateAlternativeStops(directRoute.getEta().dividedBy(2), directRoute.getEta().dividedBy(4)));
+            optimalRoute.setAlternativeStops(calculateAlternativeStops(directRoute.getEtaToFirstCheckpoint().dividedBy(2), directRoute.getEta().dividedBy(4)));
         }
 
         //If there is no time left on this session
@@ -136,11 +137,11 @@ public class
         }
 
         //If the location is within reach this day but not this session
-        else if (!directRoute.getEta().isShorterThan(sessionTimeLeft) &&
-                directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+        else if (!directRoute.getEtaToFirstCheckpoint().isShorterThan(sessionTimeLeft) &&
+                directRoute.getEtaToFirstCheckpoint().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
 
             //If the ETA/2 is longer than time left on session
-            if (directRoute.getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
+            if (directRoute.getEtaToFirstCheckpoint().dividedBy(2).isLongerThan(sessionTimeLeft)) {
                 optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().dividedBy(2));
             } else {
                 optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
@@ -149,14 +150,9 @@ public class
         }
 
         //If the location is not within reach this day (drive maximum distance)
-        else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+        else if (!directRoute.getEtaToFirstCheckpoint().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
             optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
         }
-
-        if (optimalRoute != null) {
-            optimalRoute.setTimeLeftOnSession(regulationHandler.getThisSessionTL(user.getHistory()));
-        }
-
         return optimalRoute;
     }
 
@@ -199,7 +195,7 @@ public class
         closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
         Log.w("NBRofCloseLocations", closeLocations.size() + "");
 
-        if(closeLocations.size() == 0){
+        if (closeLocations.size() == 0) {
             MapLocation forcedLocation = new MapLocation(optimalLatLong);
             forcedLocation.setAddress("Forced location");
             closeLocations.add(forcedLocation);
@@ -244,7 +240,7 @@ public class
     private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
 
-        Log.w("PolylineSize", coordinates.size()+ "");
+        Log.w("PolylineSize", coordinates.size() + "");
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
         int currentIndex = (topIndex + bottomIndex) / 2;
