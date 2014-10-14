@@ -1,6 +1,7 @@
 package truckerboys.otto.maps;
 
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
@@ -39,9 +41,11 @@ public class MapView extends SupportMapFragment implements IEventListener {
     private GoogleMap googleMap;
     private Marker positionMarker;
     private Polyline routePolyline;
+    private List<LatLng> visibleRouteLegs = new LinkedList<LatLng>();
 
-    private RouteDetail currentDetail = RouteDetail.DETAILED;
-    private static final float DETAILED_ZOOM_ABOVE = 10;
+    private RouteDetail currentDetail;
+    private static final float DETAILED_ZOOM_ABOVE = 11;
+    private static final float DISTANCE_FOR_DETAILED = 10000;
 
     private static final int GPS_FREQ = 500; // The frequency of gps updates.
     private static final int INTERPOLATION_FREQ = 25; //The frequency of the interpolation.
@@ -50,10 +54,21 @@ public class MapView extends SupportMapFragment implements IEventListener {
     private LinkedList<Double2> positions = new LinkedList<Double2>();
     private LinkedList<Float> bearings = new LinkedList<Float>();
 
+    private Handler drawPolylineHandler = new Handler();
     private Handler updateHandler = new Handler(Looper.getMainLooper());
     private Runnable updatePos = new Runnable() {
         public void run() {
             updatePositionMarker();
+        }
+    };
+    private Runnable drawPolyline = new Runnable() {
+        @Override
+        public void run() {
+            if(currentDetail == RouteDetail.DETAILED) {
+                routePolyline.setPoints(visibleRouteLegs);
+            } else {
+                routePolyline.setPoints(visibleRouteLegs);
+            }
         }
     };
 
@@ -186,16 +201,24 @@ public class MapView extends SupportMapFragment implements IEventListener {
      * will draw an overview of the route or a detailed version.
      * @param route The route to base the polyline on.
      */
-    public void updatePolyline(Route route, float zoomLevel) {
+    public void updatePolyline(Route route, float zoomLevel, Location currentLocation) {
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
         if(currentDetail != detail) {
             if (detail == RouteDetail.DETAILED) {
-                routePolyline.setPoints(route.getDetailedPolyline());
+                visibleRouteLegs.clear();
+                for(LatLng latlng : route.getDetailedPolyline()) {
+                    if(currentLocation.distanceTo(new MapLocation(latlng)) < DISTANCE_FOR_DETAILED){
+                        visibleRouteLegs.add(latlng);
+                    }
+                }
+                currentDetail = RouteDetail.DETAILED;
             } else {
-                routePolyline.setPoints(route.getOverviewPolyline());
+                visibleRouteLegs = route.getOverviewPolyline();
+                currentDetail = RouteDetail.OVERVIEW;
             }
+            drawPolylineHandler.post(drawPolyline);
         }
     }
 
@@ -205,7 +228,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
      * @param route The new Route to draw on the Map.
      */
     public void updateCamera(Route route){
-        updatePolyline(route, googleMap.getCameraPosition().zoom);
+        updatePolyline(route, googleMap.getCameraPosition().zoom, LocationHandler.getCurrentLocationAsMapLocation());
     }
 
     @Override

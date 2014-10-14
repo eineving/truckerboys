@@ -36,7 +36,7 @@ public class MapPresenter implements GoogleMap.OnCameraChangeListener, IEventLis
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         if (getRoute() != null) {
-            mapView.updatePolyline(getRoute(), cameraPosition.zoom);
+            mapView.updatePolyline(getRoute(), cameraPosition.zoom, LocationHandler.getCurrentLocationAsMapLocation());
         }
 
         mapView.adjustCamera(LocationHandler.getCurrentLocationAsLatLng(), cameraPosition.bearing);
