@@ -2,6 +2,8 @@ package truckerboys.otto.stats;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.scs.data.SCSFloat;
@@ -40,6 +42,8 @@ public class StatsView extends Fragment implements IView, IEventListener{
     private StatsPresenter presenter;
     private static final String SETTINGS = "Settings_file";
     private static final String STATS = "Stats_file";
+
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
 
     // Todays stats
     private TextView timeToday;
@@ -80,8 +84,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
         // Restores preferences for settings in presenter
         presenter.restorePreferences();
-
-
         return rootView;
     }
 
@@ -156,8 +158,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
      * This method is to be called from the presenter.
      * @param system metric/imperial
      */
-    public void
-    updateUnits(String system) {
+    public void updateUnits(String system) {
         if(system.equals("imperial")) {
             fuelUnit = ""; // MILES
             distanceUnit = ""; // GALLONS
@@ -226,9 +227,18 @@ public class StatsView extends Fragment implements IView, IEventListener{
         return "Statistics";
     }
 
+    private void updateTotalDistance(TotalDistanceEvent e){
+        //The signals unit should be meters..
+        distanceTotal.setText(e.getTotalDistance()/1000 + " km");
+    }
+
+    private void updateFuelConsumption(DistanceByFuelEvent e){
+        distanceByFuel.setText(e.getDistanceByFuel() + " km/L");
+    }
+
 
     @Override
-    public void performEvent(Event event) {
+    public void performEvent(final Event event) {
         if(event.isType(SettingsChangedEvent.class)) {
 
             // read from file and set String called system based on that
@@ -244,15 +254,24 @@ public class StatsView extends Fragment implements IView, IEventListener{
         if(event.isType(TotalDistanceEvent.class)) {
             // Update view if new total distance signal is sent
 
-            distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
+            //distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
 
+            Runnable updateDistance = new Runnable() {
+                public void run() {
+                    updateTotalDistance((TotalDistanceEvent) event);
+                }
+            };
+            updateHandler.post(updateDistance);
         }
 
         if(event.isType(DistanceByFuelEvent.class)) {
             // Update view if new total distance/fuel signal is sent
-
-            distanceByFuel.setText(((DistanceByFuelEvent)event).getDistanceByFuel() + " km/L");
-
+            Runnable updateFuelConsumption = new Runnable() {
+                public void run() {
+                    updateFuelConsumption((DistanceByFuelEvent)event);
+                }
+            };
+            updateHandler.post(updateFuelConsumption);
         }
     }
 

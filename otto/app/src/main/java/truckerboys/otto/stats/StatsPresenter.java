@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.automotiveapi.AutomotiveSignalId;
 import android.swedspot.scs.data.SCSFloat;
+import android.swedspot.scs.data.SCSLong;
+import android.util.Log;
 
 import com.swedspot.automotiveapi.AutomotiveManager;
 
@@ -42,10 +44,11 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
         this.model = new StatsModel();
 
         // Subscribes to the signals wanted
-        VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER);
-        VehicleInterface.subscribe(this, VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
+        Log.w("SIGNAL", "SUBSCRIBED");
+        VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER,VehicleSignalID.TOTAL_VEHICLE_DISTANCE);
 
         EventTruck.getInstance().subscribe(this);
+        EventTruck.getInstance().subscribe(view);
     }
 
     /**
@@ -162,23 +165,28 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
      */
     @Override
     public void receive(AutomotiveSignal signal) {
-
         switch (signal.getSignalId()) {
 
             case VehicleSignalID.KM_PER_LITER:
+
 
                 // Gets the total distance by fuel and updates the listeners
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
 
                 EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
 
-            case VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE:
+                Log.w("SIGNAL", "FUEL");
+                break;
+
+            case VehicleSignalID.TOTAL_VEHICLE_DISTANCE:
 
                 // Gets the total distance and updates the listeners
-                Float distance = ((SCSFloat) signal.getData()).getFloatValue();
+                long distance = ((SCSLong) signal.getData()).getLongValue();
 
-                EventTruck.getInstance().newEvent(new TotalDistanceEvent(Math.floor(distance * 100)/100));
+                EventTruck.getInstance().newEvent(new TotalDistanceEvent(distance));
 
+                Log.w("SIGNAL", "DISTANCE");
+                break;
         }
 
     }

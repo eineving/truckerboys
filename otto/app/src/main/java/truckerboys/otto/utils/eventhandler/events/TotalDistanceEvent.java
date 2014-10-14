@@ -4,13 +4,13 @@ package truckerboys.otto.utils.eventhandler.events;
  * Created by root on 2014-10-13.
  */
 public class TotalDistanceEvent extends Event {
-    private double totalDistance;
+    private long totalDistance;
 
-    public TotalDistanceEvent(double totalDistance) {
+    public TotalDistanceEvent(long totalDistance) {
         this.totalDistance = totalDistance;
     }
 
-    public double getTotalDistance() {
+    public long getTotalDistance() {
         return totalDistance;
     }
 }
