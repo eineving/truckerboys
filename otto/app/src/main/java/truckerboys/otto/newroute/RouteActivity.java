@@ -25,7 +25,6 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
-import utils.PlacesAutoCompleteAdapter;
 
 /**
  * Created by Mikael Malmqvist on 2014-10-02.
