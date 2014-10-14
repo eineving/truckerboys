@@ -101,7 +101,12 @@ public class GoogleDirectionsJSONDecoder {
                     checkPoints.add(new MapLocation(new LatLng(
                             startLocation.get("lat"), startLocation.get("lng"))));
                 }
-                etaToFirstCheckpoint = new Duration(((LinkedTreeMap<String, Double>) allLegs.get(0).get("duration")).get("value") * 1000);
+                //Getting the first checkpoints eta
+                LinkedTreeMap<String, Object> firstLeg = allLegs.get(0);
+                Log.w("firstCheckpoint" , ((LinkedTreeMap<String, Double>) firstLeg.get("duration")).get("value").toString());
+                int temp = 0;
+                temp += ((LinkedTreeMap<String, Double>) firstLeg.get("duration")).get("value");
+                    etaToFirstCheckpoint = new Duration( temp * 1000);
             }
 
 
@@ -111,6 +116,7 @@ public class GoogleDirectionsJSONDecoder {
             Log.w("Distance", distance + "");
             Log.w("CheckPoints", checkPoints.size() + "");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InvalidRequestException(e.getMessage());
         }
 

@@ -36,8 +36,11 @@ public class
     private MapLocation[] checkpoints;
 
     private MapLocation chosenStop;
+    private MapLocation recommendedStop;
+
 
     private int nbrOfDirCalls = 0;
+    private MapLocation currentLocation;
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
@@ -56,9 +59,7 @@ public class
      */
     public void updateRoute(MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
         //TODO also set ETA to alternative route but all this after getRoute
-        if (chosenStop != null) {
-            chosenStop.setEta(directionsProvider.getETA(currentLocation, chosenStop));
-        }
+        this.currentLocation = currentLocation;
         activeRoute = getCalculatedRoute();
         EventTruck.getInstance().newEvent(new ChangedRouteEvent());
     }
@@ -98,10 +99,11 @@ public class
      */
     public void setNewRoute(MapLocation startLocation, MapLocation finalDestination, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
         //TODO Remove hard coding
-        this.startLocation = new MapLocation(new LatLng(57.6879752, 11.9797901));
+        this.startLocation = startLocation;
         this.finalDestination = finalDestination;
         this.checkpoints = checkpoints;
         this.chosenStop = null;
+        this.currentLocation = startLocation;
         updateRoute(startLocation);
     }
 
@@ -117,8 +119,10 @@ public class
         Route optimalRoute = null;
         Duration sessionTimeLeft = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
 
-        Route directRoute = directionsProvider.getRoute(startLocation, finalDestination, checkpoints);
+        Route directRoute = directionsProvider.getRoute(currentLocation, finalDestination, checkpoints);
         nbrOfDirCalls++;
+
+        ArrayList<MapLocation> alternativeLocations = new ArrayList<MapLocation>();
 
         //TODO Implement check if gas is enough for this session
 
@@ -128,7 +132,8 @@ public class
         //Returns the direct route if ETA is shorter than the time you have left to drive
         if (directRoute.getEtaToFirstCheckpoint().isShorterThan(sessionTimeLeft)) {
             optimalRoute = directRoute;
-            optimalRoute.setAlternativeStops(calculateAlternativeStops(directRoute.getEtaToFirstCheckpoint().dividedBy(2), directRoute.getEta().dividedBy(4)));
+            alternativeLocations = (calculateAlternativeStops(
+                    directRoute.getEtaToFirstCheckpoint().dividedBy(2), directRoute.getEtaToFirstCheckpoint().dividedBy(4)));
         }
 
         //If there is no time left on this session
@@ -142,17 +147,36 @@ public class
 
             //If the ETA/2 is longer than time left on session
             if (directRoute.getEtaToFirstCheckpoint().dividedBy(2).isLongerThan(sessionTimeLeft)) {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().dividedBy(2));
+                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft());
+                alternativeLocations = (calculateAlternativeStops(sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4)));
             } else {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
+                optimalRoute = getOptimizedRoute(directRoute, directRoute.getEtaToFirstCheckpoint().dividedBy(2));
+                alternativeLocations = (calculateAlternativeStops(sessionTimeLeft, sessionTimeLeft.dividedBy(2)));
             }
-            optimalRoute.setAlternativeStops(calculateAlternativeStops(sessionTimeLeft, sessionTimeLeft.dividedBy(2)));
         }
 
         //If the location is not within reach this day (drive maximum distance)
         else if (!directRoute.getEtaToFirstCheckpoint().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
             optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
+            alternativeLocations = calculateAlternativeStops(sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+        } else {
+            throw new InvalidRequestException("Something is not right here");
         }
+
+        if (chosenStop == null) {
+            if (optimalRoute.getCheckpoints().size() > 0) {
+                optimalRoute.setRecommendedStop(optimalRoute.getCheckpoints().get(0));
+            } else {
+                optimalRoute.setRecommendedStop(optimalRoute.getFinalDestination());
+            }
+        } else {
+            optimalRoute.setRecommendedStop(chosenStop);
+        }
+
+        //TODO remove when calculateAlternativeStops is implemented
+        alternativeLocations = new ArrayList<MapLocation>();
+        alternativeLocations.add(recommendedStop);
+        optimalRoute.setAlternativeStops(alternativeLocations);
         return optimalRoute;
     }
 
@@ -180,17 +204,6 @@ public class
         LatLng optimalLatLong;
         ArrayList<MapLocation> closeLocations;
 
-        /*
-        while (closeLocations.size() == 0) {
-            optimalLatLong = findLatLngWithinDuration(directRoute, within);
-            closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
-            Log.w("NBRofCloseLocations", closeLocations.size() + "");
-
-            //If no place is found, search for ten minutes before
-            within = within.minus(Duration.standardMinutes(10));
-        }
-        */
-
         optimalLatLong = findLatLngWithinDuration(directRoute, within);
         closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
         Log.w("NBRofCloseLocations", closeLocations.size() + "");
@@ -216,13 +229,12 @@ public class
             //Checks if the restLocation is a possible stop and is faster than the previous
             Route temp = directionsProvider.getRoute(startLocation, finalDestination, tempList.toArray(new MapLocation[tempList.size()]));
 
-            //TODO Make this look better
             if (temp.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
                 if (optimalRoute == null) {
-                    this.chosenStop = closeLocations.get(i);
+                    this.recommendedStop = closeLocations.get(i);
                     optimalRoute = temp;
                 } else if (temp.getEta().isShorterThan(optimalRoute.getEta())) {
-                    this.chosenStop = closeLocations.get(i);
+                    this.recommendedStop = closeLocations.get(i);
                     optimalRoute = temp;
                 }
             }
