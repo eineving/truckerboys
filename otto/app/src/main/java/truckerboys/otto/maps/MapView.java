@@ -173,7 +173,14 @@ public class MapView extends SupportMapFragment implements  IEventListener {
                     bearings.removeFirst();
                 }
 
-                adjustCamera(positionMarker.getPosition(), positionMarker.getRotation());
+                //Move the camera to marker position
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition(
+                                positionMarker.getPosition(),
+                                googleMap.getCameraPosition().zoom,
+                                googleMap.getCameraPosition().tilt,
+                                positionMarker.getRotation()
+                        )));
             }
         }
 
@@ -222,14 +229,6 @@ public class MapView extends SupportMapFragment implements  IEventListener {
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
         }
-    }
-
-    /**
-     * Returns the GoogleMap object that we receive from google when connecting to Google.
-     * @return The current GoogleMap object.
-     */
-    public GoogleMap getGoogleMap() {
-        return googleMap;
     }
 }
 
