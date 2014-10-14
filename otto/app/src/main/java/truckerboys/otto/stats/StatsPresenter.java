@@ -10,11 +10,15 @@ import android.swedspot.automotiveapi.AutomotiveSignalId;
 
 import com.swedspot.automotiveapi.AutomotiveManager;
 
+import java.util.ArrayList;
+
+import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
@@ -123,8 +127,56 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     }
 
 
+    /**
+     * Loads session history from user database.
+     */
+    public void loadUserHistory() {
+        // TODO Set stuff
+        SessionHistory userHistory = User.getInstance().getHistory();
+
+        ArrayList<String> history1, history2, history3, history4, history5;
+        history1 = new ArrayList<String>();
+        history2 = new ArrayList<String>();
+        history3 = new ArrayList<String>();
+        history4 = new ArrayList<String>();
+        history5 = new ArrayList<String>();
+
+        history1.add(""); // Date from userHistory
+        history1.add(""); // Time from userHistory
+        history1.add(""); // Violations from userHistory
+        history1.add(""); // Type from userHistory
+
+        history2.add(""); // Date from userHistory
+        history2.add(""); // Time from userHistory
+        history2.add(""); // Violations from userHistory
+        history2.add(""); // Type from userHistory
+
+        history3.add(""); // Date from userHistory
+        history3.add(""); // Time from userHistory
+        history3.add(""); // Violations from userHistory
+        history3.add(""); // Type from userHistory
+
+        history4.add(""); // Date from userHistory
+        history4.add(""); // Time from userHistory
+        history4.add(""); // Violations from userHistory
+        history4.add(""); // Type from userHistory
+
+        history5.add(""); // Date from userHistory
+        history5.add(""); // Time from userHistory
+        history5.add(""); // Violations from userHistory
+        history5.add(""); // Type from userHistory
+
+        model.setUserHistory(history1, history2, history3, history4, history5);
+        view.setUserHistory(history1, history2, history3, history4, history5);
+    }
+
     @Override
     public void performEvent(Event event) {
+
+        if(event.isType(RestorePreferencesEvent.class)) {
+            restorePreferences();
+            loadUserHistory();
+        }
 
         // If the new time has been set in the model
         if(event.isType(TimeDrivenEvent.class)) {

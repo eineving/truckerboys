@@ -13,12 +13,15 @@ import android.widget.TextView;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import java.util.ArrayList;
+
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
@@ -37,7 +40,6 @@ import utils.IView;
 public class StatsView extends Fragment implements IView, IEventListener, IVehicleListener {
 
     private View rootView;
-    private StatsPresenter presenter;
     private static final String SETTINGS = "Settings_file";
     private static final String STATS = "Stats_file";
 
@@ -59,7 +61,6 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
 
     public StatsView(){
-        presenter = new StatsPresenter(this);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         this.violations = (TextView) rootView.findViewById(R.id.numberOfViolations);
 
         // Restores preferences for settings in presenter
-        presenter.restorePreferences();
+        EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
 
 
         return rootView;
@@ -150,10 +151,23 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
         editor.commit();
 
-        System.out.println("****** WRITTEN STUFFS ********");
 
     }
 
+    /**
+     * Sets user history.
+     * Run this method when history is updated.
+     * @param history1
+     * @param history2
+     * @param history3
+     * @param history4
+     * @param history5
+     */
+    public void setUserHistory(ArrayList<String> history1, ArrayList<String> history2,
+                               ArrayList<String> history3, ArrayList<String> history4,
+                               ArrayList<String> history5){
+
+    }
 
     /**
      * Method for setting a new unit system.
