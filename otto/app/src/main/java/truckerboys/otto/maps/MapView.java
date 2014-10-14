@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +30,6 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
-import utils.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.

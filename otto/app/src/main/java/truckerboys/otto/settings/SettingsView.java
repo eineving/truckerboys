@@ -18,7 +18,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.

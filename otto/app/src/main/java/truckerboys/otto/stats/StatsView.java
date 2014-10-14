@@ -25,7 +25,7 @@ import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 import truckerboys.otto.vehicle.VehicleSignalID;
-import utils.IView;
+import truckerboys.otto.IView;
 
 
 

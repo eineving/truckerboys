@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import truckerboys.otto.R;
+import truckerboys.otto.placeSuggestion.PlacesAutoCompleteAdapter;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;

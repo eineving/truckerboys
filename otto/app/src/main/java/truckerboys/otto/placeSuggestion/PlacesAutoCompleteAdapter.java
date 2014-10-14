@@ -1,4 +1,4 @@
-package utils;
+package truckerboys.otto.placeSuggestion;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
@@ -7,13 +7,8 @@ import android.widget.Filterable;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.directionsAPI.GoogleDirections;
-import truckerboys.otto.driver.User;
 import truckerboys.otto.placeSuggestion.GooglePlacesAutoComplete;
 import truckerboys.otto.placeSuggestion.IPlacesAutoComplete;
-import truckerboys.otto.placesAPI.GooglePlaces;
-import truckerboys.otto.planner.EURegulationHandler;
-import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import truckerboys.otto.R;
 import truckerboys.otto.newroute.RouteActivity;
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.

@@ -14,7 +14,6 @@ import truckerboys.otto.driver.TachographHandler;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.home.HomeView;
 import truckerboys.otto.maps.MapPresenter;
-import truckerboys.otto.maps.MapView;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
@@ -28,7 +27,6 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
-import utils.IView;
 
 /**
  * The root class of the program.
