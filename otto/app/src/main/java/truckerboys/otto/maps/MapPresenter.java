@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -35,8 +36,10 @@ public class MapPresenter implements GoogleMap.OnCameraChangeListener, IEventLis
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         if (getRoute() != null) {
-            mapView.updateCamera(getRoute(), cameraPosition);
+            mapView.updatePolyline(getRoute(), cameraPosition.zoom);
         }
+
+        mapView.adjustCamera(LocationHandler.getCurrentLocationAsLatLng(), cameraPosition.bearing);
     }
 
     @Override

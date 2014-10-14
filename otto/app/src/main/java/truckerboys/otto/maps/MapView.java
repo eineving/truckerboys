@@ -34,7 +34,7 @@ import truckerboys.otto.utils.positions.MapLocation;
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends SupportMapFragment implements  IEventListener {
+public class MapView extends SupportMapFragment implements IEventListener {
     private View rootView;
     private GoogleMap googleMap;
     private Marker positionMarker;
@@ -58,10 +58,6 @@ public class MapView extends SupportMapFragment implements  IEventListener {
     };
 
     private GoogleMap.OnCameraChangeListener onCameraChangeListener;
-
-    public void setOnCameraChangeListener(GoogleMap.OnCameraChangeListener onCameraChangeListener) {
-        this.onCameraChangeListener = onCameraChangeListener;
-    }
 
     public MapView() { }
 
@@ -108,7 +104,7 @@ public class MapView extends SupportMapFragment implements  IEventListener {
      * @param location The location to move the Camera to.
      * @param bearing The bearing to adjust the Camera to.
      */
-    private void adjustCamera(LatLng location, float bearing) {
+    public void adjustCamera(LatLng location, float bearing) {
         if (googleMap != null) { //Make sure google map was successfully retrieved from MapFragment.
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                     new CameraPosition(
@@ -171,7 +167,6 @@ public class MapView extends SupportMapFragment implements  IEventListener {
                     bearings.removeFirst();
                     bearings.removeFirst();
                 }
-
                 //Move the camera to marker position
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                         new CameraPosition(
@@ -191,7 +186,7 @@ public class MapView extends SupportMapFragment implements  IEventListener {
      * will draw an overview of the route or a detailed version.
      * @param route The route to base the polyline on.
      */
-    private void updatePolyline(Route route, float zoomLevel) {
+    public void updatePolyline(Route route, float zoomLevel) {
         //Check what detail level we want based on Zoom amount.
         RouteDetail detail = (zoomLevel > DETAILED_ZOOM_ABOVE ? RouteDetail.DETAILED : RouteDetail.OVERVIEW);
 
@@ -213,16 +208,6 @@ public class MapView extends SupportMapFragment implements  IEventListener {
         updatePolyline(route, googleMap.getCameraPosition().zoom);
     }
 
-    /**
-     * Updates the MapView according to the specified Route and CameraPosition.
-     * @param route The new Route to draw on the Map.
-     * @param cameraPosition The CameraPosition to use when displaying the Map.
-     */
-    public void updateCamera(Route route, CameraPosition cameraPosition) {
-        updatePolyline(route, cameraPosition.zoom);
-        adjustCamera(LocationHandler.getCurrentLocationAsLatLng(), cameraPosition.bearing);
-    }
-
     @Override
     public void performEvent(Event event) {
         if (event.isType(GPSUpdateEvent.class)) {
@@ -230,6 +215,10 @@ public class MapView extends SupportMapFragment implements  IEventListener {
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
         }
+    }
+
+    public void setOnCameraChangeListener(GoogleMap.OnCameraChangeListener onCameraChangeListener) {
+        this.onCameraChangeListener = onCameraChangeListener;
     }
 }
 
