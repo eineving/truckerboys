@@ -52,9 +52,10 @@ public class RouteActivity extends Activity implements IEventListener{
     private TextView finalDestination;
     // private TextView finalCheckpoints;
 
-    private ImageButton navigate;
+    private TextView navigate;
     private ImageButton addButton1;
     private ImageButton addButton2;
+    private ImageButton removeDestinationButton;
 
     private LinearLayout resultsBox;
     private LinearLayout historyBox;
@@ -148,6 +149,14 @@ public class RouteActivity extends Activity implements IEventListener{
 
                 ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).clear();
 
+            }
+        });
+
+        removeDestinationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeDestinationButton.setVisibility(View.INVISIBLE);
+                finalDestination.setText("");
             }
         });
 
@@ -271,16 +280,19 @@ public class RouteActivity extends Activity implements IEventListener{
 
 
                     addButton1.setVisibility(View.INVISIBLE);
+                    removeDestinationButton.setVisibility(View.VISIBLE);
                     search.setText("");
                 }
             }
         });
 
+
+
         // When the user clicks the checkpoint selected
         addButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkpoint != null) {
+                if (checkpoint != null) {
 
                     addButton2.setVisibility(View.INVISIBLE);
 
@@ -291,7 +303,7 @@ public class RouteActivity extends Activity implements IEventListener{
                     adapter.notifyDataSetChanged();
 
                     checkpointList.setLayoutParams(new LinearLayout.LayoutParams(
-                            checkpointList.getWidth(), 150*checkpointsStrings.size()));
+                            checkpointList.getWidth(), 150 * checkpointsStrings.size()));
 
                     checkpoint.setText("");
 
@@ -324,9 +336,10 @@ public class RouteActivity extends Activity implements IEventListener{
 
         finalDestination = (TextView) findViewById(R.id.final_destination_text);
 
-        navigate = (ImageButton) findViewById(R.id.navigate_button);
+        navigate = (TextView) findViewById(R.id.navigate_button);
         addButton1 = (ImageButton) findViewById(R.id.add_button1);
         addButton2 = (ImageButton) findViewById(R.id.add_button2);
+        removeDestinationButton = (ImageButton) findViewById(R.id.remove_destination);
 
     }
 
