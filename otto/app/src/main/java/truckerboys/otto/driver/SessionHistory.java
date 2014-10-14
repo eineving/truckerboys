@@ -1,5 +1,7 @@
 package truckerboys.otto.driver;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,12 @@ public class SessionHistory {
      */
     private List<Session> sessions = new ArrayList<Session>();
 
+    private HistoryOpenHelper historyDB;
+
+
+    public SessionHistory(Context context){
+        historyDB = new HistoryOpenHelper(context);
+    }
 
     /**
      * Returns weither the driver is currently driving or not.
@@ -412,4 +420,17 @@ public class SessionHistory {
         }
         return getActiveTimeSince(latestWeeklyBreak);
     }
+
+
+    private void saveHistory(){
+
+    }
+
+    private void loadHistory(){
+
+    }
+
+
+
+
 }

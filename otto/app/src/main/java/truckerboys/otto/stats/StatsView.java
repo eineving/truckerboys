@@ -56,10 +56,15 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
     private String distanceUnit = "";
     private String fuelUnit = "";
 
+    private User user;
 
 
     public StatsView(){
         presenter = new StatsPresenter(this);
+    }
+
+    public void setUser(User user){
+        this.user = user;
     }
 
     @Override
@@ -99,10 +104,10 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
 
         // TODO UNCOMMENT THIS
-        durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
+        durationToday = user.getHistory().getActiveTimeSinceLastDailyBreak();
 
         // TODO Change this to SessionHistory.getActiveTimeSince(Instant start)
-        durationTotal = User.getInstance().getHistory().getActiveTimeSince(new Instant(0));
+        durationTotal = user.getHistory().getActiveTimeSince(new Instant(0));
         // TODO Ask pegelow about this
 
 

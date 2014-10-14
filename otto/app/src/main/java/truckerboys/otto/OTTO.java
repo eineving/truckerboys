@@ -1,5 +1,7 @@
 package truckerboys.otto;
 
+import android.support.v4.app.FragmentActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ import utils.IView;
  * The root class of the program.
  * Created by Martin on 29/09/2014.
  */
-public class OTTO {
+public class OTTO extends FragmentActivity{
 
     private List<IView> views = new ArrayList<IView>();
 
@@ -34,7 +36,7 @@ public class OTTO {
 
     public OTTO() {
         regulationHandler = new EURegulationHandler();
-        user = User.getInstance();
+        user = new User(this);
         tripPlanner = new TripPlanner(regulationHandler, new GoogleDirections(), new GooglePlaces(), user);
 
         tachographHandler = new TachographHandler(user);
@@ -51,7 +53,9 @@ public class OTTO {
 
         views.add(new HomeView());
 
-        views.add(new StatsView());
+        StatsView sw = new StatsView();
+        sw.setUser(user);
+        views.add(sw);
 
         views.add(new SettingsView());
     }

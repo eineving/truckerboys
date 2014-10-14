@@ -1,26 +1,18 @@
 package truckerboys.otto.driver;
 
+import android.content.Context;
+
 /**
  * Created by Martin on 17/09/2014.
  * This class is singleton.
  */
 public class User {
 
-    private static User instance;
-    private SessionHistory history = new SessionHistory();
+    private SessionHistory history;
     private Session currentSession;
 
-    private User(){
-    }
-
-
-    public static User getInstance() {
-        if(instance == null) {
-            instance = new User();
-        }
-
-        return instance;
-
+    public User(Context context){
+        history = new SessionHistory(context);
     }
 
     /**

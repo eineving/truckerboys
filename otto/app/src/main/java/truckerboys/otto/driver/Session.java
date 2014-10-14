@@ -36,6 +36,19 @@ public class Session {
         active = true;
     }
 
+    public Session(SessionType type , Instant start, Instant end ){
+        this.type = type;
+        this.start = start;
+
+        if(end.getMillis() == 0){
+            this.active = true;
+        }else{
+            this.active = false;
+            this.end = end;
+        }
+
+    }
+
 
     /**
      * Ends the session.
@@ -87,15 +100,21 @@ public class Session {
     /**
      * Returns the end time of the session
      *
-     * If the Session is active, the method will return the current Instant as the end time.
+     * If the Session is active, the method will return EPOCH as end.
      *
-     * @return Now if active, the end time if the session is finished.
+     * @return EPOCH if active, the end time if the session is finished.
      */
     public Instant getEndTime() {
         if(active){
-            return new Instant();
+            return new Instant(0);
         }else{
             return end;
         }
     }
+
+    @Override
+    public String toString(){
+        return "Session start="+ start + " end= "+ end + " type=" + type;
+    }
+
 }
