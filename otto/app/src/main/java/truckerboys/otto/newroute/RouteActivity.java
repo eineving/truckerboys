@@ -2,9 +2,12 @@ package truckerboys.otto.newroute;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -155,15 +158,35 @@ public class RouteActivity extends Activity implements IEventListener {
         removeDestinationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 removeDestinationButton.setVisibility(View.INVISIBLE);
                 finalDestination.setText("");
             }
         });
 
+        navigate.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    navigate.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    navigate.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
+            }
+        });
+
         // Navigate button
         navigate.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
+
+
                 if (finalDestination != null && coder != null && routePresenter != null) {
                     if (finalDestination.getText() != null
                             && !finalDestination.getText().equals("")) {
@@ -248,6 +271,22 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+        history1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    history1.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    history1.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
+            }
+        });
+
         // When the user clicks the destination selected
         history2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,6 +295,22 @@ public class RouteActivity extends Activity implements IEventListener {
                 routePresenter.sendLocation("" + history2Text.getText(),
                         new ArrayList<String>(), coder);
 
+            }
+        });
+
+        history2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    history2.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    history2.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
             }
         });
 
@@ -270,10 +325,27 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+        history3.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    history3.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    history3.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
+            }
+        });
+
         // When the user clicks the destination selected
         addButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (finalDestination != null && search != null) {
                     finalDestination.setText(search.getText());
                     tempLocation = search.getText().toString();
