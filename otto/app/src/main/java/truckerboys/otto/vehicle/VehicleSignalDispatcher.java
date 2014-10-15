@@ -1,6 +1,7 @@
 package truckerboys.otto.vehicle;
 
 import android.swedspot.automotiveapi.AutomotiveSignal;
+import android.util.Log;
 
 import com.swedspot.automotiveapi.AutomotiveListener;
 
@@ -30,6 +31,7 @@ class VehicleSignalDispatcher implements AutomotiveListener {
         }
         if (!subs.get(id).contains(listener)) {
             subs.get(id).add(listener);
+            Log.w("SIGNAL", "Added listener to signal: " + id);
         }
     }
 
@@ -68,6 +70,7 @@ class VehicleSignalDispatcher implements AutomotiveListener {
      */
     @Override
     public void receive(AutomotiveSignal signal) {
+        Log.w("SIGNAL" , "SIGNAL RECEIVED " + signal.getSignalId());
         for (IVehicleListener listener : subs.get(signal.getSignalId())) {
             listener.receive(signal);
         }
@@ -76,11 +79,11 @@ class VehicleSignalDispatcher implements AutomotiveListener {
 
     @Override
     public void timeout(int i) {
-
+        Log.w("SIGNAL" , "SIGNAL TIMEOUT");
     }
 
     @Override
     public void notAllowed(int i) {
-        System.err.println("Not allowed called, this shouldn't happen. Code: " + i + " . Contact swedspot" );
+        Log.w("SIGNAL" , "SIGNAL NOT ALLOWED");
     }
 }

@@ -46,4 +46,13 @@ public class MapLocation extends Location{
     public void setEta(Duration eta) {
         this.eta = eta;
     }
+
+    /**
+     * Checks if the locations have the same coordinates.
+     * @param rhs Map location to compare with.
+     * @return true if the locations have the same coordinates.
+     */
+    public boolean equalCoordinates(MapLocation rhs){
+        return (rhs.getLatitude() == getLatitude() && rhs.getLongitude() == getLongitude());
+    }
 }

@@ -1,5 +1,7 @@
 package truckerboys.otto.vehicle;
 
+import android.util.Log;
+
 import com.swedspot.automotiveapi.AutomotiveFactory;
 import com.swedspot.automotiveapi.AutomotiveManager;
 import com.swedspot.vil.policy.AutomotiveCertificate;
@@ -12,7 +14,6 @@ public class VehicleInterface {
 
     private final static VehicleSignalDispatcher vehicleDispatcher = new VehicleSignalDispatcher();
     private final static DistractionSignalDispatcher distractionDispatcher = new DistractionSignalDispatcher();
-    //Automotive certificate? how?
     private final static AutomotiveManager manager = AutomotiveFactory.createAutomotiveManagerInstance(new AutomotiveCertificate(new byte[0]), vehicleDispatcher, distractionDispatcher);
 
 
@@ -24,6 +25,7 @@ public class VehicleInterface {
     public static void subscribe(IVehicleListener listener, int... signalIds) {
         vehicleDispatcher.subscribe(listener, signalIds);
         manager.register(signalIds);
+        Log.w("SIGNAL", "MANAGER SUBSCRIBE");
     }
 
     /**
@@ -60,4 +62,11 @@ public class VehicleInterface {
        return manager.isSignalAvailable(signalID);
     }
 
+    /**
+     * Request signals by signal ID.
+      * @param signals The signals you want to receive.
+     */
+    public static void requestSignal(int... signals){
+        manager.requestValue(signals);
+    }
 }

@@ -18,34 +18,20 @@ import truckerboys.otto.IView;
  *
  * Handles communication between MapView and MapModel.
  */
-public class MapPresenter implements GoogleMap.OnCameraChangeListener, IEventListener, IView {
+public class MapPresenter implements IEventListener, IView {
     private MapModel mapModel;
     private MapView mapView;
 
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
-        this.mapView.setOnCameraChangeListener(this);
-
         this.mapModel = new MapModel(tripPlanner);
-    }
-
-    public Route getRoute(){
-        return mapModel.getRoute();
-    }
-
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-        if (getRoute() != null) {
-            mapView.updatePolyline(getRoute(), cameraPosition.zoom);
-        }
-
-        mapView.adjustCamera(LocationHandler.getCurrentLocationAsLatLng(), cameraPosition.bearing);
     }
 
     @Override
     public void performEvent(Event event) {
         if (event.isType(ChangedRouteEvent.class)) {
-            mapView.updateCamera(getRoute());
+            mapView.calculateSteps(mapModel.getRoute());
+            mapView.drawPolyline();
         }
     }
 

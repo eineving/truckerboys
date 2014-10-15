@@ -209,9 +209,10 @@
                             android:layout_width="50dp"
                             android:layout_gravity="right"
                             android:layout_height="wrap_content"
-                            android:clickable="false"
                             android:id="@+id/remove_destination"
                             android:visibility="invisible"
+                            android:hapticFeedbackEnabled="true"
+                            android:clickable="true"
                             android:layout_toRightOf="@id/final_destination_text"
                             android:src="@android:drawable/ic_menu_close_clear_cancel"
                             android:background="#00ffc6f1" />
@@ -298,6 +299,7 @@
                     android:gravity="right">
 
                     <TextView
+
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:textColor="@color/basicblue_color"
@@ -310,8 +312,7 @@
                         android:id="@+id/navigate_button"
                         android:text="Navigate"
                         android:drawableLeft="@drawable/blue_ic_menu_send"
-                        android:gravity="center"
-                        android:textAlignment="viewEnd" />
+                        android:gravity="center"/>
 
                 </LinearLayout>
 

@@ -2,6 +2,8 @@ package truckerboys.otto.stats;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.scs.data.SCSFloat;
@@ -9,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,11 +44,13 @@ import truckerboys.otto.IView;
  * Class for displaying statistics for the user.
  */
 
-public class StatsView extends Fragment implements IEventListener, IVehicleListener {
+public class StatsView extends Fragment implements IView, IEventListener{
 
     private View rootView;
     private static final String SETTINGS = "Settings_file";
     private static final String STATS = "Stats_file";
+
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
 
     // Todays stats
     private TextView timeToday;
@@ -60,21 +65,8 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
     private TextView violations;
 
     // History stats
-    private TextView historyDate1;
-    private TextView historyTime1;
-    private TextView historyType1;
-    private TextView historyDate2;
-    private TextView historyTime2;
-    private TextView historyType2;
-    private TextView historyDate3;
-    private TextView historyTime3;
-    private TextView historyType3;
-    private TextView historyDate4;
-    private TextView historyTime4;
-    private TextView historyType4;
-    private TextView historyDate5;
-    private TextView historyTime5;
-    private TextView historyType5;
+    ArrayAdapter<String> sessionAdapter;
+    private ListView historyList;
 
     private String distanceUnit = "";
     private String fuelUnit = "";
@@ -88,30 +80,17 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView  = inflater.inflate(R.layout.fragment_stats, container, false);
 
-        // Subscribes to the signals wanted
-        VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER);
-        VehicleInterface.subscribe(this, VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
-
         // Creates TextViews from the fragment for daily stats
         timeToday = (TextView) rootView.findViewById(R.id.timeTodayTime);
         distanceByFuel = (TextView) rootView.findViewById(R.id.KmByFuel);
 
         // Session history
-        historyDate1 = (TextView) rootView.findViewById(R.id.history_date_1);
-        historyTime1 = (TextView) rootView.findViewById(R.id.history_time_1);
-        historyType1 = (TextView) rootView.findViewById(R.id.type_of_work_1);
-        historyDate2 = (TextView) rootView.findViewById(R.id.history_date_2);
-        historyTime2 = (TextView) rootView.findViewById(R.id.history_time_2);
-        historyType2 = (TextView) rootView.findViewById(R.id.type_of_work_2);
-        historyDate3 = (TextView) rootView.findViewById(R.id.history_date_3);
-        historyTime3 = (TextView) rootView.findViewById(R.id.history_time_3);
-        historyType3 = (TextView) rootView.findViewById(R.id.type_of_work_3);
-        historyDate4 = (TextView) rootView.findViewById(R.id.history_date_4);
-        historyTime4 = (TextView) rootView.findViewById(R.id.history_time_4);
-        historyType4 = (TextView) rootView.findViewById(R.id.type_of_work_4);
-        historyDate5 = (TextView) rootView.findViewById(R.id.history_date_5);
-        historyTime5 = (TextView) rootView.findViewById(R.id.history_time_5);
-        historyType5 = (TextView) rootView.findViewById(R.id.type_of_work_5);
+        historyList = (ListView) rootView.findViewById(R.id.sessionListView);
+
+        sessionAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_plain_text);
+
+        historyList.setAdapter(sessionAdapter);
+
 
         // Creates TextViews from the fragment for daily stats
         timeTotal = (TextView) rootView.findViewById(R.id.timeTotalTime);
@@ -123,7 +102,6 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
 
         // Restores preferences for settings in presenter
         EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
-
 
         return rootView;
     }
@@ -178,11 +156,7 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
 
         editor.putFloat("timeToday", Float.parseFloat(timeToday.getText().toString().substring(0, timeToday.getText().toString().length() - 2)));
         editor.putFloat("timeTotal", Float.parseFloat(timeTotal.getText().toString().substring(0, timeTotal.getText().toString().length() - 2)));
-
-        // editor.putFloat("distanceToday", Float.parseFloat(distanceToday.getText().toString().substring(0, distanceToday.getText().toString().length() - 3)));
         editor.putFloat("distanceTotal", Float.parseFloat(distanceTotal.getText().toString().substring(0, distanceTotal.getText().toString().length() - 3)));
-
-        // editor.putFloat("fuelToday", Float.parseFloat(fuelToday.getText().toString()));
         editor.putFloat("fuelTotal", Float.parseFloat(fuelTotal.getText().toString().substring(0, fuelTotal.getText().toString().length() - 2)));
         editor.putFloat("distanceByFuel", Float.parseFloat(distanceByFuel.getText().toString().substring(0, distanceByFuel.getText().toString().length() - 5)));
 
@@ -192,48 +166,18 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
 
     }
 
+
     /**
-     * Sets user history.
-     * Run this method when history is updated.
-     * @param history1
-     * @param history2
-     * @param history3
-     * @param history4
-     * @param history5
+     * Updates the list of previous sessions.
+     * @param sessionString data from previous sessions.
      */
-    public void setUserHistory(ArrayList<String> history1, ArrayList<String> history2,
-                               ArrayList<String> history3, ArrayList<String> history4,
-                               ArrayList<String> history5){
+    public void updateSessionHistory(String sessionString) {
+        sessionAdapter.add(sessionString);
 
-        if(history1.size() > 0) {
-            historyDate1.setText(history1.get(0));
-            historyTime1.setText(history1.get(1));
-            historyType1.setText(history1.get(3));
-        }
+        sessionAdapter.notifyDataSetChanged();
 
-        if(history2.size() > 0) {
-            historyDate2.setText(history2.get(0));
-            historyTime2.setText(history2.get(1));
-            historyType2.setText(history2.get(3));
-        }
-
-        if(history3.size() > 0) {
-            historyDate3.setText(history3.get(0));
-            historyTime3.setText(history3.get(1));
-            historyType3.setText(history3.get(3));
-        }
-
-        if(history4.size() > 0) {
-            historyDate4.setText(history4.get(0));
-            historyTime4.setText(history4.get(1));
-            historyType4.setText(history4.get(3));
-        }
-
-        if(history5.size() > 0) {
-            historyDate5.setText(history5.get(0));
-            historyTime5.setText(history5.get(1));
-            historyType5.setText(history5.get(3));
-        }
+        historyList.setLayoutParams(new LinearLayout.LayoutParams(
+                1000, historyList.getAdapter().getCount()*125));
 
     }
 
@@ -242,8 +186,7 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
      * This method is to be called from the presenter.
      * @param system metric/imperial
      */
-    public void
-    updateUnits(String system) {
+    public void updateUnits(String system) {
         if(system.equals("imperial")) {
             fuelUnit = ""; // MILES
             distanceUnit = ""; // GALLONS
@@ -281,17 +224,9 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
             distanceTotal.setText(Math.floor(statsTotal[1]*100)/100 + " km");
         }
 
-        /*if(distanceTotal != null) {
-            distanceTotal.setText(Math.floor(34.5223*100)/100 + " km");
-        }*/
-
         if(fuelTotal != null) {
             fuelTotal.setText(Math.floor(statsTotal[2]*100)/100 + " L");
         }
-
-        /*if(fuelTotal != null) {
-            fuelTotal.setText(Math.floor(654.3424*100)/100 + " L");
-        }*/
 
 
         // Sets violations
@@ -300,8 +235,27 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
         }
     }
 
+    public Fragment getFragment() {
+        return this;
+    }
+
     @Override
-    public void performEvent(Event event) {
+    public String getName() {
+        return "Statistics";
+    }
+
+    private void updateTotalDistance(TotalDistanceEvent e){
+        //The signals unit should be meters..
+        distanceTotal.setText(e.getTotalDistance()/1000 + " km");
+    }
+
+    private void updateFuelConsumption(DistanceByFuelEvent e){
+        distanceByFuel.setText(e.getDistanceByFuel() + " km/L");
+    }
+
+
+    @Override
+    public void performEvent(final Event event) {
         if(event.isType(SettingsChangedEvent.class)) {
 
             // read from file and set String called system based on that
@@ -317,46 +271,25 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
         if(event.isType(TotalDistanceEvent.class)) {
             // Update view if new total distance signal is sent
 
-            distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
+            //distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
 
+            Runnable updateDistance = new Runnable() {
+                public void run() {
+                    updateTotalDistance((TotalDistanceEvent) event);
+                }
+            };
+            updateHandler.post(updateDistance);
         }
 
         if(event.isType(DistanceByFuelEvent.class)) {
             // Update view if new total distance/fuel signal is sent
-
-            distanceByFuel.setText(((DistanceByFuelEvent)event).getDistanceByFuel() + " km/L");
-
+            Runnable updateFuelConsumption = new Runnable() {
+                public void run() {
+                    updateFuelConsumption((DistanceByFuelEvent)event);
+                }
+            };
+            updateHandler.post(updateFuelConsumption);
         }
     }
 
-    /**
-     * Listens to signals from the truck and sends
-     * a new Event trough the EventTruck.
-     * This method can't update the view by it self
-     * due to thread unsafety.
-     * @param signal the signal sent from the truck.
-     */
-    @Override
-    public void receive(AutomotiveSignal signal) {
-       // TODO Get fuel consumption
-
-        switch (signal.getSignalId()) {
-
-            case VehicleSignalID.KM_PER_LITER:
-
-                // Gets the total distance by fuel and updates the listeners
-                Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
-
-                EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
-
-            case VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE:
-
-                // Gets the total distance and updates the listeners
-                Float distance = ((SCSFloat) signal.getData()).getFloatValue();
-
-                EventTruck.getInstance().newEvent(new TotalDistanceEvent(Math.floor(distance * 100)/100));
-
-        }
-
-    }
 }
