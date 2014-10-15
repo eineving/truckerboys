@@ -10,6 +10,7 @@ import java.util.List;
 
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
 /**
@@ -65,8 +66,8 @@ public class GooglePlacesJSONDecoder {
         return decoded;
     }
 
-    public static ArrayList<RestLocation> getRestLocations(String encoded) {
-        ArrayList<RestLocation> decoded = new ArrayList<RestLocation>();
+    public static ArrayList<MapLocation> getRestLocations(String encoded) {
+        ArrayList<MapLocation> decoded = new ArrayList<MapLocation>();
 
         //Creating a HashMap from from the whole response
         HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(encoded, HashMap.class);

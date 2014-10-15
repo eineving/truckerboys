@@ -1,25 +1,28 @@
 package truckerboys.otto.home;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import truckerboys.otto.R;
 import truckerboys.otto.newroute.RouteActivity;
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * Central home view from where the user navigates
+ * to the rest of the app
  */
 public class HomeView extends Fragment implements IView {
     private View rootView;
     private HomePresenter presenter;
     private View newRouteButton;
-    private View continueRouteButton;
     private View mapsButton;
     private View clockButton;
     private View statsButton;
@@ -42,7 +45,6 @@ public class HomeView extends Fragment implements IView {
 
     public void defineButtons() {
         newRouteButton = rootView.findViewById(R.id.newRouteButton);
-        continueRouteButton = rootView.findViewById(R.id.continueRouteButton);
         mapsButton = rootView.findViewById(R.id.mapsButton);
         clockButton = rootView.findViewById(R.id.clockButton);
         statsButton = rootView.findViewById(R.id.statsButton);
@@ -61,15 +63,22 @@ public class HomeView extends Fragment implements IView {
                 //((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
                 Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
                 getActivity().startActivity(newRouteIntent);
-
-
             }
         });
 
-        continueRouteButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
+        newRouteButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    newRouteButton.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    newRouteButton.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
             }
         });
 
@@ -80,10 +89,42 @@ public class HomeView extends Fragment implements IView {
             }
         });
 
+        mapsButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    mapsButton.setBackgroundColor(Color.LTGRAY);
+
+                } else {
+                    mapsButton.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
+            }
+        });
+
         clockButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
                 ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+            }
+        });
+
+        clockButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    clockButton.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    clockButton.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
             }
         });
 
@@ -94,10 +135,42 @@ public class HomeView extends Fragment implements IView {
             }
         });
 
+        statsButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    statsButton.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    statsButton.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
+            }
+        });
+
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
                 ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(4);
+            }
+        });
+
+        settingsButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    settingsButton.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    settingsButton.setBackgroundColor(Color.TRANSPARENT);
+
+                }
+
+                return false;
             }
         });
 

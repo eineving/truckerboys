@@ -4,12 +4,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 
+import truckerboys.otto.driver.User;
+import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -21,8 +23,8 @@ public class ClockPresenter  implements IView, IEventListener {
     private Handler updateHandler;
     private Runnable update;
 
-    public ClockPresenter(TripPlanner tripPlanner){
-        model = new ClockModel(tripPlanner);
+    public ClockPresenter(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user){
+        model = new ClockModel(tripPlanner, regulationHandler, user);
         view = new ClockView();
 
         EventTruck.getInstance().subscribe(this);
@@ -61,7 +63,7 @@ public class ClockPresenter  implements IView, IEventListener {
     @Override
     public void performEvent(Event event) {
         if(event.isType(ChangedRouteEvent.class)){
-            model.setRoute(((ChangedRouteEvent)event).getRoute());
+            model.processChangedRoute();
             view.setRecommendedStop(model.getRecommendedStop());
             view.setAltStops(model.getAltStops());
             view.setNextDestination(model.getNextDestination());

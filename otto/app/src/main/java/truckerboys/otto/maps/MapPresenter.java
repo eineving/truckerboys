@@ -1,21 +1,47 @@
 package truckerboys.otto.maps;
 
+import android.support.v4.app.Fragment;
+
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.LocationHandler;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ *
+ * Handles communication between MapView and MapModel.
  */
-public class MapPresenter {
+public class MapPresenter implements IEventListener, IView {
     private MapModel mapModel;
+    private MapView mapView;
 
-    public MapPresenter(TripPlanner tripPlanner, GoogleMap googleMap){
-        this.mapModel = new MapModel(tripPlanner, googleMap);
+    public MapPresenter(TripPlanner tripPlanner){
+        this.mapView = new MapView();
+        this.mapModel = new MapModel(tripPlanner);
     }
 
-    public Route getOriginalRoute(){
-        return mapModel.getOriginalRoute();
+    @Override
+    public void performEvent(Event event) {
+        if (event.isType(ChangedRouteEvent.class)) {
+            mapView.calculateSteps(mapModel.getRoute());
+            mapView.drawPolyline();
+        }
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return mapView;
+    }
+
+    @Override
+    public String getName() {
+        return "Map";
     }
 }

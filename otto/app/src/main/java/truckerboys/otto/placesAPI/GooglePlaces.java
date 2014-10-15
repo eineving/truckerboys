@@ -39,11 +39,11 @@ public class GooglePlaces implements IPlaces {
 
 
     @Override
-    public ArrayList<RestLocation> getNearbyRestLocations(LatLng position) {
+    public ArrayList<MapLocation> getNearbyRestLocations(LatLng position) {
         String response;
 
         //TODO What types to search for?  https://developers.google.com/places/documentation/search
-        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&radius=3000&types=parking" + "&key=" + GOOGLE_KEY;
+        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&radius=3000&types=gas_station" + "&key=" + GOOGLE_KEY;
 
         try {
             response = new GoogleRequesterHandler().execute(request).get();

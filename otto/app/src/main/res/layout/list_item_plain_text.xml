@@ -8,9 +8,7 @@
     android:textSize="14dp"
     android:gravity="center_vertical"
     android:textStyle="bold"
-    android:padding="5dp"
-    android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
-    android:text="Göteborg"
+    android:padding="10dp"
     android:layout_height="match_parent">
 
 </TextView>

@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import truckerboys.otto.directionsAPI.Route;
+import truckerboys.otto.driver.User;
+import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TimeLeft;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
@@ -25,13 +28,17 @@ public class ClockModel {
     private long timeDifference;
 
     private TripPlanner tripPlanner;
+    private IRegulationHandler regulationHandler;
+    private User user;
     private Route route;
 
     private ArrayList<MapLocation> altStops;
 
-    public ClockModel(TripPlanner tripPlanner) {
+    public ClockModel(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user) {
 
         this.tripPlanner = tripPlanner;
+        this.regulationHandler = regulationHandler;
+        this.user = user;
 
         lastTimeUpdate = new Instant();
         timeLeftDuration = new Duration(Duration.ZERO);
@@ -68,9 +75,14 @@ public class ClockModel {
      * Sets the time left until violation and the stops.
      * Called when the route is changed.
      */
-    private void processChangedRoute() {
+    public void processChangedRoute() {
 
-        timeLeft = route.getTimeLeftOnSession();
+        try {
+            route = tripPlanner.getRoute();
+        }catch (NoActiveRouteException e){
+            route = null;
+        }
+        timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
         timeLeftDuration = timeLeft.getTimeLeft();
         timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
 
@@ -110,15 +122,6 @@ public class ClockModel {
      */
     public TimeLeft getTimeLeft() {
         return timeLeft;
-    }
-
-    /**
-     * Sets the route in clock
-     * @param newRoute The route
-     */
-    public void setRoute(Route newRoute){
-        route = newRoute;
-        processChangedRoute();
     }
 
     public Route getRoute(){

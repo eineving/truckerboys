@@ -5,25 +5,40 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.automotiveapi.AutomotiveSignalId;
+import android.swedspot.scs.data.SCSFloat;
+import android.swedspot.scs.data.SCSLong;
+import android.util.Log;
 
-import com.swedspot.automotiveapi.AutomotiveManager;
+import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
+
+import truckerboys.otto.IView;
+import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.SessionHistory;
+import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
+import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
+import truckerboys.otto.vehicle.VehicleInterface;
 import truckerboys.otto.vehicle.VehicleSignalID;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * Class for handling most logic for the StatsView showing
+ * usefull statistics for the user.
  */
-public class StatsPresenter implements IEventListener, IVehicleListener {
+public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     private StatsModel model;
 
     private StatsView view;
@@ -33,11 +48,16 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     public static final String STATS = "Stats_file";
     public static final String SETTINGS = "Settings_file";
 
-    public StatsPresenter(StatsView view){
-        this.view = view;
+    public StatsPresenter(){
+        this.view = new StatsView();
         this.model = new StatsModel();
 
+        // Subscribes to the signals wanted
+        Log.w("SIGNAL", "SUBSCRIBED");
+        VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER,VehicleSignalID.TOTAL_VEHICLE_DISTANCE);
+
         EventTruck.getInstance().subscribe(this);
+        EventTruck.getInstance().subscribe(view);
     }
 
     /**
@@ -49,21 +69,15 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
 
         // Gets today stats
         double timeToday = stats.getFloat("timeToday", 0);
-        // double distanceToday = stats.getFloat("distanceToday", 5); // Implement later
-        // double fuelToday = stats.getFloat("fuelToday", 5);
-        double distanceByFuel = stats.getFloat("distanceByFuel", 5);
+        double distanceByFuel = stats.getFloat("distanceByFuel", 0);
 
         // Gets total stats
         double timeTotal = stats.getFloat("timeTotal", 0);
-        double distanceTotal = stats.getFloat("distanceTotal", 5);
-        double fuelTotal = stats.getFloat("fuelTotal", 5);
-        // double fuelByDistanceTotal = stats.getFloat("fuelByDistanceTotal", 5);
+        double distanceTotal = stats.getFloat("distanceTotal", 0);
+        double fuelTotal = stats.getFloat("fuelTotal", 0);
 
         // Gets total stats
         int violation = stats.getInt("violation", 0);
-
- //       double[] statsToday = {timeToday, distanceToday, fuelToday, fuelByDistanceToday};
- //       double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal};
 
         double[] statsToday = {timeToday, 0, 0, distanceByFuel};
         double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, 0};
@@ -80,6 +94,7 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
      */
     public void setStats(double[] statsToday, double[] statsTotal, int violations) {
         // Sets the stats in the model
+
         model.setStats(statsToday, statsTotal, violations);
 
         // Updates the view with stats
@@ -93,11 +108,9 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
      * @param system metric/imperial - defaults to metric.
      */
     public void setUnits(String system) {
-        model.setUnits(system);
-        view.updateUnits(system);
-
-       // double[] statsToday = {model.getTimeToday(), model.getDistanceToday(), model.getFuelToday(), model.getfuelByDistanceToday()};
-       // double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};
+        // TODO implement when better switching between units has been set
+        // model.setUnits(system);
+        // view.updateUnits(system);
 
 
         double[] statsToday = {model.getTimeToday(), 0, 0, 0};
@@ -119,8 +132,58 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     }
 
 
+    /**
+     * Loads session history from user database.
+     */
+    public void loadUserHistory() {
+
+        SessionHistory userHistory = User.getInstance().getHistory();
+
+        // Adds dummy session history
+        userHistory.addSession(new Session(SessionType.DRIVING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
+
+        // Ends them
+        for(Session session : userHistory.getSessions()){
+            session.end();
+        }
+
+        String sessionString = "";
+
+        // Update statsview with the new session string
+        for(Session session : userHistory.getSessions()) {
+
+            // If the session isn't active
+            if(!session.isActive()) {
+                sessionString = new DateTime(session.getStartTime()).getYear()
+                        + "-" + new DateTime(session.getStartTime()).getMonthOfYear()
+                        + "-" + new DateTime(session.getStartTime()).getDayOfMonth()
+                        + ": " + session.getSessionType().toString()
+                        + " for " + session.getDuration().getStandardHours()
+                        + "h " + session.getDuration().getStandardMinutes() + "min";
+
+
+                // Update statsview with the new session string
+                view.updateSessionHistory(sessionString);
+
+            }
+
+        }
+
+        model.updateSessionHistory(sessionString);
+    }
+
     @Override
     public void performEvent(Event event) {
+
+        if(event.isType(RestorePreferencesEvent.class)) {
+            restorePreferences();
+
+            loadUserHistory();
+        }
 
         // If the new time has been set in the model
         if(event.isType(TimeDrivenEvent.class)) {
@@ -141,8 +204,48 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
         }
     }
 
+    /**
+     * Listens to signals from the truck and sends
+     * a new Event trough the EventTruck.
+     * This method can't update the view by it self
+     * due to thread unsafety.
+     * @param signal the signal sent from the truck.
+     */
     @Override
     public void receive(AutomotiveSignal signal) {
+        switch (signal.getSignalId()) {
 
+            case VehicleSignalID.KM_PER_LITER:
+
+
+                // Gets the total distance by fuel and updates the listeners
+                Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
+
+                EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
+
+                Log.w("SIGNAL", "FUEL");
+                break;
+
+            case VehicleSignalID.TOTAL_VEHICLE_DISTANCE:
+
+                // Gets the total distance and updates the listeners
+                long distance = ((SCSLong) signal.getData()).getLongValue();
+
+                EventTruck.getInstance().newEvent(new TotalDistanceEvent(distance));
+
+                Log.w("SIGNAL", "DISTANCE");
+                break;
+        }
+
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return view;
+    }
+
+    @Override
+    public String getName() {
+        return "Statistics";
     }
 }
