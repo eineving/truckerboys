@@ -22,7 +22,7 @@ public class StatsModel{
     private double timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal;
     private int violations;
 
-    ArrayList<String> sessionHistory;
+    ArrayList<String> sessionHistory = new ArrayList<String>();
 
     private String fuelUnit = "L";
     private String distanceUnit = "Km";
