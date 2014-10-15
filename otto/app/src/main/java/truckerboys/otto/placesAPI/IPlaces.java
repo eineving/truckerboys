@@ -5,38 +5,23 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
 public interface IPlaces {
     /**
-     * Get a suggested address (location) from a user input String
-     * @param input user input
-     * @return suggested addresses
+     * Get the closest rest locations to given position (gas stations included).
+     * @param position target position to calculate from.
+     * @return rest locations nearby given positions (gas stations included).
      */
-    public List<String> getSuggestedAddresses(String input);
+    public ArrayList<MapLocation> getNearbyRestLocations(LatLng position);
 
     /**
-     *
-     * Get a suggested address (location) from a user input String
-     * @param input user input
-     * @param currentLocation location to focus the searches from
-     * @return suggested addresses
+     * Get the closest gas stations to given position.
+     * @param position target position to calculate from.
+     * @return gas stations nearby given positions.
      */
-    public List<String> getSuggestedAddresses(String input, MapLocation currentLocation);
-
-    /**
-     * Get the closest rest locations to given position
-     * @param position target position to calculate from
-     * @return rest locations nearby given positions
-     */
-    public ArrayList<RestLocation> getNearbyRestLocations(LatLng position);
-
-    /**
-     * Get the closest gas stations to given position
-     * @param position target position to calculate from
-     * @return gas stations nearby given positions
-     */
-    public ArrayList<GasStation> getNearbyGasStations(LatLng position);
+    public ArrayList<GasStation> getNearbyGasStations(LatLng position) throws NoConnectionException;
 }

@@ -17,37 +17,35 @@ public class ClockModel {
 
     private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
-    private RestStop stop1, stop2, stop3;
+    private RestStop recStop, firstAltStop, secAltStop;
     private long timeDifference;
-    private ArrayList<RestStop> restStops = new ArrayList<RestStop>();
 
     public ClockModel() {
+
+        //TODO: Change to real values when Tripplanner is implemented
         lastTimeUpdate = new Instant();
         timeLeftDuration = new Duration(120 * 60 * 1000);
-        timeLeftExtendedDuration = new Duration(180 * 60 * 1000);
+        timeLeftExtendedDuration = new Duration(60 * 60 * 1000);
         timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
 
         //Placeholders until TripPlanner is fully implemented
-        stop1 = new RestStop(new Duration(45 * 60 * 1000), "Name of first stop");
-        stop2 = new RestStop(new Duration(110 * 60 * 1000), "Name of second stop");
-        stop3 = new RestStop(new Duration(140 * 60 * 1000), "Name of third stop");
-        restStops.add(stop1);
-        restStops.add(stop2);
-        restStops.add(stop3);
+        recStop = new RestStop(new Duration(45 * 60 * 1000), "Name of first stop");
+        firstAltStop = new RestStop(new Duration(110 * 60 * 1000), "Name of second stop");
+        secAltStop = new RestStop(new Duration(140 * 60 * 1000), "Name of third stop");
 
-        //TODO: Add when regulations and user is implemented
-        //timeLeft = tripPlanner.getTimeleft();
     }
 
-
+    /**
+     * Updates the ETAs of the stops and until violation
+     */
     public void update() {
         timeNow = new Instant();
         timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
         timeLeftDuration = timeLeftDuration.minus(timeDifference);
         timeLeftExtendedDuration = timeLeftDuration.minus(timeDifference);
-        stop1.setTimeLeft(stop1.getTimeLeft().minus(timeDifference));
-        stop2.setTimeLeft(stop2.getTimeLeft().minus(timeDifference));
-        stop3.setTimeLeft(stop3.getTimeLeft().minus(timeDifference));
+        recStop.setTimeLeft(recStop.getTimeLeft().minus(timeDifference));
+        firstAltStop.setTimeLeft(firstAltStop.getTimeLeft().minus(timeDifference));
+        secAltStop.setTimeLeft(secAltStop.getTimeLeft().minus(timeDifference));
         lastTimeUpdate = timeNow;
     }
 
@@ -55,13 +53,31 @@ public class ClockModel {
         //TODO: Add checking for reststops with TripPlanner
     }
 
-    public ArrayList<RestStop> getRestStops() {
-        return restStops;
+    /**
+     * Returns the recommended reststop
+     * @return The recommended reststop
+     */
+    public RestStop getRecommendedRestStop(){
+        return recStop;
+    }
+
+    /**
+     * Returns the first alternative reststop
+     * @return The first alternative reststop
+     */
+    public RestStop getFirstAltReststop() {
+        return firstAltStop;
+    }
+
+    /**
+     * Returns the second alternative reststop
+     * @return The second alternative reststop
+     */
+    public RestStop getSecondAltReststop() {
+        return secAltStop;
     }
 
     public TimeLeft getTimeLeft() {
-        //TODO: Add when TripPlanner is implemented
-        //return timeLeft.getTimeLeft();
         return new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
     }
 }

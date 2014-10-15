@@ -1,18 +1,16 @@
-package utils;
+package truckerboys.otto.placeSuggestion;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
-import truckerboys.otto.directionsAPI.GoogleDirections;
-import truckerboys.otto.driver.User;
-import truckerboys.otto.placesAPI.GooglePlaces;
-import truckerboys.otto.planner.EURegulationHandler;
-import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.placeSuggestion.GooglePlacesAutoComplete;
+import truckerboys.otto.placeSuggestion.IPlacesAutoComplete;
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 
 
 /**
@@ -25,14 +23,12 @@ import truckerboys.otto.planner.TripPlanner;
  * Credits to: Google.
  */
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
-    private ArrayList<String> resultList;
-    private TripPlanner tripPlanner;
+    private ArrayList<String> resultList = new ArrayList<String>();
+    private IPlacesAutoComplete suggestionsProvider;
 
     public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
-
-        // TODO: Use a new or reuse tripplanner?
-        tripPlanner = new TripPlanner(new EURegulationHandler(), new GoogleDirections(), new GooglePlaces(), User.getInstance());
+        suggestionsProvider = new GooglePlacesAutoComplete();
 
     }
 
@@ -60,14 +56,21 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
 
                 FilterResults filterResults = new FilterResults();
 
-                // Removes all white spaces
-                charSequence = ((String)charSequence).replaceAll("\\s", "");
-
-                System.out.println("**************" + charSequence +"************");
-
                 if(charSequence != null) {
+
+                    // Removes all white spaces
+                    charSequence = ((String)charSequence).replaceAll("\\s", "");
+
                     // Retrieves autocomplete results from TripPlanner class
-                    resultList = (ArrayList<String>)tripPlanner.getAddressSuggestion(charSequence.toString());
+                    try {
+                        resultList = (ArrayList<String>) suggestionsProvider.getSuggestedAddresses(charSequence.toString());
+                    } catch (InvalidRequestException e) {
+                        e.printStackTrace();
+                        //TODO Implement catch
+                    } catch (NoConnectionException e) {
+                        //TODO Implement catch
+                        e.printStackTrace();
+                    }
 
                     // Assign the data to the FilterResults
                     filterResults.values = resultList;

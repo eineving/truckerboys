@@ -16,18 +16,26 @@
             android:value="AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk"/>
 
         <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait">
+            android:name=".MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            </activity>
+        </activity>
+
+        <activity
+            android:name=".OTTOActivity"
+            android:screenOrientation="portrait">
+        </activity>
 
         <activity
             android:name=".newroute.RouteActivity"
             android:windowSoftInputMode="stateVisible">
+        </activity>
+
+        <activity
+            android:name=".NoConnectionActivity">
         </activity>
 
     </application>

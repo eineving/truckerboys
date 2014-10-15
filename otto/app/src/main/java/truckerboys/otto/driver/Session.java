@@ -115,12 +115,23 @@ public class Session {
      * <p/>
      * If the Session is active, the method will return the current Instant as the end time.
      *
+<<<<<<< HEAD
      * @return Now if active, the end time if the session is finished.
      */
     public Instant getEndTime() {
         if (active) {
             return new Instant();
         } else {
+=======
+     * If the Session is active, the method will return the current Instant as the end time.
+     *
+     * @return Now if active, the end time if the session is finished.
+     */
+    public Instant getEndTime() {
+        if(active){
+            return new Instant();
+        }else{
+>>>>>>> 5fb3f1692d54b7db1623cc9d268dcda9639a8606
             return end;
         }
     }

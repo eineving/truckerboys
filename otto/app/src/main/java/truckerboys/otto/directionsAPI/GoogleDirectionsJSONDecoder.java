@@ -11,106 +11,121 @@ import org.joda.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
+ *
  * @author Daniel Eineving
  */
 public class GoogleDirectionsJSONDecoder {
     /**
      * Creates a route from a Google Direction JSON response
-     *
+     * <p/>
      * OBS: This method uses very much typecasting,
      * think twice before changing anything
      *
      * @param response JSON response
      * @return a decoded Route
      */
-    public static Route stringToRoute(String response) {
+    public static Route stringToRoute(String response) throws InvalidRequestException {
+
         MapLocation finalDestination;
         Duration eta;
         int distance = 0;
         ArrayList<LatLng> overviewPolyline;
         ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
         ArrayList<MapLocation> checkPoints = new ArrayList<MapLocation>();
+        Duration etaToFirstCheckpoint = null;
+        try {
 
-        //Creating a HashMap from from the whole response
-        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
+            //Creating a HashMap from from the whole response
+            HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
 
-        //Making all routes into HashMaps
-        ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
+            //Making all routes into HashMaps
+            ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
 
-        ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
-        ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
+            ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
+            ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
 
-        //Combines all the legs to one common array
-        for (LinkedTreeMap<String, Object> route : routes) {
-            for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
-                allLegs.add(leg);
-        }
-
-        //Combines all steps to one common array
-        for (LinkedTreeMap<String, Object> leg : allLegs) {
-            for (LinkedTreeMap<String, Object> step : (ArrayList<LinkedTreeMap<String, Object>>) leg.get("steps"))
-                allSteps.add(step);
-        }
-
-        //TODO remove printouts
-        Log.w("Routes", "" + routes.size());
-        Log.w("Legs", "" + allLegs.size());
-        Log.w("Steps", "" + allSteps.size());
-
-
-        //Creating the final destination
-        LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
-        LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
-                ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
-        finalDestination = new MapLocation(coordinate);
-        finalDestination.setAddress((String) lastLeg.get("end_address"));
-
-        //Creating ETA and distance
-        int etaSeconds = 0;
-        for (LinkedTreeMap<String, Object> leg : allLegs) {
-            //Some shady typecasting here, take care when changing
-            etaSeconds +=  ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
-            distance +=  ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
-        }
-        eta = new Duration(etaSeconds * 1000);
-
-        //Creating big polyline
-        for (LinkedTreeMap<String, Object> step : allSteps) {
-            for (LatLng temp : polylineDecoder(((LinkedTreeMap<String, String>) step.get("polyline")).get("points"))){
-                detailedPolyline.add(temp);
+            //Combines all the legs to one common array
+            for (LinkedTreeMap<String, Object> route : routes) {
+                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
+                    allLegs.add(leg);
             }
-        }
-        //Getting the overview polyline
-        overviewPolyline = polylineDecoder(((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points"));
 
-        //Getting checkpoints if there are any
-        if(allLegs.size() > 1){
-            for(LinkedTreeMap<String, Object> leg : allLegs){
-                LinkedTreeMap<String, Double> startLocation =
-                        (LinkedTreeMap<String, Double>) leg.get("start_location");
-                checkPoints.add(new MapLocation(new LatLng(
-                        startLocation.get("lat"),startLocation.get("lng"))));
+            //Combines all steps to one common array
+            for (LinkedTreeMap<String, Object> leg : allLegs) {
+                for (LinkedTreeMap<String, Object> step : (ArrayList<LinkedTreeMap<String, Object>>) leg.get("steps"))
+                    allSteps.add(step);
             }
+
+            //TODO remove printouts
+            Log.w("Routes", "" + routes.size());
+            Log.w("Legs", "" + allLegs.size());
+            Log.w("Steps", "" + allSteps.size());
+
+
+            //Creating the final destination
+            LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
+            LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
+                    ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
+            finalDestination = new MapLocation(coordinate);
+            finalDestination.setAddress((String) lastLeg.get("end_address"));
+
+            //Creating ETA and distance
+            int etaSeconds = 0;
+            for (LinkedTreeMap<String, Object> leg : allLegs) {
+                //Some shady typecasting here, take care when changing
+                etaSeconds += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
+                distance += ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
+            }
+            eta = new Duration(etaSeconds * 1000);
+
+
+            //Creating big polyline
+            for (LinkedTreeMap<String, Object> step : allSteps) {
+                for (LatLng temp : polylineDecoder(((LinkedTreeMap<String, String>) step.get("polyline")).get("points"))) {
+                    detailedPolyline.add(temp);
+                }
+            }
+            //Getting the overview polyline
+            overviewPolyline = polylineDecoder(((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points"));
+
+            //Getting checkpoints if there are any
+            if (allLegs.size() > 1) {
+                for (LinkedTreeMap<String, Object> leg : allLegs) {
+                    LinkedTreeMap<String, Double> startLocation =
+                            (LinkedTreeMap<String, Double>) leg.get("start_location");
+                    checkPoints.add(new MapLocation(new LatLng(
+                            startLocation.get("lat"), startLocation.get("lng"))));
+                }
+                //Getting the first checkpoints eta
+                LinkedTreeMap<String, Object> firstLeg = allLegs.get(0);
+                Log.w("firstCheckpoint" , ((LinkedTreeMap<String, Double>) firstLeg.get("duration")).get("value").toString());
+                int temp = 0;
+                temp += ((LinkedTreeMap<String, Double>) firstLeg.get("duration")).get("value");
+                    etaToFirstCheckpoint = new Duration( temp * 1000);
+            }
+
+
+            //TODO remove printouts
+            Log.w("finalDestination", finalDestination.getAddress());
+            Log.w("ETA", eta.toStandardSeconds().getSeconds() + "");
+            Log.w("Distance", distance + "");
+            Log.w("CheckPoints", checkPoints.size() + "");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InvalidRequestException(e.getMessage());
         }
 
-
-        //TODO remove printouts
-        Log.w("finalDestination", finalDestination.getAddress());
-        Log.w("ETA", eta.toStandardSeconds().getSeconds() + "");
-        Log.w("Distance", distance + "");
-        Log.w("CheckPoints", checkPoints.size() + "");
-
-
-        return new Route(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkPoints);
+        return new Route(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkPoints, etaToFirstCheckpoint);
     }
 
     /**
      * Decodes a polyline into an array of LatLng
-     *
+     * <p/>
      * Based on example from
      * http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-locations-using-google-directions-in-google-map-android-api-v2/
      * Written by George Mathew
@@ -154,32 +169,39 @@ public class GoogleDirectionsJSONDecoder {
 
     /**
      * Creates a ETA duration from a Google Direction JSON response
+     *
      * @param response Google Direction JSON
      * @return ETA to requested location
      */
-    public static Duration etaToDestination(String response) {
+    public static Duration etaToDestination(String response) throws InvalidRequestException {
+        int etaSeconds = 0;
         //Some shady typecasting here, take care when changing
 
-        //Creating a HashMap from from the whole response
-        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
+        try {
+            //Creating a HashMap from from the whole response
+            HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
 
-        //Making all routes into HashMaps
-        ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
+            //Making all routes into HashMaps
+            ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
 
-        ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
-        ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
+            ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
+            ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
 
-        //Combines all the legs to one common array
-        for (LinkedTreeMap<String, Object> route : routes) {
-            for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
-                allLegs.add(leg);
+            //Combines all the legs to one common array
+            for (LinkedTreeMap<String, Object> route : routes) {
+                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
+                    allLegs.add(leg);
+            }
+
+            //Creating ETA
+
+            for (LinkedTreeMap<String, Object> leg : allLegs) {
+                etaSeconds += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
+            }
+        } catch (Exception e) {
+            throw new InvalidRequestException(e.getMessage());
         }
 
-        //Creating ETA
-        int etaSeconds = 0;
-        for (LinkedTreeMap<String, Object> leg : allLegs) {
-            etaSeconds +=  ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
-        }
         return new Duration(etaSeconds * 1000);
     }
 }

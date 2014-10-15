@@ -6,6 +6,7 @@ import org.joda.time.Instant;
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.NoValidBreakFound;
 import truckerboys.otto.driver.Session;
+
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.SessionType;
 
@@ -14,9 +15,9 @@ import truckerboys.otto.driver.SessionType;
  */
 public class EURegulationHandler implements IRegulationHandler {
 
-    private final Duration ZERO_DURATION = new Duration(0);
-
     private final Duration MAX_SESSION_LENGTH = Duration.standardMinutes(270);
+
+    private final Duration ZERO_DURATION = new Duration(0);
 
     private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
     private final Duration STANDARD_SESSION_REST = Duration.standardMinutes(45);
@@ -56,16 +57,16 @@ public class EURegulationHandler implements IRegulationHandler {
         //Get latest daily break, if no break was found. We are in first week ever. Search all sessions.
         Instant maxTimeMarker;
         try {
+            //Check maximum TL today before you have to take a break, so that you will
+            //have time to finish your break before the 24h time limit runs out.
             if (history.getNumberOfReducedDailyRestsThisWeek() < 3) {
                 maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
             } else {
-                //Check maximum TL today before you have to take a break, so that you will
-                //have time to finish your break before the 24h time limit runs out.
                 maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
             }
-
         } catch (NoValidBreakFound e) {
-            maxTimeMarker = new Instant(0);
+            maxTimeMarker = Instant.now().plus(Duration.standardHours(24));
+
         }
 
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
@@ -87,7 +88,7 @@ public class EURegulationHandler implements IRegulationHandler {
         }
 
         //The same thing as above but do it as the max day is 10 hours and calculate the difference.
-        if (history.getNumberOfExtendedDaysThisWeek() < 2) {
+        if (history.getNumberOfExtendedDaysThisWeek() < 3) {
             //If you are allowed to take an extended day.
 
             extendedTL = MAX_DAY_LENGTH_EXTENDED.minus(timeSinceDailyBreak);
@@ -125,18 +126,7 @@ public class EURegulationHandler implements IRegulationHandler {
         //Cap maxTimeAllowed based on the max time for one week according to regulation.
         maxTimeAllowedThisWeek = (maxTimeAllowedThisWeek.isLongerThan(MAX_WEEKLY_LENGTH) ? MAX_WEEKLY_LENGTH : maxTimeAllowedThisWeek);
 
-        //Calculate TimeLeft
-        Duration TL = new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak())));
-
-        //Avoid negative timeLeft
-        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
-
-
-        Duration TLThisTwoWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
-        //Cap week
-        TL = (TL.isLongerThan(TLThisTwoWeek) ? TL : TLThisTwoWeek);
-
-        return new TimeLeft(TL, ZERO_DURATION);
+        return new TimeLeft(new Duration(maxTimeAllowedThisWeek.minus((history.getActiveTimeSinceLastWeeklyBreak()))), Duration.ZERO);
     }
 
     @Override

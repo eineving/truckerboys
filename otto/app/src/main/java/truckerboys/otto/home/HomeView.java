@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import truckerboys.otto.R;
 import truckerboys.otto.newroute.RouteActivity;
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -61,43 +61,41 @@ public class HomeView extends Fragment implements IView {
                 //((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
                 Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
                 getActivity().startActivity(newRouteIntent);
-
-
             }
         });
 
         continueRouteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
             }
         });
 
         mapsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
             }
         });
 
         clockButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(2);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
             }
         });
 
         statsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(5);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(3);
             }
         });
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //presenter.contiueRouteButtonClicked(v);
-                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(3);
+                ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(4);
             }
         });
 

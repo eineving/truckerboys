@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.positions.GasStation;
+import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
 
 /**
@@ -26,19 +28,24 @@ public class GooglePlacesJSONDecoder {
      * @param response JSON response
      * @return a list of suggestions
      */
-    public static List<String> getAutoCompleteList(String response) {
-        ArrayList<String> decoded = new ArrayList<String>();
+    public static List<String> getAutoCompleteList(String response) throws InvalidRequestException {
+        try {
+            ArrayList<String> decoded = new ArrayList<String>();
 
-        //Creating a HashMap from from the whole response
-        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
+            //Creating a HashMap from from the whole response
+            HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
 
-        //Making all predictions into HashMaps
-        ArrayList<LinkedTreeMap<String, Object>> predictions = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("predictions");
+            //Making all predictions into HashMaps
+            ArrayList<LinkedTreeMap<String, Object>> predictions = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("predictions");
 
-        for(LinkedTreeMap<String, Object> prediction : predictions) {
-            decoded.add((String) prediction.get("description")) ;
+            for (LinkedTreeMap<String, Object> prediction : predictions) {
+                decoded.add((String) prediction.get("description"));
+            }
+            return decoded;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new InvalidRequestException(e.getMessage());
         }
-        return decoded;
     }
 
     public static ArrayList<GasStation> getGasStations(String encoded) {
@@ -59,8 +66,8 @@ public class GooglePlacesJSONDecoder {
         return decoded;
     }
 
-    public static ArrayList<RestLocation> getRestLocations(String encoded) {
-        ArrayList<RestLocation> decoded = new ArrayList<RestLocation>();
+    public static ArrayList<MapLocation> getRestLocations(String encoded) {
+        ArrayList<MapLocation> decoded = new ArrayList<MapLocation>();
 
         //Creating a HashMap from from the whole response
         HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(encoded, HashMap.class);

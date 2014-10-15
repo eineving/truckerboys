@@ -9,26 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import truckerboys.otto.utils.eventhandler.EventTruck;
-import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 
 /**
- * Created by root on 2014-10-06.
+ * Created by Mikael Malmqvist on 2014-10-06.
+ * Class for handling some logic for the RouteActivity.
  */
-public class RoutePresenter implements IEventListener {
-
-    public RoutePresenter() {
-        EventTruck.getInstance().subscribe(this);
-    }
+public class RoutePresenter {
 
     /**
      * Sends the selected address (string) to the EventTruck by converting
      * it to an actual address location.
      * @param nameOfLocation the string selected.
      */
-    public void sendLocation(String nameOfLocation, Geocoder coder){
+    public void sendLocation(String nameOfLocation, List<String> checkpoints, Geocoder coder){
 
         int maxResults = 1;
 
@@ -37,9 +32,17 @@ public class RoutePresenter implements IEventListener {
             // and gets the first result
             List<Address> locations = coder.getFromLocationName(nameOfLocation, maxResults);
 
+            ArrayList<Address> checkpointsArray = new ArrayList<Address>();
+
+            for(String checkpoint : checkpoints) {
+
+                checkpointsArray.add((coder.getFromLocationName(checkpoint, maxResults)).get(0));
+            }
+
             if(locations.size() > 0) {
                 Address location = locations.get(0);
-                EventTruck.getInstance().newEvent(new NewDestination(location));
+                //Address checkPoint = checkPoints.get(0);
+                EventTruck.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
             }
 
         } catch (IOException e) {
@@ -83,8 +86,4 @@ public class RoutePresenter implements IEventListener {
 
     }
 
-    @Override
-    public void performEvent(Event event) {
-
-    }
 }
