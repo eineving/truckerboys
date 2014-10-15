@@ -11,6 +11,7 @@ import android.swedspot.automotiveapi.AutomotiveSignalId;
 
 import com.swedspot.automotiveapi.AutomotiveManager;
 
+import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
 import java.util.ArrayList;
@@ -149,8 +150,35 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
         userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
 
+        String sessionString = "";
 
-        ArrayList<String> history1, history2, history3, history4, history5;
+
+        // Update statsview with the new session string
+        view.updateSessionHistory(sessionString);
+
+        for(Session session : userHistory.getSessions()) {
+
+            // If the session isn't active
+            if(!session.isActive()) {
+                sessionString = new DateTime(session.getStartTime()).getYear()
+                        + "-" + new DateTime(session.getStartTime()).getMonthOfYear()
+                        + "-" + new DateTime(session.getStartTime()).getDayOfMonth()
+                        + ": " + session.getSessionType().toString()
+                        + " for " + session.getDuration().getStandardHours()
+                        + "h " + session.getDuration().getStandardMinutes() + "min";
+
+
+                // Update statsview with the new session string
+                view.updateSessionHistory(sessionString);
+
+                System.out.println("SENT TO VIEW: " + sessionString + "**********");
+            }
+
+
+        }
+
+
+        /*ArrayList<String> history1, history2, history3, history4, history5;
         history1 = new ArrayList<String>(4);
         history2 = new ArrayList<String>(4);
         history3 = new ArrayList<String>(4);
@@ -229,7 +257,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         }
 
         model.setUserHistory(history1, history2, history3, history4, history5);
-        view.setUserHistory(history1, history2, history3, history4, history5);
+        view.setUserHistory(history1, history2, history3, history4, history5);*/
     }
 
     @Override

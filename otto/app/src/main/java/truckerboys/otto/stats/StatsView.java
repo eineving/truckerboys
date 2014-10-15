@@ -60,6 +60,9 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
     private TextView violations;
 
     // History stats
+    ArrayAdapter<String> sessionAdapter;
+    private ListView historyList;
+
     private TextView historyDate1;
     private TextView historyTime1;
     private TextView historyType1;
@@ -97,6 +100,13 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
         distanceByFuel = (TextView) rootView.findViewById(R.id.KmByFuel);
 
         // Session history
+
+        historyList = (ListView) rootView.findViewById(R.id.sessionListView);
+
+        sessionAdapter = new ArrayAdapter<String>(getActivity(), R.layout.text_list_item);
+
+        historyList.setAdapter(sessionAdapter);
+
         historyDate1 = (TextView) rootView.findViewById(R.id.history_date_1);
         historyTime1 = (TextView) rootView.findViewById(R.id.history_time_1);
         historyType1 = (TextView) rootView.findViewById(R.id.type_of_work_1);
@@ -190,6 +200,17 @@ public class StatsView extends Fragment implements IEventListener, IVehicleListe
         editor.commit();
 
 
+    }
+
+
+    /**
+     * Updates the list of previous sessions.
+     * @param sessionString data from previous sessions.
+     */
+    public void updateSessionHistory(String sessionString) {
+        sessionAdapter.add(sessionString);
+
+        sessionAdapter.notifyDataSetChanged();
     }
 
     /**

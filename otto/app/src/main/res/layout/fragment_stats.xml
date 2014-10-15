@@ -365,13 +365,22 @@
             android:layout_height="1dp"
             android:background="@color/textLightest"/>
 
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:id="@+id/sessionListView"
+            android:layout_below="@+id/sessionTitle"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
         <TextView
             android:id="@+id/history_date_1"
             android:textColor="@color/textLight"
             android:textSize="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/divider9"
+            android:layout_below="@+id/sessionListView"
             android:text=""
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
@@ -631,6 +640,7 @@
             android:layout_toLeftOf="@+id/type_of_work_5"
             android:layout_toStartOf="@+id/type_of_work_5"
             android:layout_alignBottom="@+id/history_date_5" />
+
 
     </RelativeLayout>
 
