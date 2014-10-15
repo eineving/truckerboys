@@ -2,12 +2,14 @@ package truckerboys.otto.clock;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -17,6 +19,8 @@ import org.joda.time.Minutes;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+
+import java.util.ArrayList;
 
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
@@ -35,14 +39,17 @@ public class ClockView extends Fragment {
 
     ViewSwitcher viewSwitcher;
 
-    TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, recStopName, firstAltStopName, secAltStopName, recStopTitle;
-    ImageView recStopImage, firstAltStopImage, secAltStopImage;
-    RelativeLayout recStopClick, firstAltStopClick, secAltStopClick;
-    Button alternativeStopsButton, backButton;
+    TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, thirdAltStopETA,
+            recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle;
+    ImageView recStopImage, firstAltStopImage, secAltStopImage, thirdAltStopImage, backButton;
+    RelativeLayout firstAltStopClick, secAltStopClick, thirdAltStopClick;
+    LinearLayout alternativeStopsButton;
 
-    MapLocation recStop, firstAltStop, secAltStop;
+    MapLocation recStop, firstAltStop, secAltStop, thirdAltStop, nextDestination;
 
-    Boolean variablesSet = false, showStops = false;
+    ArrayList<MapLocation> altStops = new ArrayList<MapLocation>();
+
+    Boolean variablesSet = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
     public ClockView() {}
@@ -52,7 +59,7 @@ public class ClockView extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_clock, container, false);
 
         viewSwitcher = (ViewSwitcher) rootView.findViewById(R.id.clockViewSwitcher);
-        viewSwitcher.setInAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left));
+        viewSwitcher.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.slide_in_right));
         viewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right));
 
         initiateVariables();
@@ -72,48 +79,47 @@ public class ClockView extends Fragment {
         recStopETA = (TextView) rootView.findViewById(R.id.recStopETA);
         firstAltStopETA = (TextView) rootView.findViewById(R.id.firstAltStopETA);
         secAltStopETA = (TextView) rootView.findViewById(R.id.secAltStopETA);
+        thirdAltStopETA = (TextView) rootView.findViewById(R.id.thirdAltStopETA);
 
         recStopName = (TextView) rootView.findViewById(R.id.recStopName);
         firstAltStopName = (TextView) rootView.findViewById(R.id.firstAltStopName);
         secAltStopName = (TextView) rootView.findViewById(R.id.secAltStopName);
+        thirdAltStopName = (TextView) rootView.findViewById(R.id.thirdAltStopName);
 
         recStopImage = (ImageView) rootView.findViewById(R.id.recStopImage);
         firstAltStopImage = (ImageView) rootView.findViewById(R.id.firstAltStopImage);
         secAltStopImage = (ImageView) rootView.findViewById(R.id.secAltStopImage);
+        thirdAltStopImage = (ImageView) rootView.findViewById(R.id.thirdAltStopImage);
 
-        recStopClick = (RelativeLayout) rootView.findViewById(R.id.recStop);
         firstAltStopClick = (RelativeLayout) rootView.findViewById(R.id.firstAltStop);
         secAltStopClick = (RelativeLayout) rootView.findViewById(R.id.secAltStop);
+        thirdAltStopClick = (RelativeLayout) rootView.findViewById(R.id.thirdAltStop);
+
+        alternativeStopsButton = (LinearLayout) rootView.findViewById(R.id.alternativesButton);
+        backButton = (ImageView) rootView.findViewById(R.id.backButton);
 
         View.OnClickListener stopClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String tag = ((RelativeLayout) view).getTag().toString();
                 //TODO: Add sending events + method for handling clickevents
-                if (tag.equalsIgnoreCase("recStop")) {
-                    recStopTitle.setText("Chosen stop");
-                }
                 if (tag.equalsIgnoreCase("firstAltStop")) {
-                    recStopTitle.setText("Chosen stop");
-                    MapLocation temp = recStop;
-                    recStop = firstAltStop;
-                    firstAltStop = temp;
+
                 }
                 if (tag.equalsIgnoreCase("secAltStop")) {
-                    recStopTitle.setText("Chosen stop");
-                    MapLocation temp = recStop;
-                    recStop = secAltStop;
-                    secAltStop = temp;
+
+                }
+                if(tag.equalsIgnoreCase("thirdAltStop")){
+
                 }
             }
         };
-        recStopClick.setOnClickListener(stopClickListener);
+
         firstAltStopClick.setOnClickListener(stopClickListener);
         secAltStopClick.setOnClickListener(stopClickListener);
+        thirdAltStopClick.setOnClickListener(stopClickListener);
 
-        alternativeStopsButton = (Button) rootView.findViewById(R.id.alternative_stops_button);
-        backButton = (Button) rootView.findViewById(R.id.back_button);
-
+        Log.w("Null", "recStopETA is null? " + (recStopETA == null));
         alternativeStopsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,9 +134,12 @@ public class ClockView extends Fragment {
             }
         });
 
+        alternativeStopsButton.setVisibility(View.GONE);
+
         setStopUI(recStop, recStopETA, recStopName, recStopImage);
         setStopUI(firstAltStop, firstAltStopETA, firstAltStopName, firstAltStopImage);
         setStopUI(secAltStop, secAltStopETA, secAltStopName, secAltStopImage);
+        setStopUI(thirdAltStop, thirdAltStopETA, thirdAltStopName, thirdAltStopImage);
 
         variablesSet = true;
     }
@@ -168,12 +177,19 @@ public class ClockView extends Fragment {
     /**
      * Sets the alternative stops to the given stops
      *
-     * @param firstAltStop The first alternative stop
-     * @param secAltStop   The second alternative stop
+     * @param altStops The list of the alternative stops
      */
-    public void setAltStops(MapLocation firstAltStop, MapLocation secAltStop) {
-        this.firstAltStop = firstAltStop;
-        this.secAltStop = secAltStop;
+    public void setAltStops(ArrayList<MapLocation> altStops) {
+        this.altStops = altStops;
+        if(altStops!=null){
+            firstAltStop = altStops.get(0);
+            secAltStop = altStops.get(1);
+            thirdAltStop = altStops.get(2);
+        }
+    }
+
+    public void setNextDestination(MapLocation nextDestination){
+        this.nextDestination = nextDestination;
     }
 
     /**
@@ -203,10 +219,24 @@ public class ClockView extends Fragment {
             timeLeftExtended.setText(timeLE);
             timeLeftExtended.setVisibility(TextView.VISIBLE);
         }
+        ViewGroup v = (ViewGroup)recStopETA.getParent();
+        if (nextDestination==null){
+            v.setVisibility(ViewGroup.GONE);
+            alternativeStopsButton.setVisibility(View.GONE);
+        }else if(recStop == null){
+            recStopETA.setText(getTimeAsFormattedString(nextDestination.getEta()));
+            recStopName.setText(nextDestination.getAddress());
+            recStopImage.setVisibility(TextView.GONE);
+            v.setVisibility(ViewGroup.VISIBLE);
+            alternativeStopsButton.setVisibility(View.VISIBLE);
 
-        setStopUI(recStop, recStopETA, recStopName, recStopImage);
+        }else{
+            setStopUI(recStop, recStopETA, recStopName, recStopImage);
+        }
+
         setStopUI(firstAltStop, firstAltStopETA, firstAltStopName, firstAltStopImage);
         setStopUI(secAltStop, secAltStopETA, secAltStopName, secAltStopImage);
+        setStopUI(thirdAltStop, thirdAltStopETA, thirdAltStopName, thirdAltStopImage);
 
     }
 
@@ -219,10 +249,12 @@ public class ClockView extends Fragment {
      * @param image The ImageView with the image
      */
     private void setStopUI(MapLocation stop, TextView eta, TextView name, ImageView image) {
+        ViewGroup v = (ViewGroup)eta.getParent();
         if (stop == null) {
-            setStopVisible(false, eta, name, image);
+            v.setVisibility(ViewGroup.GONE);
             return;
         }
+        v.setVisibility(ViewGroup.VISIBLE);
         eta.setText(getTimeAsFormattedString(stop.getEta()));
         if (stop instanceof RestLocation) {
             name.setText(((RestLocation) stop).getName());

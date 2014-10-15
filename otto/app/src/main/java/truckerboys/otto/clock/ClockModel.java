@@ -3,6 +3,7 @@ package truckerboys.otto.clock;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import truckerboys.otto.directionsAPI.Route;
@@ -20,11 +21,13 @@ public class ClockModel {
 
     private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
-    private MapLocation recStop, firstAltStop, secAltStop;
+    private MapLocation recStop, nextDestination;
     private long timeDifference;
 
     private TripPlanner tripPlanner;
     private Route route;
+
+    private ArrayList<MapLocation> altStops;
 
     public ClockModel(TripPlanner tripPlanner) {
 
@@ -35,6 +38,7 @@ public class ClockModel {
         timeLeftExtendedDuration = new Duration(Duration.ZERO);
         timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
 
+        altStops = new ArrayList<MapLocation>();
     }
 
     /**
@@ -47,10 +51,13 @@ public class ClockModel {
         timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
         if(recStop!=null)
         recStop.setEta(recStop.getEta().minus(timeDifference));
-        if(firstAltStop!=null)
-        firstAltStop.setEta(firstAltStop.getEta().minus(timeDifference));
-        if(secAltStop!=null)
-        secAltStop.setEta(secAltStop.getEta().minus(timeDifference));
+        if(altStops!=null) {
+            for (MapLocation stop : altStops) {
+                if (stop != null) {
+                    stop.setEta(stop.getEta().minus(timeDifference));
+                }
+            }
+        }
 
         timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
 
@@ -68,17 +75,13 @@ public class ClockModel {
         timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
 
         recStop = route.getRecommendedStop();
-        if(route.getAlternativeStops()!=null) {
-            Iterator it = route.getAlternativeStops().iterator();
+        altStops = route.getAlternativeStops();
 
-            if (it.hasNext()) {
-                firstAltStop = (MapLocation) it.next();
-            }
-            if (it.hasNext()) {
-                secAltStop = (MapLocation) it.next();
-            }
+        if(route.getCheckpoints() == null || route.getCheckpoints().size() == 0){
+            nextDestination = route.getFinalDestination();
+        }else{
+            nextDestination = route.getCheckpoints().get(0);
         }
-
     }
 
     /**
@@ -90,19 +93,15 @@ public class ClockModel {
     }
 
     /**
-     * Returns the first alternative stop
-     * @return The first alternative stop
+     * Returns the alternative stops
+     * @return A list of the alternative stops
      */
-    public MapLocation getFirstAltStop() {
-        return firstAltStop;
+    public ArrayList<MapLocation> getAltStops(){
+        return altStops;
     }
 
-    /**
-     * Returns the second alternative stop
-     * @return The second alternative stop
-     */
-    public MapLocation getSecondAltStop() {
-        return secAltStop;
+    public MapLocation getNextDestination(){
+        return nextDestination;
     }
 
     /**

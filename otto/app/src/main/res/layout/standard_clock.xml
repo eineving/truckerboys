@@ -6,8 +6,7 @@
     android:background="@color/background_color"
     android:orientation="vertical"
     android:paddingBottom="10dp"
-    android:paddingTop="10dp"
-    android:id="@+id/standard_clock">
+    android:paddingTop="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +27,7 @@
             android:layout_marginTop="10dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/textLight"
-            android:textSize="24sp" />
+            android:textSize="45sp" />
 
         <TextView
             android:id="@+id/clockETA"
@@ -57,7 +56,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -65,79 +64,59 @@
         android:layout_marginRight="10dp"
         android:background="@drawable/white_dropshadow"
         android:orientation="vertical"
-        android:paddingTop="5dp">
+        android:paddingTop="5dp"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/recStopTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:paddingBottom="10dp"
-            android:text="Recommended stop"
-            android:textAlignment="center"
+            android:text="Next"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/textLight"
-            android:textSize="24sp"
+            android:textSize="45sp"
             android:textStyle="bold" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/textLightest" />
-
-        <RelativeLayout
-            android:id="@+id/recStop"
-            android:tag="recStop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:orientation="horizontal"
-            android:clickable="true">
 
             <TextView
                 android:id="@+id/recStopName"
-                android:layout_width="180dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
+                android:layout_below="@+id/recStopETA"
                 android:singleLine="true"
                 android:text="Mc Donalds"
                 android:textColor="@color/textLight"
-                android:textSize="20sp" />
+                android:textSize="45sp" />
 
             <ImageView
                 android:id="@+id/recStopImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="5dp"
-                android:layout_toLeftOf="@+id/recStopETA"
-                android:padding="5dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
                 android:src="@drawable/reststop" />
 
             <TextView
                 android:id="@+id/recStopETA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
+                android:layout_below="@+id/recStopTitle"
                 android:text="01:25"
                 android:textColor="@color/textLight"
-                android:textSize="24sp"
+                android:textSize="45sp"
                 android:textStyle="bold" />
         </RelativeLayout>
-    </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/alternativesButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/white_dropshadow"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:clickable="true"
         android:paddingTop="5dp">
 
         <TextView
@@ -146,118 +125,17 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:paddingBottom="10dp"
-            android:text="Alternative stops"
-            android:textAlignment="center"
+            android:text="Alternatives"
             android:textColor="@color/textLight"
-            android:textSize="24sp" />
+            android:textSize="45sp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/textLightest" />
-
-        <RelativeLayout
-            android:id="@+id/firstAltStop"
-            android:tag="firstAltStop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:orientation="horizontal"
-            android:clickable="true">
-
-            <TextView
-                android:id="@+id/firstAltStopName"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingRight="5dp"
-                android:singleLine="true"
-                android:text="Adas matställe på landet "
-                android:textColor="@color/textLight"
-                android:textSize="20sp" />
-
-
-            <ImageView
-                android:id="@+id/firstAltStopImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="5dp"
-                android:layout_toLeftOf="@+id/firstAltStopETA"
-                android:padding="5dp"
-                android:src="@drawable/reststop" />
-
-            <TextView
-                android:id="@+id/firstAltStopETA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:text="01:02"
-                android:textColor="@color/textLight"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_below="@+id/firstAltStopName"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/textLightest" />
-
-        <RelativeLayout
-            android:id="@+id/secAltStop"
-            android:tag="secAltStop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:orientation="horizontal"
-            android:clickable="true">
-
-            <TextView
-                android:id="@+id/secAltStopName"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:singleLine="true"
-                android:text="Skogsdungen"
-                android:textColor="@color/textLight"
-                android:textSize="20sp" />
-
-            <ImageView
-                android:id="@+id/secAltStopImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="5dp"
-                android:layout_toLeftOf="@+id/secAltStopETA"
-                android:padding="5dp"
-                android:src="@drawable/reststop" />
-
-            <TextView
-                android:id="@+id/secAltStopETA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:text="01:17"
-                android:textColor="@color/textLight"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="28dp"
+            android:src="@drawable/arrowright" />
 
     </LinearLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Alternative Stops"
-        android:id="@+id/alternative_stops_button"
-        android:layout_gravity="center_horizontal" />
 </LinearLayout>

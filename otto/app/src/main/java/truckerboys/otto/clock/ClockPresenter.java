@@ -63,7 +63,8 @@ public class ClockPresenter  implements IView, IEventListener {
         if(event.isType(ChangedRouteEvent.class)){
             model.setRoute(((ChangedRouteEvent)event).getRoute());
             view.setRecommendedStop(model.getRecommendedStop());
-            view.setAltStops(model.getFirstAltStop(), model.getSecondAltStop());
+            view.setAltStops(model.getAltStops());
+            view.setNextDestination(model.getNextDestination());
         }
     }
 }
