@@ -209,10 +209,14 @@ public class
             } else {
                 optimalRoute.setRecommendedStop(optimalRoute.getFinalDestination());
             }
+            //Adds ETA to recommended stop
+            optimalRoute.getRecommendedStop().setEta(directionsProvider.getETA(currentLocation, optimalRoute.getRecommendedStop()));
         } else {
+            //Adds ETA to chosen stop
+            chosenStop.setEta(directionsProvider.getETA(currentLocation, chosenStop));
             optimalRoute.setRecommendedStop(chosenStop);
+            alternativeLocations.add(recommendedStop);
         }
-        alternativeLocations.add(recommendedStop);
         optimalRoute.setAlternativeStops(alternativeLocations);
         return optimalRoute;
     }
