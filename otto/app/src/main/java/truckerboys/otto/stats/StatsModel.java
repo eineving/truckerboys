@@ -1,5 +1,7 @@
 package truckerboys.otto.stats;
 
+import android.widget.LinearLayout;
+
 import java.util.ArrayList;
 
 import truckerboys.otto.driver.User;
@@ -20,31 +22,13 @@ public class StatsModel{
     private double timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal;
     private int violations;
 
-    ArrayList<String> history1, history2, history3, history4, history5;
+    ArrayList<String> sessionHistory;
 
     private String fuelUnit = "L";
     private String distanceUnit = "Km";
 
     public StatsModel() {
 
-    }
-
-    /**
-     * Sets user history
-     * @param history1
-     * @param history2
-     * @param history3
-     * @param history4
-     * @param history5
-     */
-    public void setUserHistory(ArrayList<String> history1, ArrayList<String> history2,
-                               ArrayList<String> history3, ArrayList<String> history4,
-                               ArrayList<String> history5){
-        this.history1 = history1;
-        this.history2 = history2;
-        this.history3 = history3;
-        this.history4 = history4;
-        this.history5 = history5;
     }
 
     /**
@@ -106,6 +90,14 @@ public class StatsModel{
 
     }
 
+    /**
+     * Updates the list of previous sessions.
+     * @param sessionString data from previous sessions.
+     */
+    public void updateSessionHistory(String sessionString) {
+        sessionHistory.add(sessionString);
+
+    }
 
     public double getTimeToday() {
         return timeToday;

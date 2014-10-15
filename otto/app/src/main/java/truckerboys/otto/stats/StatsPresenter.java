@@ -7,20 +7,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.swedspot.automotiveapi.AutomotiveSignal;
-import android.swedspot.automotiveapi.AutomotiveSignalId;
 
-import com.swedspot.automotiveapi.AutomotiveManager;
-
+import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
-import java.util.ArrayList;
 
 import truckerboys.otto.IView;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -28,10 +24,11 @@ import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
-import truckerboys.otto.vehicle.VehicleSignalID;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
+ * Class for handling most logic for the StatsView showing
+ * usefull statistics for the user.
  */
 public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     private StatsModel model;
@@ -47,7 +44,6 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         this.view = new StatsView();
         this.model = new StatsModel();
 
-        System.out.println("CERATED***********");
         EventTruck.getInstance().subscribe(this);
     }
 
@@ -60,21 +56,15 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
         // Gets today stats
         double timeToday = stats.getFloat("timeToday", 0);
-        // double distanceToday = stats.getFloat("distanceToday", 5); // Implement later
-        // double fuelToday = stats.getFloat("fuelToday", 5);
         double distanceByFuel = stats.getFloat("distanceByFuel", 0);
 
         // Gets total stats
         double timeTotal = stats.getFloat("timeTotal", 0);
         double distanceTotal = stats.getFloat("distanceTotal", 0);
         double fuelTotal = stats.getFloat("fuelTotal", 0);
-        // double fuelByDistanceTotal = stats.getFloat("fuelByDistanceTotal", 5);
 
         // Gets total stats
         int violation = stats.getInt("violation", 0);
-
- //       double[] statsToday = {timeToday, distanceToday, fuelToday, fuelByDistanceToday};
- //       double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal};
 
         double[] statsToday = {timeToday, 0, 0, distanceByFuel};
         double[] statsTotal = {timeTotal, distanceTotal, fuelTotal, 0};
@@ -109,9 +99,6 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         // model.setUnits(system);
         // view.updateUnits(system);
 
-       // double[] statsToday = {model.getTimeToday(), model.getDistanceToday(), model.getFuelToday(), model.getfuelByDistanceToday()};
-       // double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), model.getfuelByDistanceTotal()};
-
 
         double[] statsToday = {model.getTimeToday(), 0, 0, 0};
         double[] statsTotal = {model.getTimeTotal(), model.getDistanceTotal(), model.getFuelTotal(), 0};
@@ -136,11 +123,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
      * Loads session history from user database.
      */
     public void loadUserHistory() {
-        // TODO Set stuff
 
         SessionHistory userHistory = User.getInstance().getHistory();
-
-        //userHistory.getSessions().get(0).getStartTime();
 
         // Adds dummy session history
         userHistory.addSession(new Session(SessionType.DRIVING, new Instant(Instant.now())));
@@ -149,87 +133,34 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
         userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
 
-
-        ArrayList<String> history1, history2, history3, history4, history5;
-        history1 = new ArrayList<String>(4);
-        history2 = new ArrayList<String>(4);
-        history3 = new ArrayList<String>(4);
-        history4 = new ArrayList<String>(4);
-        history5 = new ArrayList<String>(4);
-
-        int n = 0;
-
-        if(userHistory.getSessions().get(0).isActive()) {
-            n++;
+        // Ends them
+        for(Session session : userHistory.getSessions()){
+            session.end();
         }
 
-        // Adds history data of latest sessions if exists
-        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
+        String sessionString = "";
+
+        // Update statsview with the new session string
+        for(Session session : userHistory.getSessions()) {
+
+            // If the session isn't active
+            if(!session.isActive()) {
+                sessionString = new DateTime(session.getStartTime()).getYear()
+                        + "-" + new DateTime(session.getStartTime()).getMonthOfYear()
+                        + "-" + new DateTime(session.getStartTime()).getDayOfMonth()
+                        + ": " + session.getSessionType().toString()
+                        + " for " + session.getDuration().getStandardHours()
+                        + "h " + session.getDuration().getStandardMinutes() + "min";
 
 
-            history1.add(0, userHistory.getDateOfSession(n).getYear()
-                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
-                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
-            history1.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
-                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
-            history1.add(2, ""); // Violations from userHistory
-            history1.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
+                // Update statsview with the new session string
+                view.updateSessionHistory(sessionString);
 
-            n++;
+            }
+
         }
 
-
-        // Adds history data of sessions if exists
-        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
-            history2.add(0, userHistory.getDateOfSession(n).getYear()
-                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
-                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
-            history2.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
-                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
-            history2.add(2, ""); // Violations from userHistory
-            history2.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
-
-            n++;
-        }
-
-        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
-            history3.add(0, userHistory.getDateOfSession(n).getYear()
-                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
-                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
-            history3.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
-                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
-            history3.add(2, ""); // Violations from userHistory
-            history3.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
-
-            n++;
-        }
-
-        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
-            history4.add(0, userHistory.getDateOfSession(n).getYear()
-                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
-                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
-            history4.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
-                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
-            history4.add(2, ""); // Violations from userHistory
-            history4.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
-
-            n++;
-        }
-
-        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
-            history5.add(0, userHistory.getDateOfSession(n).getYear()
-                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
-                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
-            history5.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
-                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
-            history5.add(2, ""); // Violations from userHistory
-            history5.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
-
-            n++;
-        }
-
-        model.setUserHistory(history1, history2, history3, history4, history5);
-        view.setUserHistory(history1, history2, history3, history4, history5);
+        model.updateSessionHistory(sessionString);
     }
 
     @Override
