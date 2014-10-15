@@ -17,6 +17,7 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
 
@@ -78,6 +79,12 @@ public class MapModel implements IEventListener {
     }
 
     public Route getRoute() {
-        return tripPlanner.getRoute();
+        try {
+            return tripPlanner.getRoute();
+        } catch (NoActiveRouteException e) {
+            //TODO catch this properly!!!
+            e.printStackTrace();
+            return null;
+        }
     }
 }

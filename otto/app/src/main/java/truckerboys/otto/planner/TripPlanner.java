@@ -16,7 +16,9 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
+import truckerboys.otto.utils.exceptions.CheckpointNotFoundException;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
 
@@ -66,8 +68,12 @@ public class
      * Get the active route
      *
      * @return the active route
+     * @throws NoActiveRouteException
      */
-    public Route getRoute() {
+    public Route getRoute() throws NoActiveRouteException {
+        if (activeRoute == null) {
+            throw new NoActiveRouteException("There is no active route");
+        }
         return activeRoute;
     }
 
@@ -78,10 +84,49 @@ public class
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public void updateChoosenStop(MapLocation chosenStop) throws InvalidRequestException, NoConnectionException {
+    public void setChoosenStop(MapLocation chosenStop) throws InvalidRequestException, NoConnectionException {
         this.chosenStop = chosenStop;
         activeRoute = getCalculatedRoute();
         EventTruck.getInstance().newEvent(new ChangedRouteEvent());
+    }
+
+    /**
+     * Removes checkpoint from the route, and finishes the route if the checkpoint is the final destination.
+     *
+     * @param passedCheckpoint checkpoint that has been passed.
+     * @throws CheckpointNotFoundException
+     */
+    public void passedCheckpoint(MapLocation passedCheckpoint) throws CheckpointNotFoundException {
+        boolean checkpointFound = false;
+
+        if (passedCheckpoint.equalCoordinates(chosenStop)) {
+            chosenStop = null;
+            checkpointFound = true;
+        }
+
+        if (passedCheckpoint.equalCoordinates(recommendedStop)) {
+            recommendedStop = null;
+            checkpointFound = true;
+        }
+
+        if (passedCheckpoint.equalCoordinates(finalDestination)) {
+            activeRoute = null;
+            checkpointFound = true;
+        }
+        ArrayList<MapLocation> temp = new ArrayList<MapLocation>();
+        for (MapLocation checkpoint : checkpoints) {
+            if (passedCheckpoint.equalCoordinates(checkpoint)) {
+                checkpoint = null;
+                checkpointFound = true;
+            } else {
+                temp.add(checkpoint);
+            }
+        }
+        checkpoints = temp.toArray(checkpoints);
+
+        if (!checkpointFound) {
+            throw new CheckpointNotFoundException("does not exist");
+        }
     }
 
     /**
