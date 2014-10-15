@@ -1,7 +1,6 @@
 package truckerboys.otto.maps;
 
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -18,7 +16,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -48,7 +45,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
     private Polyline routePolyline;
 
     // Currently visible (drawn) legs of the polyline.
-    private List<LatLng> visibleRouteLegs = new LinkedList<LatLng>();
+    private List<LatLng> visibleRouteSteps = new LinkedList<LatLng>();
 
     private RouteDetail currentDetail;
 
@@ -86,9 +83,9 @@ public class MapView extends SupportMapFragment implements IEventListener {
         @Override
         public void run() {
             if (currentDetail == RouteDetail.DETAILED) {
-                routePolyline.setPoints(visibleRouteLegs);
+                routePolyline.setPoints(visibleRouteSteps);
             } else {
-                routePolyline.setPoints(visibleRouteLegs);
+                routePolyline.setPoints(visibleRouteSteps);
             }
         }
     };
@@ -143,6 +140,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
      * it will decrease performance significantly.
      */
     public void drawPolyline(){
+
         //Make the drawing of the polyline happen on a different thread.
         drawPolylineHandler.post(drawPolyline);
     }
@@ -153,25 +151,20 @@ public class MapView extends SupportMapFragment implements IEventListener {
      * the steps are not visible on the map.
      *
      * @param route The route to calculate the visible legs from.
-     * @return A list of visible route legs.
      */
-    public List<LatLng> calculateSteps(Route route){
-        List<LatLng> visibleLegs = new LinkedList<LatLng>();
-
+    public void calculateSteps(Route route){
         if(currentDetail == RouteDetail.DETAILED){
             for(LatLng latlng : route.getDetailedPolyline()){
 
                 //LocationHandler is connected and distance to latlng is within DISTANCE_FOR_VISIBLE_STEPS
                 if(LocationHandler.isConnected() &&
                         LocationHandler.getCurrentLocationAsMapLocation().distanceTo(new MapLocation(latlng)) < DISTANCE_FOR_VISIBLE_STEPS){
-                    visibleLegs.add(latlng);
+                    visibleRouteSteps.add(latlng);
                 }
             }
         } else {
-            visibleLegs.addAll(route.getOverviewPolyline());
+            visibleRouteSteps.addAll(route.getOverviewPolyline());
         }
-
-        return visibleLegs;
     }
 
     /**
