@@ -47,7 +47,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
     // Currently visible (drawn) legs of the polyline.
     private List<LatLng> visibleRouteSteps = new LinkedList<LatLng>();
 
-    private RouteDetail currentDetail;
+    private RouteDetail currentDetail = RouteDetail.DETAILED;
 
     // Specifies at what zoomlevel the route detail should change.
     private static final float DETAILED_ZOOM_ABOVE = 11;
@@ -82,11 +82,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
     private Runnable drawPolyline = new Runnable() {
         @Override
         public void run() {
-            if (currentDetail == RouteDetail.DETAILED) {
-                routePolyline.setPoints(visibleRouteSteps);
-            } else {
-                routePolyline.setPoints(visibleRouteSteps);
-            }
+            routePolyline.setPoints(visibleRouteSteps);
         }
     };
     //endregion
@@ -101,7 +97,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
         googleMap = getMap();
         if(googleMap != null) /* If we were successfull in receiving a GoogleMap */ {
             // Set all gestures disabled, truckdriver shouldn't be able to move the map.
-            googleMap.getUiSettings().setAllGesturesEnabled(true);
+            googleMap.getUiSettings().setAllGesturesEnabled(false);
             googleMap.getUiSettings().setZoomControlsEnabled(false);
 
             //TODO Read from settings if the user wants Hybrid or Normal map type.
@@ -111,7 +107,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
             positionMarker = googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow)).position(new LatLng(0, 0)).flat(true));
 
             // Add the empty polyline to the GoogleMap, making it possible to change the line later on.
-            routePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.rgb(92, 173, 255)).width(5));
+            routePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.rgb(1, 87, 155)).width(20));
         }
 
         updatePos.run();
@@ -154,15 +150,21 @@ public class MapView extends SupportMapFragment implements IEventListener {
      */
     public void calculateSteps(Route route){
         if(currentDetail == RouteDetail.DETAILED){
-            for(LatLng latlng : route.getDetailedPolyline()){
+            if(LocationHandler.isConnected()) {
+                System.out.println("isConnected: " + LocationHandler.isConnected());
+                for (LatLng latlng : route.getDetailedPolyline()) {
+                    System.out.println("distanceTo: " + LocationHandler.getCurrentLocationAsMapLocation().distanceTo(new MapLocation(latlng)));
 
-                //LocationHandler is connected and distance to latlng is within DISTANCE_FOR_VISIBLE_STEPS
-                if(LocationHandler.isConnected() &&
-                        LocationHandler.getCurrentLocationAsMapLocation().distanceTo(new MapLocation(latlng)) < DISTANCE_FOR_VISIBLE_STEPS){
-                    visibleRouteSteps.add(latlng);
+                    //LocationHandler is connected and distance to latlng is within DISTANCE_FOR_VISIBLE_STEPS
+                    if (LocationHandler.getCurrentLocationAsMapLocation().distanceTo(new MapLocation(latlng)) < DISTANCE_FOR_VISIBLE_STEPS) {
+                        visibleRouteSteps.add(latlng);
+                    } else {
+                        break;
+                    }
                 }
             }
         } else {
+            System.out.println("Is not connected");
             visibleRouteSteps.addAll(route.getOverviewPolyline());
         }
     }
@@ -237,7 +239,7 @@ public class MapView extends SupportMapFragment implements IEventListener {
 
             // If we just initiated the map, we should move to first received GPS position.
             // For better user experience.
-            if(positions.size() == 0){
+            if(positions.size() < 3){
                 moveCamera(false, new LatLng(newLocation.getLatitude(), newLocation.getLongitude()), newLocation.getBearing());
                 positionMarker.setPosition(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()));
                 positionMarker.setRotation(newLocation.getBearing());

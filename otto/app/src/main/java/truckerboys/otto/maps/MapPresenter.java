@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
+import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -25,6 +26,7 @@ public class MapPresenter implements IEventListener, IView {
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
         this.mapModel = new MapModel(tripPlanner);
+        EventTruck.getInstance().subscribe(this);
     }
 
     @Override
