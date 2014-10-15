@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.

@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import truckerboys.otto.utils.eventhandler.EventTruck;
-import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 
 /**
@@ -44,7 +42,7 @@ public class RoutePresenter {
             if(locations.size() > 0) {
                 Address location = locations.get(0);
                 //Address checkPoint = checkPoints.get(0);
-                EventTruck.getInstance().newEvent(new NewDestination(location, checkpointsArray));
+                EventTruck.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
             }
 
         } catch (IOException e) {

@@ -19,12 +19,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import truckerboys.otto.R;
+import truckerboys.otto.placeSuggestion.PlacesAutoCompleteAdapter;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
-import utils.PlacesAutoCompleteAdapter;
 
 /**
  * Created by Mikael Malmqvist on 2014-10-02.
@@ -32,7 +32,7 @@ import utils.PlacesAutoCompleteAdapter;
  * This class can be seen as the view in the MVP pattern.
  * for when selecting a new route.
  */
-public class RouteActivity extends Activity implements IEventListener{
+public class RouteActivity extends Activity implements IEventListener {
     private RoutePresenter routePresenter;
     private RouteModel routeModel = new RouteModel();
 
@@ -52,9 +52,10 @@ public class RouteActivity extends Activity implements IEventListener{
     private TextView finalDestination;
     // private TextView finalCheckpoints;
 
-    private ImageButton navigate;
+    private TextView navigate;
     private ImageButton addButton1;
     private ImageButton addButton2;
+    private ImageButton removeDestinationButton;
 
     private LinearLayout resultsBox;
     private LinearLayout historyBox;
@@ -82,8 +83,8 @@ public class RouteActivity extends Activity implements IEventListener{
         coder = new Geocoder(this);
         history = getSharedPreferences(HISTORY, 0);
         routePresenter = new RoutePresenter();
-        keyboard = (InputMethodManager)getSystemService(
-               this.INPUT_METHOD_SERVICE);
+        keyboard = (InputMethodManager) getSystemService(
+                this.INPUT_METHOD_SERVICE);
 
         // Sets the UI components
         initzialiseUI();
@@ -111,13 +112,13 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                if(routeModel.getCheckpoints().contains(((TextView)view).getText())){
-                    routeModel.getCheckpoints().remove(((TextView)view).getText());
-                    adapter.remove(((TextView)view).getText());
+                if (routeModel.getCheckpoints().contains(((TextView) view).getText())) {
+                    routeModel.getCheckpoints().remove(((TextView) view).getText());
+                    adapter.remove(((TextView) view).getText());
                     adapter.notifyDataSetChanged();
 
                     checkpointList.setLayoutParams(new LinearLayout.LayoutParams(
-                            checkpointList.getWidth(), 150*checkpointsStrings.size()));
+                            checkpointList.getWidth(), 150 * checkpointsStrings.size()));
                 }
             }
         });
@@ -146,8 +147,16 @@ public class RouteActivity extends Activity implements IEventListener{
                 // Hides keyboard
                 keyboard.hideSoftInputFromWindow(checkpoint.getWindowToken(), 0);
 
-                ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).clear();
+                ((PlacesAutoCompleteAdapter) checkpoint.getAdapter()).clear();
 
+            }
+        });
+
+        removeDestinationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeDestinationButton.setVisibility(View.INVISIBLE);
+                finalDestination.setText("");
             }
         });
 
@@ -155,14 +164,14 @@ public class RouteActivity extends Activity implements IEventListener{
         navigate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finalDestination != null && coder != null && routePresenter != null) {
-                    if(finalDestination.getText() != null
-                            && !finalDestination.getText().equals("")){
+                if (finalDestination != null && coder != null && routePresenter != null) {
+                    if (finalDestination.getText() != null
+                            && !finalDestination.getText().equals("")) {
 
                         routePresenter.sendLocation("" + finalDestination.getText().toString(),
                                 routeModel.getCheckpoints(), coder);
 
-                        if(history != null) {
+                        if (history != null) {
                             routePresenter.saveHistory(history, ""
                                     + finalDestination.getText().toString());
                         }
@@ -176,14 +185,14 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
 
-                if(i == KeyEvent.KEYCODE_BACK) {
+                if (i == KeyEvent.KEYCODE_BACK) {
                     finish();
                 }
 
                 // If "done" on keyboard is clicked set search result to most accurate item
                 if (i == 66 && search != null && search.getAdapter() != null) {
 
-                    if(!search.getAdapter().isEmpty() && !tempLocation.equals(
+                    if (!search.getAdapter().isEmpty() && !tempLocation.equals(
                             finalDestination.getText().toString())
                             && !search.getAdapter().getItem(0).toString().equals(
                             finalDestination.getText())) {
@@ -208,9 +217,9 @@ public class RouteActivity extends Activity implements IEventListener{
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 // If "done" on keyboard is clicked set search result to most accurate item
-                if(i == 66 && checkpoint != null && checkpoint.getAdapter() != null) {
+                if (i == 66 && checkpoint != null && checkpoint.getAdapter() != null) {
 
-                    if(!checkpoint.getAdapter().isEmpty()) {
+                    if (!checkpoint.getAdapter().isEmpty()) {
 
                         checkpoint.setText(checkpoint.getAdapter().getItem(0).toString());
                         checkpoint.clearFocus();
@@ -219,7 +228,7 @@ public class RouteActivity extends Activity implements IEventListener{
                         // Hides keyboard
                         keyboard.hideSoftInputFromWindow(checkpoint.getWindowToken(), 0);
 
-                        ((PlacesAutoCompleteAdapter)checkpoint.getAdapter()).clear();
+                        ((PlacesAutoCompleteAdapter) checkpoint.getAdapter()).clear();
 
                     }
 
@@ -265,22 +274,24 @@ public class RouteActivity extends Activity implements IEventListener{
         addButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finalDestination != null && search != null) {
+                if (finalDestination != null && search != null) {
                     finalDestination.setText(search.getText());
                     tempLocation = search.getText().toString();
 
 
                     addButton1.setVisibility(View.INVISIBLE);
+                    removeDestinationButton.setVisibility(View.VISIBLE);
                     search.setText("");
                 }
             }
         });
 
+
         // When the user clicks the checkpoint selected
         addButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkpoint != null) {
+                if (checkpoint != null) {
 
                     addButton2.setVisibility(View.INVISIBLE);
 
@@ -291,7 +302,7 @@ public class RouteActivity extends Activity implements IEventListener{
                     adapter.notifyDataSetChanged();
 
                     checkpointList.setLayoutParams(new LinearLayout.LayoutParams(
-                            checkpointList.getWidth(), 150*checkpointsStrings.size()));
+                            checkpointList.getWidth(), 150 * checkpointsStrings.size()));
 
                     checkpoint.setText("");
 
@@ -305,7 +316,7 @@ public class RouteActivity extends Activity implements IEventListener{
     /**
      * Initzialises the ui components.
      */
-    private void initzialiseUI(){
+    private void initzialiseUI() {
 
         historyBox = (LinearLayout) findViewById(R.id.history_box);
         checkpointList = (ListView) findViewById(R.id.list_of_checks);
@@ -324,9 +335,10 @@ public class RouteActivity extends Activity implements IEventListener{
 
         finalDestination = (TextView) findViewById(R.id.final_destination_text);
 
-        navigate = (ImageButton) findViewById(R.id.navigate_button);
+        navigate = (TextView) findViewById(R.id.navigate_button);
         addButton1 = (ImageButton) findViewById(R.id.add_button1);
         addButton2 = (ImageButton) findViewById(R.id.add_button2);
+        removeDestinationButton = (ImageButton) findViewById(R.id.remove_destination);
 
     }
 
@@ -335,17 +347,15 @@ public class RouteActivity extends Activity implements IEventListener{
     public void performEvent(Event event) {
 
         // When a new destination is selected this activity is to be finished
-        if(event.isType(NewDestination.class)) {
-
+        if (event.isType(RouteRequestEvent.class)) {
             // Sends user back to MainActivity after have chosen the destination
             finish();
-
         }
 
-        if(event.isType(RefreshHistoryEvent.class)) {
-            history1Text.setText(((RefreshHistoryEvent)event).getPlace1());
-            history2Text.setText(((RefreshHistoryEvent)event).getPlace2());
-            history3Text.setText(((RefreshHistoryEvent)event).getPlace3());
+        if (event.isType(RefreshHistoryEvent.class)) {
+            history1Text.setText(((RefreshHistoryEvent) event).getPlace1());
+            history2Text.setText(((RefreshHistoryEvent) event).getPlace2());
+            history3Text.setText(((RefreshHistoryEvent) event).getPlace3());
         }
     }
 }

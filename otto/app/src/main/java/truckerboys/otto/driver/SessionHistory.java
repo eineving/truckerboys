@@ -3,10 +3,13 @@ package truckerboys.otto.driver;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.joda.time.JodaTimePermission;
 
 
 /**
@@ -432,7 +435,6 @@ public class SessionHistory {
         return getActiveTimeSince(latestWeeklyBreak);
     }
 
-
     private void saveHistory(){
 
     }
@@ -441,7 +443,11 @@ public class SessionHistory {
 
     }
 
+    public List<Session> getSessions() {
+        return sessions;
+    }
 
-
-
+    public DateTime getDateOfSession(int sessionIndex) {
+        return new DateTime(sessions.get(sessionIndex).getStartTime());
+    }
 }

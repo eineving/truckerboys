@@ -13,7 +13,7 @@ import java.util.Map;
 
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
-import utils.IView;
+import truckerboys.otto.IView;
 
 /**
  * Created by Simon Petersson on 2014-09-18.
