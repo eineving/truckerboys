@@ -32,8 +32,9 @@ public class MapPresenter implements IEventListener, IView {
     @Override
     public void performEvent(Event event) {
         if (event.isType(ChangedRouteEvent.class)) {
-            mapView.calculateSteps(mapModel.getRoute());
+            mapView.setRoute(mapModel.getRoute());
             mapView.drawPolyline();
+            mapView.setMarkers(mapModel.getRoute().getCheckpoints());
         }
     }
 

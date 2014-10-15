@@ -46,4 +46,8 @@ public class MapLocation extends Location{
     public void setEta(Duration eta) {
         this.eta = eta;
     }
+
+    public LatLng getLatLng(){
+        return new LatLng(getLatitude(), getLongitude());
+    }
 }
