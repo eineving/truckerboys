@@ -31,7 +31,7 @@ public class Session {
         if (start.isBefore(new Instant())) {
             this.start = start;
         }else{
-            start = new Instant();
+            this.start = new Instant();
         }
         active = true;
     }
