@@ -80,13 +80,14 @@ public class HistoryOpenHelper extends SQLiteOpenHelper{
     }
 
     public List<Session> getAllSessions() {
+        Log.w("HISTORY", "READING SESSIONS");
         List<Session> sessions = new ArrayList<Session>();
 
         // 1. build the query
-        String query = "SELECT  * FROM " + TABLE_SESSIONS;
+        String query = "SELECT * FROM " + TABLE_SESSIONS;
 
         // 2. get reference to writable DB
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
         // 3. go over each row, build book and add it to list

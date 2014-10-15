@@ -34,6 +34,7 @@ public class SessionHistory {
 
     public SessionHistory(Context context){
         historyDB = new HistoryOpenHelper(context);
+        //sessions.addAll(historyDB.getAllSessions());
     }
 
     /**
@@ -88,12 +89,22 @@ public class SessionHistory {
      * @param session the past sessions
      */
     public void addSession(Session session) {
-        for (Session s : sessions) {
-            if (session.getEndTime().isAfter(s.getEndTime())) {
-                sessions.add(sessions.indexOf(s), session);
-                break;
+        if(sessions.size() == 0){
+            sessions.add(session);
+        }else{
+            boolean added = false;
+            for (Session s : sessions) {
+                if (session.getStartTime().isAfter(s.getStartTime())) {
+                    sessions.add(sessions.indexOf(s), session);
+                    added = true;
+                    break;
+                }
+            }
+            if(!added){
+                sessions.add(session);
             }
         }
+        historyDB.addSession(session);
     }
 
     /**
