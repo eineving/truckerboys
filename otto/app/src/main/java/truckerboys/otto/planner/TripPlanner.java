@@ -116,7 +116,6 @@ public class
         ArrayList<MapLocation> temp = new ArrayList<MapLocation>();
         for (MapLocation checkpoint : checkpoints) {
             if (passedCheckpoint.equalCoordinates(checkpoint)) {
-                checkpoint = null;
                 checkpointFound = true;
             } else {
                 temp.add(checkpoint);
