@@ -4,9 +4,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -29,13 +34,14 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends SupportMapFragment implements IEventListener, GoogleMap.OnCameraChangeListener {
+public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener {
 
     private View rootView;
 
@@ -46,7 +52,8 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
     private Polyline routePolyline;
 
     // Currently visible (drawn) legs of the polyline.
-    private List<LatLng> visibleRouteSteps = new LinkedList<LatLng>();
+    private List<LatLng> routeSteps = new LinkedList<LatLng>();
+    private LinearLayout startRoute;
 
     //region Camera Settings
     private float CAMERA_TILT = 45f;
@@ -74,19 +81,20 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
     private Runnable drawPolyline = new Runnable() {
         @Override
         public void run() {
-            routePolyline.setPoints(visibleRouteSteps);
+            routePolyline.setPoints(routeSteps);
         }
     };
     //endregion
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = super.onCreateView(inflater, container, savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
+        rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
         EventTruck.getInstance().subscribe(this);
 
         // Get GoogleMap from Google.
-        googleMap = getMap();
+        googleMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         if (googleMap != null) /* If we were successfull in receiving a GoogleMap */ {
             // Set all gestures disabled, truckdriver shouldn't be able to move the map.
             googleMap.getUiSettings().setAllGesturesEnabled(true);
@@ -103,6 +111,28 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
             // Add the empty polyline to the GoogleMap, making it possible to change the line later on.
             routePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.rgb(1, 87, 155)).width(20));
         }
+
+        startRoute = (LinearLayout) rootView.findViewById(R.id.startRoute_button);
+
+        startRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                moveCamera(true, LocationHandler.getCurrentLocationAsLatLng(), 16f, LocationHandler.getCurrentLocationAsMapLocation().getBearing());
+            }
+        });
+
+        startRoute.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    startRoute.setBackgroundColor(R.color.textLightest);
+                } else {
+                    startRoute.setBackgroundColor(Color.TRANSPARENT);
+                }
+
+                return false;
+            }
+        });
 
         updatePos.run();
 
@@ -122,6 +152,39 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
             } else {
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+            }
+        }
+    }
+
+    /**
+     * Helper method to move the camera across the map.
+     *
+     * @param animate True if you want the camera to be animated across the map. False if it should just move instantly.
+     * @param bounds The bounds to zoom according to.
+     */
+    public void moveCamera(boolean animate, LatLngBounds bounds) {
+        if (googleMap != null) {
+            if (animate) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
+            } else {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
+            }
+        }
+    }
+
+    /**
+     * Helper method to move the camera across the map.
+     *
+     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
+     * @param location The location to set the camera to.
+     * @param bearing  The bearing to set the camera to.
+     */
+    public void moveCamera(boolean animate, LatLng location, float zoom, float bearing) {
+        if (googleMap != null) {
+            if (animate) {
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
+            } else {
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
             }
         }
     }
@@ -227,7 +290,6 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
                 positionMarker.setRotation(newLocation.getBearing());
             }
 
-
             // Everytime we get a GPS Position Update we add that position and the bearing to a list
             // Making it possible to interpolate theese values.
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
@@ -238,6 +300,17 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
             // TODO Implement logics if you go beyond a checkpoint.
         }
         //endregion
+
+        if(event.isType(RouteRequestEvent.class)){
+            RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
+
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(LocationHandler.getCurrentLocationAsLatLng());
+            builder.include(new LatLng(routeRequestEvent.getFinalDestion().getLatitude(), routeRequestEvent.getFinalDestion().getLongitude()));
+            LatLngBounds bounds = builder.build();
+
+            moveCamera(true, bounds);
+        }
     }
 
     @Override
@@ -252,9 +325,13 @@ public class MapView extends SupportMapFragment implements IEventListener, Googl
      */
     public void setRoute(Route route) {
         //Clear old route
-        visibleRouteSteps.clear();
+        routeSteps.clear();
 
         //Add all new steps.
-        visibleRouteSteps.addAll(route.getDetailedPolyline());
+        routeSteps.addAll(route.getDetailedPolyline());
+    }
+
+    public LinearLayout getStartRouteButton(){
+        return startRoute;
     }
 }

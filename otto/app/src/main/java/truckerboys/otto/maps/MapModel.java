@@ -2,7 +2,6 @@ package truckerboys.otto.maps;
 
 import android.location.Address;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
@@ -25,11 +23,11 @@ import truckerboys.otto.utils.positions.MapLocation;
  */
 public class MapModel implements IEventListener {
     private TripPlanner tripPlanner;
-    private EventTruck eventTruck = EventTruck.getInstance();
+    private boolean activeRoute = false;
 
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
-        eventTruck.subscribe(this);
+        EventTruck.getInstance().subscribe(this);
     }
 
     @Override
@@ -79,5 +77,13 @@ public class MapModel implements IEventListener {
 
     public Route getRoute() {
         return tripPlanner.getRoute();
+    }
+
+    public boolean isActiveRoute() {
+        return activeRoute;
+    }
+
+    public void setActiveRoute(boolean activeRoute) {
+        this.activeRoute = activeRoute;
     }
 }
