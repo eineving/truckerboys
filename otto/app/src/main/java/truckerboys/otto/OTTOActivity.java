@@ -19,6 +19,7 @@ import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.settings.SettingsView;
+import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.stats.StatsView;
 import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
@@ -114,7 +115,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener{
 
         views.add(new HomeView());
 
-        views.add(new StatsView());
+        views.add(new StatsPresenter());
 
         views.add(new SettingsView());
     }

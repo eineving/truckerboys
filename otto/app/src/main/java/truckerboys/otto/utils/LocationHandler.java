@@ -28,12 +28,10 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         GooglePlayServicesClient.ConnectionCallbacks,
         LocationListener {
 
-    private static final int LOCATION_REQUEST_INTERVAL_MS = 500;
+    public static final int LOCATION_REQUEST_INTERVAL_MS = 500;
 
-    private LocationClient locationClient;
+    private static LocationClient locationClient;
 
-    private static MapLocation currentLocation;
-    private static boolean connected = false;
     private Context context;
 
     public LocationHandler(Context context){
@@ -52,22 +50,16 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         //Request new location updates to this LocationListener.
         locationClient.requestLocationUpdates(locationRequest, this);
 
-        this.currentLocation = new MapLocation(locationClient.getLastLocation());
-
         //Define that the LocationHandler is connected to the GPS.
-        connected = true;
     }
 
     @Override
-    public void onDisconnected() {
-        connected = false;
-    }
+    public void onDisconnected() {}
 
     @Override
     public void onLocationChanged(Location location) {
         if(isMoreAccurate(location)) {
             EventTruck.getInstance().newEvent(new GPSUpdateEvent(new MapLocation(location), getCurrentLocationAsMapLocation()));
-            this.currentLocation = new MapLocation(location);
         }
     }
 
@@ -87,14 +79,18 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
     }
 
     public static boolean isConnected() {
-        return connected;
+        return locationClient.isConnected();
     }
 
     public static MapLocation getCurrentLocationAsMapLocation() {
-        return currentLocation;
+        return new MapLocation(locationClient.getLastLocation());
     }
 
     public static LatLng getCurrentLocationAsLatLng() {
-        return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        return new LatLng(locationClient.getLastLocation().getLatitude(), locationClient.getLastLocation().getLongitude());
+    }
+
+    public static LocationClient getLocationClient() {
+        return locationClient;
     }
 }

@@ -5,16 +5,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.automotiveapi.AutomotiveSignalId;
 
 import com.swedspot.automotiveapi.AutomotiveManager;
 
+import org.joda.time.Instant;
+
+import java.util.ArrayList;
+
+import truckerboys.otto.IView;
+import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.SessionHistory;
+import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.vehicle.IVehicleListener;
@@ -23,7 +33,7 @@ import truckerboys.otto.vehicle.VehicleSignalID;
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class StatsPresenter implements IEventListener, IVehicleListener {
+public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     private StatsModel model;
 
     private StatsView view;
@@ -33,10 +43,11 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     public static final String STATS = "Stats_file";
     public static final String SETTINGS = "Settings_file";
 
-    public StatsPresenter(StatsView view){
-        this.view = view;
+    public StatsPresenter(){
+        this.view = new StatsView();
         this.model = new StatsModel();
 
+        System.out.println("CERATED***********");
         EventTruck.getInstance().subscribe(this);
     }
 
@@ -80,8 +91,6 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
      */
     public void setStats(double[] statsToday, double[] statsTotal, int violations) {
         // Sets the stats in the model
-        System.out.println("DISTANCE DRIVEN: " + statsTotal[1] + " **********************");
-        System.out.println("FUEL CONSUMPTION: " + statsTotal[2] + " **********************");
 
         model.setStats(statsToday, statsTotal, violations);
 
@@ -123,8 +132,114 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     }
 
 
+    /**
+     * Loads session history from user database.
+     */
+    public void loadUserHistory() {
+        // TODO Set stuff
+
+        SessionHistory userHistory = User.getInstance().getHistory();
+
+        //userHistory.getSessions().get(0).getStartTime();
+
+        // Adds dummy session history
+        userHistory.addSession(new Session(SessionType.DRIVING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
+
+
+        ArrayList<String> history1, history2, history3, history4, history5;
+        history1 = new ArrayList<String>(4);
+        history2 = new ArrayList<String>(4);
+        history3 = new ArrayList<String>(4);
+        history4 = new ArrayList<String>(4);
+        history5 = new ArrayList<String>(4);
+
+        int n = 0;
+
+        if(userHistory.getSessions().get(0).isActive()) {
+            n++;
+        }
+
+        // Adds history data of latest sessions if exists
+        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
+
+
+            history1.add(0, userHistory.getDateOfSession(n).getYear()
+                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
+                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
+            history1.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
+                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
+            history1.add(2, ""); // Violations from userHistory
+            history1.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
+
+            n++;
+        }
+
+
+        // Adds history data of sessions if exists
+        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
+            history2.add(0, userHistory.getDateOfSession(n).getYear()
+                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
+                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
+            history2.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
+                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
+            history2.add(2, ""); // Violations from userHistory
+            history2.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
+
+            n++;
+        }
+
+        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
+            history3.add(0, userHistory.getDateOfSession(n).getYear()
+                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
+                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
+            history3.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
+                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
+            history3.add(2, ""); // Violations from userHistory
+            history3.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
+
+            n++;
+        }
+
+        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
+            history4.add(0, userHistory.getDateOfSession(n).getYear()
+                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
+                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
+            history4.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
+                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
+            history4.add(2, ""); // Violations from userHistory
+            history4.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
+
+            n++;
+        }
+
+        if(n != userHistory.getSessions().size() && userHistory.getSessions().get(n) != null) {
+            history5.add(0, userHistory.getDateOfSession(n).getYear()
+                    + "-" + userHistory.getDateOfSession(n).getMonthOfYear()
+                    + "-" + userHistory.getDateOfSession(n).getDayOfMonth()); // Date from userHistory
+            history5.add(1, userHistory.getSessions().get(n).getDuration().getStandardHours() + "h, "
+                    + userHistory.getSessions().get(n).getDuration().getStandardMinutes() + " min"); // Time from userHistory
+            history5.add(2, ""); // Violations from userHistory
+            history5.add(3, userHistory.getSessions().get(n).getSessionType().toString()); // Type from userHistory
+
+            n++;
+        }
+
+        model.setUserHistory(history1, history2, history3, history4, history5);
+        view.setUserHistory(history1, history2, history3, history4, history5);
+    }
+
     @Override
     public void performEvent(Event event) {
+
+        if(event.isType(RestorePreferencesEvent.class)) {
+            restorePreferences();
+
+            loadUserHistory();
+        }
 
         // If the new time has been set in the model
         if(event.isType(TimeDrivenEvent.class)) {
@@ -148,5 +263,15 @@ public class StatsPresenter implements IEventListener, IVehicleListener {
     @Override
     public void receive(AutomotiveSignal signal) {
 
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return view;
+    }
+
+    @Override
+    public String getName() {
+        return "Statistics";
     }
 }
