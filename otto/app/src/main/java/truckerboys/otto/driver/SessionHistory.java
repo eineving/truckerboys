@@ -26,6 +26,9 @@ public class SessionHistory {
     private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
     private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
 
+    private final Duration SPLIT_DAY_REST_FIRST = Duration.standardHours(3);
+    private final Duration SPLIT_DAY_REST_SECOND = Duration.standardHours(9);
+
     /**
      * The list of past sessions, sorted with the last session first.
      */
@@ -40,6 +43,7 @@ public class SessionHistory {
         this.sessions = new ArrayList<Session>();
         this.sessions.addAll(sessions);
     }
+
     public SessionHistory() {
     }
 
@@ -239,7 +243,6 @@ public class SessionHistory {
      * @return total reduced rests.
      */
     public int getNumberOfReducedDailyRestsThisWeek() {
-        //TODO: Regulation 7.2.2
         int numberOfReducedDailyRests = 0;
 
         //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
@@ -249,16 +252,31 @@ public class SessionHistory {
         } catch (NoValidBreakFound e) {
             latestWeeklyBreak = new Instant(0);
         }
+        for (int i = 0; i < sessions.size() - 1; i++) {
 
-        for (Session session : sessions) {
+            Session session = sessions.get(i);
+
             //If 'session' is in this week (since "if after LAST weeks end", we're in this week.)
             if (latestWeeklyBreak.isBefore(session.getStartTime())) {
                 if (session.getSessionType() == SessionType.RESTING) {
                     //If it's longer than 9 hours and shorter than 11 hours it's a reduced daily rest.
                     if (session.getDuration().isLongerThan(REDUCED_DAILY_REST) && session.getDuration().isShorterThan(STANDARD_DAILY_REST)) {
-                        //We also need to make sure the rest isn't in progress.
+
+                        //Check that the reduced break isn't a split daily rest which is a normal daily rest.
+                        //If there's a rest longer than 3h before the one just found and occurs on the same day
+                        //the one just found is a normal rest.
+
+                        //Find the next daily break
+                        for (int j = i + 1; j < sessions.size() - 1; j++) {
+                            Session sessionTwo = sessions.get(j);
+                            if (sessionTwo.getDuration().isLongerThan(SPLIT_DAY_REST_FIRST) &&
+                                    sessionTwo.getDuration().isShorterThan(SPLIT_DAY_REST_SECOND) &&
+                                    (getDateOfSession(j).getDayOfYear() == getDateOfSession(i).getDayOfYear())) {
+                                numberOfReducedDailyRests--;
+                            }
+                        }
+
                         numberOfReducedDailyRests++;
-                        //TODO Check for split daily break, regulation 7.2.2
                     }
                 }
             }
