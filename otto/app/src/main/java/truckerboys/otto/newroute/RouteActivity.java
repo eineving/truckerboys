@@ -1,11 +1,13 @@
 package truckerboys.otto.newroute;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,12 +18,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import truckerboys.otto.OTTOActivity;
 import truckerboys.otto.R;
+import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.placeSuggestion.PlacesAutoCompleteAdapter;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
@@ -68,6 +73,8 @@ public class RouteActivity extends Activity implements IEventListener {
 
     private String tempLocation = "temp";
 
+    // Dialogs
+    private NoDestinationDialog dialog = new NoDestinationDialog();
 
     InputMethodManager keyboard;
 
@@ -168,11 +175,17 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
+
+                if(!finalDestination.getText().equals("")){
+                }
+
                 if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+
                     navigate.setBackgroundColor(Color.LTGRAY);
 
                 }else {
                     navigate.setBackgroundColor(Color.TRANSPARENT);
+
 
                 }
 
@@ -186,7 +199,7 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-
+                // If destination is set
                 if (finalDestination != null && coder != null && routePresenter != null) {
                     if (finalDestination.getText() != null
                             && !finalDestination.getText().equals("")) {
@@ -198,6 +211,13 @@ public class RouteActivity extends Activity implements IEventListener {
                             routePresenter.saveHistory(history, ""
                                     + finalDestination.getText().toString());
                         }
+
+
+
+
+                    } else {
+                        // If no destination is set
+                        dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
                     }
                 }
             }
