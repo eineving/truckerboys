@@ -50,24 +50,27 @@ public class MapModel implements IEventListener {
             GPSUpdateEvent gpsUpdateEvent = (GPSUpdateEvent) event;
             // TODO Check if outside current route, calculate new route.
 
-            // If we got in range of the checkpoint since last update.
-            if(gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) < DISTANCE_FROM_CHECKPOINT && !closeToCheckpoint) {
-                closeToCheckpoint = true;
-            } else if(closeToCheckpoint) /* We're currently in range. */{
-                try {
-                    // We left checkpoint range again, calculate new route to final destination.
-                    if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) > DISTANCE_FROM_CHECKPOINT) {
-                        tripPlanner.setNewRoute(LocationHandler.getCurrentLocationAsMapLocation(), getRoute().getFinalDestination(), null);
-                        closeToCheckpoint = false;
-                    }
-                } catch (InvalidRequestException e) {
-                    //TODO Create proper catch
-                    e.printStackTrace();
-                } catch (NoConnectionException e) {
-                    //TODO Create proper catch
-                    e.printStackTrace();
-                }
-            }
+            // If we have route and checkpoints in route.
+//            if(getRoute() != null && getRoute().getCheckpoints().get(0) != null) {
+//                // If we got in range of the checkpoint since last update.
+//                if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) < DISTANCE_FROM_CHECKPOINT && !closeToCheckpoint) {
+//                    closeToCheckpoint = true;
+//                } else if (closeToCheckpoint) /* We're currently in range. */ {
+//                    try {
+//                        // We left checkpoint range again, calculate new route to final destination.
+//                        if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) > DISTANCE_FROM_CHECKPOINT) {
+//                            tripPlanner.setNewRoute(LocationHandler.getCurrentLocationAsMapLocation(), getRoute().getFinalDestination(), null);
+//                            closeToCheckpoint = false;
+//                        }
+//                    } catch (InvalidRequestException e) {
+//                        //TODO Create proper catch
+//                        e.printStackTrace();
+//                    } catch (NoConnectionException e) {
+//                        //TODO Create proper catch
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
         }
         //region NewRouteEvent (This event is fired when the user requests a new route from RouteActivity.)
         if (event.isType(RouteRequestEvent.class)) {
@@ -80,7 +83,7 @@ public class MapModel implements IEventListener {
                     // We get the checkpoints as adresses in NewRouteEvent. Remake them to MapLocations
                     // making it possible to send them into tripplanner.
                     MapLocation[] checkpoints = new MapLocation[((RouteRequestEvent) event).getCheckpoints().size()];
-                    for (Address address : adressList.subList(1, adressList.size())) {
+                    for (Address address : adressList) {
                         checkpoints[adressList.indexOf(address)] = new MapLocation(new LatLng(address.getLatitude(), address.getLongitude()));
                     }
 
