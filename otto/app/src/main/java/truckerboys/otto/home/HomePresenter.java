@@ -38,8 +38,7 @@ public class HomePresenter implements IView, IEventListener {
 
         this.handler = handler;
 
-        dialog = new ActiveSessionDialogFragment();
-        dialog.onAttach(view.getActivity());
+
 
         EventTruck.getInstance().subscribe(this);
     }
@@ -52,23 +51,24 @@ public class HomePresenter implements IView, IEventListener {
      */
     public void newRouteClicked() {
 
+
+        User.getInstance().getHistory().addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
+
         // If there's any sessions stored
         if (User.getInstance().getHistory().getSessions().size() > 0) {
 
-            // If the latest session is DRIVING show a dialog
-            if (User.getInstance().getHistory().getSessions().get
-                    (User.getInstance().getHistory().getSessions().size() - 1).getSessionType()
-                    == SessionType.RESTING){
-
+            // If the latest session is RESTING
+            if (User.getInstance().getHistory().getSessions().get(0).getSessionType() == SessionType.RESTING){
 
                 try {
-                    // If the user can't drive because this would violate a time regulation
+                    // If the user can't drive because this would violate a time regulation show a dialog
                     if(handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().isLongerThan(Duration.ZERO)){
-                        // dialog = new ActiveSessionDialogFragment();
 
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("timeLeft", handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().getMillis());
-                        dialog.setArguments(bundle);
+                        // Sends time left on break
+                        dialog = new ActiveSessionDialogFragment().newInstance(
+                                handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().getMillis());
+                        dialog.onAttach(view.getActivity());
+
 
                         dialog.show(view.getActivity().getFragmentManager(), "DriverBreak");
                     }
