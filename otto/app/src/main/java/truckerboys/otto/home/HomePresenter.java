@@ -1,13 +1,20 @@
 package truckerboys.otto.home;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import truckerboys.otto.IView;
+import truckerboys.otto.driver.CurrentlyNotOnRestException;
+import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.newroute.RouteActivity;
+import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -20,14 +27,18 @@ import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
  */
 public class HomePresenter implements IView, IEventListener {
 
+    private EURegulationHandler handler;
     private HomeModel model;
     private HomeView view;
-    private ActiveSessionDialogFragment dialog = new ActiveSessionDialogFragment();
+    private ActiveSessionDialogFragment dialog;
 
-    public HomePresenter() {
+    public HomePresenter(EURegulationHandler handler) {
         this.model = new HomeModel();
         this.view = new HomeView();
 
+        this.handler = handler;
+
+        dialog = new ActiveSessionDialogFragment();
         dialog.onAttach(view.getActivity());
 
         EventTruck.getInstance().subscribe(this);
@@ -41,19 +52,34 @@ public class HomePresenter implements IView, IEventListener {
      */
     public void newRouteClicked() {
 
-        // Adds a dummy session
-        /*User.getInstance().getHistory().addSession(new Session(SessionType.DRIVING,
-                new Instant(Instant.now())));*/
-
-
         // If there's any sessions stored
         if (User.getInstance().getHistory().getSessions().size() > 0) {
 
             // If the latest session is DRIVING show a dialog
             if (User.getInstance().getHistory().getSessions().get
-                    (User.getInstance().getHistory().getSessions().size() - 1).getSessionType() == SessionType.DRIVING) {
+                    (User.getInstance().getHistory().getSessions().size() - 1).getSessionType()
+                    == SessionType.RESTING){
 
-                dialog.show(view.getActivity().getFragmentManager(), "Active Session");
+
+                try {
+                    // If the user can't drive because this would violate a time regulation
+                    if(handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().isLongerThan(Duration.ZERO)){
+                        // dialog = new ActiveSessionDialogFragment();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("timeLeft", handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().getMillis());
+                        dialog.setArguments(bundle);
+
+                        dialog.show(view.getActivity().getFragmentManager(), "DriverBreak");
+                    }
+                } catch (CurrentlyNotOnRestException e) { // Else 
+
+                    // Enter new route
+                    Intent newRouteIntent = new Intent(view.getActivity(), RouteActivity.class);
+                    view.getActivity().startActivity(newRouteIntent);
+                }
+
+
 
             } else { // If the latest session isn't active
 

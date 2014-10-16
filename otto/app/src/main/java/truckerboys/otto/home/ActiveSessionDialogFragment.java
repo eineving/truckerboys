@@ -10,7 +10,7 @@ import android.os.Bundle;
 /**
  * Created by Mikael Malmqvist on 2014-10-16.
  * Dialog to display when an active session is running and
- * the user tries to enter a new route.
+ * has the type break and the user tries to enter a new route.
  */
 public class ActiveSessionDialogFragment extends DialogFragment {
 
@@ -21,8 +21,9 @@ public class ActiveSessionDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle bundle) {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-        dialogBuilder.setMessage("You've got an active session running!\n " +
-                "You sure you want to set a new route?").setPositiveButton("Yes",
+        dialogBuilder.setMessage("You've got " + bundle.getLong("timeLeft")/1000
+                + "min left until you're allowed to drive again. You sure you want to set a new " +
+                "route?").setPositiveButton("Yes",
                 new DialogInterface.OnClickListener() {
 
             // User clicks "yes"
