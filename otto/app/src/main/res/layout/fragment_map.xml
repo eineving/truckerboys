@@ -20,7 +20,7 @@
         android:background="@drawable/opacity_grey_gradient"
         android:paddingLeft="10dp"
         android:paddingTop="0dp"
-        android:visibility="visible" >
+        android:visibility="invisible" >
 
         <LinearLayout
             android:orientation="vertical"

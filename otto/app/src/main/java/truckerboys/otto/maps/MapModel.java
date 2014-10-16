@@ -58,7 +58,7 @@ public class MapModel implements IEventListener {
                     // We get the checkpoints as adresses in NewRouteEvent. Remake them to MapLocations
                     // making it possible to send them into tripplanner.
                     MapLocation[] checkpoints = new MapLocation[((RouteRequestEvent) event).getCheckpoints().size()];
-                    for (Address address : adressList) {
+                    for (Address address : adressList.subList(1, adressList.size())) {
                         checkpoints[adressList.indexOf(address)] = new MapLocation(new LatLng(address.getLatitude(), address.getLongitude()));
                     }
 
