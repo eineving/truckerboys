@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/map_frame">
+
+    <fragment
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- Start Route Dialog -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/startRoute_dialog"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="90dp"
+        android:layout_gravity="left|bottom"
+        android:background="@drawable/opacity_grey_gradient"
+        android:paddingLeft="10dp"
+        android:paddingTop="0dp"
+        android:visibility="invisible" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:weightSum="2"
+            android:layout_weight="2"
+            android:paddingTop="23dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Stockholm, Sweden"
+                android:id="@+id/finalDestination_text"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="3dp"
+                android:maxLines="1"
+                android:maxLength="29"
+                android:ellipsize="marquee" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="52km | "
+                    android:id="@+id/finalDestinationDist_text"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="marquee" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="1h 30min"
+                    android:id="@+id/finalDestinationETA_text"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:showDividers="middle|beginning|end"
+            android:id="@+id/startRoute_button"
+            android:focusableInTouchMode="false"
+            android:textAlignment="center">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/imageView2"
+                android:src="@android:drawable/ic_menu_directions"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Active Route Dialog -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/activeRoute_dialog"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="90dp"
+        android:layout_gravity="left|bottom"
+        android:background="@drawable/opacity_grey_gradient"
+        android:paddingLeft="10dp"
+        android:paddingTop="0dp"
+        android:visibility="invisible" >
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/stopRoute_button"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_gravity="center"
+            android:layout_marginRight="10dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Next Checkpoint"
+                android:id="@+id/nextStop_text"
+                android:layout_gravity="left|center_horizontal"
+                android:maxLines="1"
+                android:maxLength="29"
+                android:ellipsize="end" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="30m"
+                    android:id="@+id/nextStopDistance_text"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="5dp"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="1h 30min"
+                    android:id="@+id/nextStopETA_text"
+                    android:layout_gravity="center"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="end" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

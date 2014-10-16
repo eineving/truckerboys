@@ -244,7 +244,7 @@
                             android:layout_height="30dp"
                             android:background="#00ffffff"
                             android:layout_margin="10dp"
-                            android:id="@+id/imageView"
+                            android:id="@+id/stopRoute_button"
                             android:src="@android:drawable/ic_menu_myplaces" />
 
                         <TextView
@@ -256,8 +256,8 @@
                             android:text="Checkpoints"
                             android:layout_marginTop="15dp"
                             android:layout_marginLeft="10dp"
-                            android:layout_toRightOf="@+id/imageView"
-                            android:layout_toEndOf="@+id/imageView"
+                            android:layout_toRightOf="@+id/stopRoute_button"
+                            android:layout_toEndOf="@+id/stopRoute_button"
                             android:id="@+id/textView2" />
 
                     </LinearLayout>
