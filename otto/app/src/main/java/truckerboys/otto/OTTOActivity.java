@@ -29,6 +29,7 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
@@ -36,7 +37,7 @@ import truckerboys.otto.utils.tabs.TabPagerAdapter;
  * The root class of the program.
  * Created by Martin on 29/09/2014.
  */
-public class OTTOActivity extends FragmentActivity implements IEventListener{
+public class OTTOActivity extends FragmentActivity implements IEventListener, ActiveSessionDialogFragment.ActiveSessionDialogFragmentListener{
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
 
@@ -133,5 +134,20 @@ public class OTTOActivity extends FragmentActivity implements IEventListener{
         if (event.isType(RouteRequestEvent.class)) {
             viewPager.setCurrentItem(0);
         }
+    }
+
+    /**
+     * Handles clicks from thr ActiveSessionDialog
+     * and redirects them to the HomePresenter
+     * @param dialog
+     */
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        EventTruck.getInstance().newEvent(new YesClickedEvent());
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        ;
     }
 }

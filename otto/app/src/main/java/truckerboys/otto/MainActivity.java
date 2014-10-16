@@ -9,6 +9,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import truckerboys.otto.home.ActiveSessionDialogFragment;
+
 /**
  * Created by Simon Petersson on 14/10/2014.
  *

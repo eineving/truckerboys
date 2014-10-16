@@ -15,6 +15,7 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.NewRouteClickedEvent;
+import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -30,6 +31,8 @@ public class HomePresenter implements IView, IEventListener,
     public HomePresenter(){
         this.model = new HomeModel();
         this.view = new HomeView();
+
+        dialog.onAttach(view.getActivity());
 
         EventTruck.getInstance().subscribe(this);
     }
@@ -98,6 +101,12 @@ public class HomePresenter implements IView, IEventListener,
         // If new route has been clicked in HomeView
         if(event.isType(NewRouteClickedEvent.class)) {
             newRouteClicked();
+        }
+
+        // If user clicks yes, in the "session-is-active"-dialog
+        if(event.isType(YesClickedEvent.class)) {
+            Intent newRouteIntent = new Intent(view.getActivity(), RouteActivity.class);
+            view.getActivity().startActivity(newRouteIntent);
         }
     }
 
