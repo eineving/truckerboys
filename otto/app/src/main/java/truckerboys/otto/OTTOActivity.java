@@ -1,5 +1,6 @@
 package truckerboys.otto;
 
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -12,6 +13,8 @@ import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.TachographHandler;
 import truckerboys.otto.driver.User;
+import truckerboys.otto.home.ActiveSessionDialogFragment;
+import truckerboys.otto.home.HomePresenter;
 import truckerboys.otto.home.HomeView;
 import truckerboys.otto.maps.MapPresenter;
 import truckerboys.otto.placesAPI.GooglePlaces;
@@ -26,6 +29,7 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
 
@@ -33,7 +37,7 @@ import truckerboys.otto.utils.tabs.TabPagerAdapter;
  * The root class of the program.
  * Created by Martin on 29/09/2014.
  */
-public class OTTOActivity extends FragmentActivity implements IEventListener{
+public class OTTOActivity extends FragmentActivity implements IEventListener, ActiveSessionDialogFragment.ActiveSessionDialogFragmentListener{
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
 
@@ -113,7 +117,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener{
 
         views.add(new ClockPresenter());
 
-        views.add(new HomeView());
+        views.add(new HomePresenter());
 
         views.add(new StatsPresenter());
 
@@ -130,5 +134,20 @@ public class OTTOActivity extends FragmentActivity implements IEventListener{
         if (event.isType(RouteRequestEvent.class)) {
             viewPager.setCurrentItem(0);
         }
+    }
+
+    /**
+     * Handles clicks from thr ActiveSessionDialog
+     * and redirects them to the HomePresenter
+     * @param dialog
+     */
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        EventTruck.getInstance().newEvent(new YesClickedEvent());
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        ;
     }
 }

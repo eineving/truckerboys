@@ -1,6 +1,5 @@
 package truckerboys.otto.home;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,17 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import truckerboys.otto.R;
-import truckerboys.otto.newroute.RouteActivity;
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.events.NewRouteClickedEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  * Central home view from where the user navigates
  * to the rest of the app
  */
-public class HomeView extends Fragment implements IView {
+public class HomeView extends Fragment {
     private View rootView;
-    private HomePresenter presenter;
     private View newRouteButton;
     private View mapsButton;
     private View clockButton;
@@ -29,7 +27,6 @@ public class HomeView extends Fragment implements IView {
     private View settingsButton;
 
     public HomeView(){
-        presenter = new HomePresenter();
     }
 
 
@@ -59,10 +56,11 @@ public class HomeView extends Fragment implements IView {
     public void asignListeners() {
 
         newRouteButton.setOnClickListener(new View.OnClickListener() {
+
             public void onClick(View v) {
-                //((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(1);
-                Intent newRouteIntent = new Intent(getActivity(), RouteActivity.class);
-                getActivity().startActivity(newRouteIntent);
+
+                EventTruck.getInstance().newEvent(new NewRouteClickedEvent());
+
             }
         });
 
@@ -84,8 +82,10 @@ public class HomeView extends Fragment implements IView {
 
         mapsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //presenter.contiueRouteButtonClicked(v);
+
+                // Enter maps
                 ((ViewPager)getActivity().findViewById(R.id.pager)).setCurrentItem(0);
+
             }
         });
 
@@ -177,13 +177,4 @@ public class HomeView extends Fragment implements IView {
     }
 
 
-    @Override
-    public Fragment getFragment() {
-        return this;
-    }
-
-    @Override
-    public String getName() {
-        return "Home";
-    }
 }
