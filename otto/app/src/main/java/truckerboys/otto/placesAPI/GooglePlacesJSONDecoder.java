@@ -11,7 +11,7 @@ import java.util.List;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RestLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
@@ -79,7 +79,7 @@ public class GooglePlacesJSONDecoder {
             LinkedTreeMap<String, Double> coordinate = (LinkedTreeMap<String, Double>)((LinkedTreeMap<String, Object>) location.get("geometry")).get("location");
             LatLng position = new LatLng(coordinate.get("lat"), coordinate.get("lng"));
             ArrayList<String> types = (ArrayList<String>)location.get("types");
-            decoded.add(new RestLocation(position,(String) location.get("name"), types));
+            decoded.add(new RouteLocation(position,(String) location.get("name"), types));
         }
 
         return decoded;

@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
@@ -31,12 +32,12 @@ public class GoogleDirectionsJSONDecoder {
      */
     public static Route stringToRoute(String response) throws InvalidRequestException {
 
-        MapLocation finalDestination;
+        RouteLocation finalDestination;
         Duration eta;
         int distance = 0;
         ArrayList<LatLng> overviewPolyline;
         ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
-        ArrayList<MapLocation> checkPoints = new ArrayList<MapLocation>();
+        ArrayList<RouteLocation> checkPoints = new ArrayList<RouteLocation>();
         Duration etaToFirstCheckpoint = null;
         try {
 
@@ -71,7 +72,7 @@ public class GoogleDirectionsJSONDecoder {
             LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
             LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
                     ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
-            finalDestination = new MapLocation(coordinate);
+            finalDestination = new RouteLocation(coordinate);
             finalDestination.setAddress((String) lastLeg.get("end_address"));
 
             //Creating ETA and distance

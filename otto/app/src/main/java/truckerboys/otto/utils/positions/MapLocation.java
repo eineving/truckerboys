@@ -23,30 +23,6 @@ public class MapLocation extends Location{
         setLongitude(latLng.longitude);
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    /**
-     * Get ETA to location
-     * @return ETA to location (ZERO if no ETA is set)
-     */
-    public Duration getEta() {
-        return eta;
-    }
-
-    /**
-     * Set ETA to location
-     * @param eta eta to location
-     */
-    public void setEta(Duration eta) {
-        this.eta = eta;
-    }
-
     /**
      * Checks if the locations have the same coordinates.
      * @param rhs Map location to compare with.

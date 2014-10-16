@@ -6,23 +6,19 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.planner.TimeLeft;
-import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RestLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
-/**
- * Created by Daniel on 2014-09-24.
- */
+
 public class Route {
     private MapLocation finalDestination;
     private Duration eta;
     private int distance;
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
-    private ArrayList<MapLocation> checkpoints;
-    private MapLocation recommendedStop;
-    private ArrayList<MapLocation> alternativeStops;
+    private ArrayList<RouteLocation> checkpoints;
+    private RouteLocation recommendedStop;
+    private ArrayList<RouteLocation> alternativeStops;
     private Duration etaToFirstCheckpoint = null;
 
 
@@ -37,7 +33,7 @@ public class Route {
      * @param checkpoints      checkpoints
      */
     public Route(MapLocation finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
-                 ArrayList<LatLng> detailedPolyline, ArrayList<MapLocation> checkpoints) {
+                 ArrayList<LatLng> detailedPolyline, ArrayList<RouteLocation> checkpoints) {
         this.finalDestination = finalDestination;
         this.eta = eta;
         this.overviewPolyline = overviewPolyline;
@@ -59,7 +55,7 @@ public class Route {
      * @param etaToFirstCheckpoint ETA to the first checkpoint
      */
     public Route(MapLocation finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
-                 ArrayList<LatLng> detailedPolyline, ArrayList<MapLocation> checkpoints, Duration etaToFirstCheckpoint) {
+                 ArrayList<LatLng> detailedPolyline, ArrayList<RouteLocation> checkpoints, Duration etaToFirstCheckpoint) {
         this(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkpoints);
         if (etaToFirstCheckpoint == null) {
             this.etaToFirstCheckpoint = eta;
@@ -118,7 +114,7 @@ public class Route {
      *
      * @return route checkpoints
      */
-    public ArrayList<MapLocation> getCheckpoints() {
+    public ArrayList<RouteLocation> getCheckpoints() {
         return checkpoints;
     }
 
@@ -136,7 +132,7 @@ public class Route {
      *
      * @param recommendedStop the recommended stop for the route.
      */
-    public void setRecommendedStop(MapLocation recommendedStop) {
+    public void setRecommendedStop(RouteLocation recommendedStop) {
         this.recommendedStop = recommendedStop;
     }
 
@@ -145,7 +141,7 @@ public class Route {
      *
      * @return alternative stops.
      */
-    public ArrayList<MapLocation> getAlternativeStops() {
+    public ArrayList<RouteLocation> getAlternativeStops() {
         return alternativeStops;
     }
 
@@ -154,7 +150,7 @@ public class Route {
      *
      * @param alternativeStops the alternative stops for the route.
      */
-    public void setAlternativeStops(ArrayList<MapLocation> alternativeStops) {
+    public void setAlternativeStops(ArrayList<RouteLocation> alternativeStops) {
         this.alternativeStops = alternativeStops;
     }
 
