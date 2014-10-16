@@ -150,4 +150,10 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     public void onDialogNegativeClick(DialogFragment dialog) {
         ;
     }
+
+    @Override
+    public void onBackPressed() {
+        // Go to home on back pressed.
+        viewPager.setCurrentItem(2);
+    }
 }

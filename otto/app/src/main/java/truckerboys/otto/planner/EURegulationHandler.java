@@ -5,7 +5,10 @@ import org.joda.time.Instant;
 
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.NoValidBreakFound;
+import truckerboys.otto.driver.Session;
+
 import truckerboys.otto.driver.SessionHistory;
+import truckerboys.otto.driver.SessionType;
 
 /**
  * Created by Daniel on 2014-09-17.
@@ -18,6 +21,9 @@ public class EURegulationHandler implements IRegulationHandler {
 
     private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
     private final Duration STANDARD_SESSION_REST = Duration.standardMinutes(45);
+
+    private final Duration SPLIT_SESSION_REST_15 = Duration.standardMinutes(15);
+    private final Duration SPLIT_SESSION_REST_30 = Duration.standardMinutes(30);
 
     private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
     private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
@@ -33,17 +39,65 @@ public class EURegulationHandler implements IRegulationHandler {
     @Override
     public TimeLeft getThisSessionTL(SessionHistory history) {
 
-        //Find the active time since the last valid break, expand to handle split breaks aswell...
-        Duration sinceLast45 = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+        Instant last45;
+        Instant last30;
+        Instant last15;
 
-        Duration TL = MAX_SESSION_LENGTH.minus(sinceLast45); // Calculate
+        //Find the active time since the last valid break.(Standard scenario)
+        Duration activeTimeSinceLastSessionRest = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+
+        try {
+            last45 = history.getEndTimeOfRestLongerThan(STANDARD_SESSION_REST);
+        } catch (NoValidBreakFound e) {
+            //There has been now standard session rest yet.
+            last45 = new Instant(0);
+        }
+
+        //First look for a rest longer than 30min and shorter than 45min.
+        //If it doesn't exist, the TLThisSession will be calculated from last45
+        // even if there is a 15min break since last45
+        try {
+
+            last30 = history.getEndTimeOfRestInTheInterval(SPLIT_SESSION_REST_30, STANDARD_SESSION_REST);
+            //check that last30 is after last45
+            if (last30.isAfter(last45)) {
+                //Check if there is a break longer than 15min and shorter than 45 between them.
+                try {
+
+                    last15 = history.getEndTimeOfRestInTheInterval(SPLIT_SESSION_REST_15, STANDARD_SESSION_REST);
+                    //check that last15 is after last45
+                    if (last15.isAfter(last45)) {
+                        //Check that last15 is before last30
+                        if(last15.isBefore(last30)){
+                            //Valid split rest found!
+                            //Calculate from last30
+                            activeTimeSinceLastSessionRest = history.getActiveTimeSince(last30);
+
+                        }
+                    }
+                } catch (NoValidBreakFound e) {
+                }
+
+            } else {
+                //Calculate TL since last45
+                activeTimeSinceLastSessionRest = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+
+            }
+
+        } catch (NoValidBreakFound e) {
+            //No rest longer than 30min and shorter than 45
+            //This means there is no valid split rest since last 45rest
+            //Calculate from last45.
+            activeTimeSinceLastSessionRest = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+        }
+
+        Duration TL = MAX_SESSION_LENGTH.minus(activeTimeSinceLastSessionRest); // Calculate
 
         Duration TLToday = getThisDayTL(history).getTimeLeft().plus(getThisDayTL(history).getExtendedTimeLeft());
 
         //Cap the TL to the time left of the day.
         TL = (TL.isLongerThan(TLToday) ? TLToday : TL);
 
-        //I don't know how negative durations is handled in jodatime so the TL is so the minimum is set to zero.
 
         return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, ZERO_DURATION) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }
@@ -63,6 +117,7 @@ public class EURegulationHandler implements IRegulationHandler {
             }
         } catch (NoValidBreakFound e) {
             maxTimeMarker = Instant.now().plus(Duration.standardHours(24));
+
         }
 
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
@@ -155,38 +210,37 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getTimeLeftOnBreak(SessionHistory history) throws CurrentlyNotOnRestException {
+
         //If currently on break
-        if (!history.isDriving()) {
-            if (getThisWeekTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive this week. */ {
-                //TODO Logic for weekly break time
-            }
+        if (history.isResting()) {
+            SessionHistory tempHistory = new SessionHistory(history.getSessions());
 
-            if (getThisDayTL(history).getTimeLeft().isEqual(Duration.ZERO)) /* There is no time left to drive today. */ {
-                /* TODO
-                 * Alternativt kan den normala dygnsvilan delas i två perioder. Den första perioden måste vara minst 3 timmar,
-                 * och den kan du placera fitt under arbetspasset. Den sista perioden ska vara minst 9 timmar som avslutning på
-                 * arbetsdagen. Summan av en delad dygnsvila ska vara minst 12 timmar.
-                 */
+            //10 minutes.
+            int i = 10;
+            Session s;
+            while (true) {
+                //Add a rest session, make it longer and longer in each loop.
+                //When the rest is long enough getTLThisSession will return something other than zero.
+                //Then we know the required length off the break.
+                s = new Session(SessionType.RESTING, new Instant(), new Instant().plus(Duration.standardMinutes(i)));
+                //To be a bit more efficient we add 10 minutes each time.
 
-                //Check if reduced daily rest is allowed this week (If there hasn't been more than 3 of them.)
-                boolean allowReduced = (history.getNumberOfReducedDailyRestsThisWeek() < 3 ? true : false);
+                tempHistory.addSession(s);
+                if (!getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
 
-                //If reduced is allowed and current rest time is under reduced dailyrest.
-                if(allowReduced && !history.getTimeSinceRestStart().isLongerThan(REDUCED_DAILY_REST)) {
-                    return new TimeLeft(REDUCED_DAILY_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
-                } else /* Reduced daily rest is not allowed or current rest time is more than 9 hours. */ {
-                    return new TimeLeft(STANDARD_DAILY_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
+                    //And then loop backwards reducing by one minute.
+                    while (true) {
+                        s = new Session(SessionType.RESTING, new Instant(), new Instant().plus(Duration.standardMinutes(i)));
+                        tempHistory.addSession(s);
+                        if (getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
+                            return new TimeLeft(s.getDuration().plus(Duration.standardMinutes(1)), Duration.ZERO);
+                        }
+                        tempHistory.removeLastSession();
+                        i--;
+                    }
                 }
-            }
-
-            //TODO Rasten kan ersättas med dygns eller veckovila
-            //Check if there was a break of atleast 15 minutes in the last 4 hours 30 minutes.
-            if (history.existRestLonger(Duration.standardMinutes(15), MAX_SESSION_LENGTH)) {
-                //Return "30 minutes" - "current break time"
-                return new TimeLeft(Duration.standardMinutes(30).minus(history.getTimeSinceRestStart()), Duration.ZERO);
-            } else /* else check time left until current break is 45 minutes long. */ {
-                //Return "45 minutes" - "current break time"
-                return new TimeLeft(STANDARD_SESSION_REST.minus(history.getTimeSinceRestStart()), Duration.ZERO);
+                tempHistory.removeLastSession();
+                i += 10;
             }
 
         } else {
