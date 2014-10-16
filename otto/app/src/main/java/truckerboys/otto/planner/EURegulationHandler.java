@@ -22,6 +22,9 @@ public class EURegulationHandler implements IRegulationHandler {
     private final Duration MAX_DAY_LENGTH = Duration.standardHours(9);
     private final Duration STANDARD_SESSION_REST = Duration.standardMinutes(45);
 
+    private final Duration SPLIT_SESSION_REST_15 = Duration.standardMinutes(15);
+    private final Duration SPLIT_SESSION_REST_30 = Duration.standardMinutes(30);
+
     private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
     private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
 
@@ -36,17 +39,65 @@ public class EURegulationHandler implements IRegulationHandler {
     @Override
     public TimeLeft getThisSessionTL(SessionHistory history) {
 
-        //Find the active time since the last valid break, expand to handle split breaks aswell...
-        Duration sinceLast45 = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+        Instant last45;
+        Instant last30;
+        Instant last15;
 
-        Duration TL = MAX_SESSION_LENGTH.minus(sinceLast45); // Calculate
+        //Find the active time since the last valid break.(Standard scenario)
+        Duration activeTimeSinceLastSessionRest = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+
+        try {
+            last45 = history.getEndTimeOfRestLongerThan(STANDARD_SESSION_REST);
+        } catch (NoValidBreakFound e) {
+            //There has been now standard session rest yet.
+            last45 = new Instant(0);
+        }
+
+        //First look for a rest longer than 30min and shorter than 45min.
+        //If it doesn't exist, the TLThisSession will be calculated from last45
+        // even if there is a 15min break since last45
+        try {
+
+            last30 = history.getEndTimeOfRestInTheInterval(SPLIT_SESSION_REST_30, STANDARD_SESSION_REST);
+            //check that last30 is after last45
+            if (last30.isAfter(last45)) {
+                //Check if there is a break longer than 15min and shorter than 45 between them.
+                try {
+
+                    last15 = history.getEndTimeOfRestInTheInterval(SPLIT_SESSION_REST_15, STANDARD_SESSION_REST);
+                    //check that last15 is after last45
+                    if (last15.isAfter(last45)) {
+                        //Check that last15 is before last30
+                        if(last15.isBefore(last30)){
+                            //Valid split rest found!
+                            //Calculate from last30
+                            activeTimeSinceLastSessionRest = history.getActiveTimeSince(last30);
+
+                        }
+                    }
+                } catch (NoValidBreakFound e) {
+                }
+
+            } else {
+                //Calculate TL since last45
+                activeTimeSinceLastSessionRest = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+
+            }
+
+        } catch (NoValidBreakFound e) {
+            //No rest longer than 30min and shorter than 45
+            //This means there is no valid split rest since last 45rest
+            //Calculate from last45.
+            activeTimeSinceLastSessionRest = history.getActiveTimeSinceBreakLongerThan(STANDARD_SESSION_REST);
+        }
+
+        Duration TL = MAX_SESSION_LENGTH.minus(activeTimeSinceLastSessionRest); // Calculate
 
         Duration TLToday = getThisDayTL(history).getTimeLeft().plus(getThisDayTL(history).getExtendedTimeLeft());
 
         //Cap the TL to the time left of the day.
         TL = (TL.isLongerThan(TLToday) ? TLToday : TL);
 
-        //I don't know how negative durations is handled in jodatime so the TL is so the minimum is set to zero.
 
         return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, ZERO_DURATION) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
     }

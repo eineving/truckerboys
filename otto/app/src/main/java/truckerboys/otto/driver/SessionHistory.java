@@ -84,17 +84,17 @@ public class SessionHistory {
      * an interval [now, backLimit]
      *
      * @param restTime  The length of the time to check for
-     * @param backLimit The length of the interval to check back to.
+     * @param backLimit The instant of which to check back to.
      * @return True if break exists
      */
-    public boolean existRestLonger(Duration restTime, Duration backLimit) {
+    public boolean existRestLonger(Duration restTime, Instant backLimit) {
 
         //Loop through all sessions
         for (Session session : sessions) {
             //If session is of type RESTING
             if (session.getSessionType() == SessionType.RESTING) {
-                //If break is longer than specified and within interval
-                if (!session.getDuration().isShorterThan(restTime) && session.getEndTime().getMillis() >= backLimit.getMillis()) {
+                //If break is longer than specified and after the backlimit
+                if (!session.getDuration().isShorterThan(restTime) && session.getEndTime().isAfter(backLimit)) {
                     return true;
                 }
             }
@@ -378,15 +378,35 @@ public class SessionHistory {
      * @return the end time of the last break longer than specified.
      * @throws NoValidBreakFound
      */
-    public Instant getEndTimeOfRestBreakLongerThan(Duration duration) throws NoValidBreakFound {
+    public Instant getEndTimeOfRestLongerThan(Duration duration) throws NoValidBreakFound {
         for (Session session : sessions) {
-            if (session.getSessionType() == SessionType.RESTING && session.getDuration().isLongerThan(duration)) {
+            if (session.getSessionType() == SessionType.RESTING && !session.getDuration().isShorterThan(duration)) {
                 return session.getEndTime();
             }
         }
         throw new
 
                 NoValidBreakFound("No rest longer than specified found");
+    }
+
+    /**
+     * Returns the end time of the last rest longer and shorter than specified.
+     *
+     * @param min the specified minimum length
+     * @param max the specified max length
+     * @return the end time of the last break longer than specified.
+     * @throws NoValidBreakFound
+     */
+    public Instant getEndTimeOfRestInTheInterval(Duration min, Duration max) throws NoValidBreakFound {
+        for (Session session : sessions) {
+            if (session.getSessionType() == SessionType.RESTING &&
+                    !session.getDuration().isLongerThan(min) && session.getDuration().isShorterThan(max)) {
+                return session.getEndTime();
+            }
+        }
+        throw new
+
+                NoValidBreakFound("No rest in the interval found");
     }
 
     /**
