@@ -16,8 +16,6 @@ import org.joda.time.JodaTimePermission;
  */
 public class SessionHistory {
 
-    //TODO: Regulation 9.1
-
     private final Duration STANDARD_DAY_SESSION = Duration.standardHours(9);
 
     private final Duration STANDARD_DAILY_REST = Duration.standardHours(11);
@@ -374,17 +372,33 @@ public class SessionHistory {
     }
 
     /**
+     * Returns the end time of the last rest longer than specified.
+     *
+     * @param duration the specified length
+     * @return the end time of the last break longer than specified.
+     * @throws NoValidBreakFound
+     */
+    public Instant getEndTimeOfRestBreakLongerThan(Duration duration) throws NoValidBreakFound {
+        for (Session session : sessions) {
+            if (session.getSessionType() == SessionType.RESTING && session.getDuration().isLongerThan(duration)) {
+                return session.getEndTime();
+            }
+        }
+        throw new
+
+                NoValidBreakFound("No rest longer than specified found");
+    }
+
+    /**
      * Returns the instant of which the last weekly break ended.
      * If there have been no valid weekly breaks the method will throw exception
      *
      * @return the instant of the last weekly break end.
      * @throws NoValidBreakFound When no valid weekly breaks could be found in the session history.
      */
-
     public Instant getLatestWeeklyRestEndTime(List<Session> sessions) throws NoValidBreakFound {
 
         //TODO: Regulation 9.6
-        //TODO: Regulation 10
 
         Duration weeklyRest1;
         Duration weeklyRest2;
