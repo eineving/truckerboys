@@ -1,5 +1,6 @@
 package truckerboys.otto;
 
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -12,6 +13,8 @@ import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.TachographHandler;
 import truckerboys.otto.driver.User;
+import truckerboys.otto.home.ActiveSessionDialogFragment;
+import truckerboys.otto.home.HomePresenter;
 import truckerboys.otto.home.HomeView;
 import truckerboys.otto.maps.MapPresenter;
 import truckerboys.otto.placesAPI.GooglePlaces;
@@ -113,7 +116,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener{
 
         views.add(new ClockPresenter());
 
-        views.add(new HomeView());
+        views.add(new HomePresenter());
 
         views.add(new StatsPresenter());
 
