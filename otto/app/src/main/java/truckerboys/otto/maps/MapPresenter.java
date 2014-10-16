@@ -31,7 +31,9 @@ public class MapPresenter implements IEventListener, IView {
     private Runnable updatePos = new Runnable() {
         public void run() {
             if(mapModel.isActiveRoute()) {
-                mapView.followRoute();
+                mapView.updatePositionMarker(true);
+            } else {
+                mapView.updatePositionMarker(false);
             }
             updateHandler.postDelayed(updatePos, LocationHandler.LOCATION_REQUEST_INTERVAL_MS / MapView.INTERPOLATION_FREQ);
         }
@@ -50,13 +52,14 @@ public class MapPresenter implements IEventListener, IView {
         mapView.moveCamera(true, LocationHandler.getCurrentLocationAsLatLng(), 18f, LocationHandler.getCurrentLocationAsMapLocation().getBearing(), 1000);
         mapModel.setActiveRoute(true);
 
-        //Wait 520ms before running the updatePos runnable. Making the above animation finish before starting the next one.
+        //Make sure the handler doesnt run updatePos to many times.
+        updateHandler.removeCallbacks(updatePos);
+        //Wait 1000ms before running the updatePos runnable. Making the above animation finish before starting the next one.
         updateHandler.postDelayed(updatePos, 2000);
     }
 
     public void stopFollowRoute(){
         mapModel.setActiveRoute(false);
-        updateHandler.removeCallbacks(updatePos);
     }
 
     @Override

@@ -33,8 +33,6 @@ public class MapModel implements IEventListener {
     // The number of GPS coordinates in a row that have been distanceToRoute >= OUTSIDE_ROUTE_DIFF
     private List<MapLocation> outsideRoute = new LinkedList<MapLocation>();
 
-
-
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
         EventTruck.getInstance().subscribe(this);

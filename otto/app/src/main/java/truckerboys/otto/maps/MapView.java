@@ -248,10 +248,11 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * Updates the marker for our current position, will also interpolate the position making it
      * move smoothly across the map between each GPS Update.
      *
+     * @param followMarker True if camera should follow marker.
      * @requires to be updated once every 1/INTERPOLATION_FREQ second to function properly.
      * @requires setupPositionMarker() has been called.
      */
-    public void followRoute() {
+    public void updatePositionMarker(boolean followMarker) {
         if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
@@ -295,7 +296,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     bearings.removeFirst();
                 }
             }
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(positionMarker.getPosition()));
+
+            if(followMarker) {
+                moveCamera(false, positionMarker.getPosition(), positionMarker.getRotation());
+            }
         }
     }
 
