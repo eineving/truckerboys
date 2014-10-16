@@ -17,12 +17,24 @@ public class ActiveSessionDialogFragment extends DialogFragment {
     // Use this instance of the interface to deliver action events
     ActiveSessionDialogFragmentListener myListener;
 
+    public static ActiveSessionDialogFragment newInstance(Long timeLeft) {
+        ActiveSessionDialogFragment frag = new ActiveSessionDialogFragment();
+
+        Bundle args = new Bundle();
+        args.putLong("timeLeft", timeLeft);
+        frag.setArguments(args);
+
+        return frag;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle bundle) {
+        Long timeLeft = getArguments().getLong("timeLeft");
+
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-        dialogBuilder.setMessage("You've got " + bundle.getLong("timeLeft")/1000
-                + "min left until you're allowed to drive again. You sure you want to set a new " +
+        dialogBuilder.setMessage("You've got " + ((timeLeft/1000)/60)  + "." + ((timeLeft/60)%1000) +
+                "min left until you're allowed to drive again. You sure you want to set a new " +
                 "route?").setPositiveButton("Yes",
                 new DialogInterface.OnClickListener() {
 
