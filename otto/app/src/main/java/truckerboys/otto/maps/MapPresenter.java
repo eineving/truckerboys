@@ -71,17 +71,23 @@ public class MapPresenter implements IEventListener, IView {
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
             mapView.setFinalDestinationText(mapModel.getRoute().getFinalDestination().getAddress());
-            mapView.setFinalDestinationDistText(mapModel.getRoute().getDistance() + " | ");
-            mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardMinutes() + "");
+            mapView.setFinalDestinationDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
+            mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
             mapView.showStartRouteDialog(true);
 
-            // Get first checkpoint
-            MapLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
+            if(mapModel.getRoute().getCheckpoints().size() > 0) {
+                // Get first checkpoint
+                MapLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
 
-            // Set first checkpoints in strings.
-            mapView.setNextCheckpointText(firstCheckpoint.getAddress());
-            //mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
-            mapView.setNextCheckpointETAText(Long.toString(firstCheckpoint.getEta().getStandardMinutes()));
+                // Set first checkpoints in strings.
+                mapView.setNextCheckpointText(firstCheckpoint.getAddress());
+                //mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
+                mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardMinutes() + "");
+            } else {
+                mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getAddress());
+                mapView.setNextCheckpointETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
+                mapView.setNextCheckpointDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
+            }
             mapView.showActiveRouteDialog(false);
 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();

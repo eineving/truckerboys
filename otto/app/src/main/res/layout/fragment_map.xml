@@ -37,7 +37,10 @@
                 android:text="Stockholm, Sweden"
                 android:id="@+id/finalDestination_text"
                 android:layout_gravity="center_vertical"
-                android:layout_marginBottom="3dp" />
+                android:layout_marginBottom="3dp"
+                android:maxLines="1"
+                android:maxLength="29"
+                android:ellipsize="marquee" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -49,14 +52,20 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="52km | "
-                    android:id="@+id/finalDestinationDist_text" />
+                    android:id="@+id/finalDestinationDist_text"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="marquee" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="1h 30min"
-                    android:id="@+id/finalDestinationETA_text" />
+                    android:id="@+id/finalDestinationETA_text"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="end" />
 
             </LinearLayout>
 
@@ -99,7 +108,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/stopRoute_button"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_marginRight="10dp" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -113,13 +123,16 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Next Checkpoint"
                 android:id="@+id/nextStop_text"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="left|center_horizontal"
+                android:maxLines="1"
+                android:maxLength="29"
+                android:ellipsize="end" />
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="left|center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -128,7 +141,10 @@
                     android:text="30m"
                     android:id="@+id/nextStopDistance_text"
                     android:layout_gravity="center"
-                    android:layout_marginRight="5dp" />
+                    android:layout_marginRight="5dp"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="end" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -136,7 +152,10 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="1h 30min"
                     android:id="@+id/nextStopETA_text"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"
+                    android:maxLines="1"
+                    android:maxLength="29"
+                    android:ellipsize="end" />
             </LinearLayout>
 
         </LinearLayout>

@@ -359,7 +359,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
             positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
         } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
-            // TODO Get new arrow (red)
             positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
         }
     }
