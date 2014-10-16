@@ -2,6 +2,7 @@ package truckerboys.otto.utils;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -10,6 +11,7 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 public class GoogleRequesterHandlerTest extends TestCase {
 
+    @Test
     public void testDoInBackground() throws Exception {
         String response = "";
         try {

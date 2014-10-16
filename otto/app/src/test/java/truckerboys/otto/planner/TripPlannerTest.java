@@ -12,6 +12,14 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.utils.positions.MapLocation;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class TripPlannerTest extends TestCase {
     //Bergvagen 11 Molnlycke
     private MapLocation currentLocation = new MapLocation(new LatLng(57.6535522, 12.1244496));
@@ -25,24 +33,29 @@ public class TripPlannerTest extends TestCase {
 
     private Route activeRoute;
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         tripPlanner = new TripPlanner(new EURegulationHandler(), new GoogleDirections(), new GooglePlaces(), user);
 
     }
 
+    @Test
     public void testUpdateRoute() throws Exception {
         fail("Test not implemented");
     }
 
-    public void testGetRoute() throws Exception {
+    @Test
+    public void testGestRoute() throws Exception {
         fail("Test not implemented");
     }
 
+    @Test
     public void testSetChoosenStop() throws Exception {
         fail("Test not implemented");
     }
 
+    @Test
     public void testSetNewRoute() throws Exception {
         tripPlanner.setNewRoute(currentLocation, kiruna, malmo,stockholm);
         activeRoute = tripPlanner.getRoute();
@@ -54,9 +67,17 @@ public class TripPlannerTest extends TestCase {
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(kiruna));
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(stockholm));
 
+        assertFalse(activeRoute.getEta().isEqual(activeRoute.getEtaToFirstCheckpoint()));
+
+        //Malmo is within reach
+        tripPlanner.setNewRoute(currentLocation, malmo);
+        activeRoute=tripPlanner.getRoute();
+
+        assertTrue(activeRoute.getRecommendedStop().equalCoordinates(malmo));
         assertTrue(activeRoute.getEta().isEqual(activeRoute.getEtaToFirstCheckpoint()));
     }
 
+    @Test
     public void testPassedCheckpoint() throws Exception{
         fail("Test not implemented");
     }
