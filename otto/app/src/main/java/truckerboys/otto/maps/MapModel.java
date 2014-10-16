@@ -27,11 +27,17 @@ public class MapModel implements IEventListener {
     // The amount of meters that the GPS position is allowed to be outside the route.
     private static final int OUTSIDE_ROUTE_DIFF = 10;
 
+    // The distance from a checkpoint (in meters) that we need to go to change route.
+    private static final int DISTANCE_FROM_CHECKPOINT = 1000;
+
     private TripPlanner tripPlanner;
     private boolean activeRoute = false;
 
     // The number of GPS coordinates in a row that have been distanceToRoute >= OUTSIDE_ROUTE_DIFF
     private List<MapLocation> outsideRoute = new LinkedList<MapLocation>();
+
+    // If we've been close to a checkpoint on the route.
+    private boolean closeToCheckpoint = false;
 
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
@@ -41,9 +47,27 @@ public class MapModel implements IEventListener {
     @Override
     public void performEvent(Event event) {
         if (event.isType(GPSUpdateEvent.class)) {
+            GPSUpdateEvent gpsUpdateEvent = (GPSUpdateEvent) event;
             // TODO Check if outside current route, calculate new route.
 
-            // TODO Implement logics if you go beyond a checkpoint.
+            // If we got in range of the checkpoint since last update.
+            if(gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) < DISTANCE_FROM_CHECKPOINT && !closeToCheckpoint) {
+                closeToCheckpoint = true;
+            } else if(closeToCheckpoint) /* We're currently in range. */{
+                try {
+                    // We left checkpoint range again, calculate new route to final destination.
+                    if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) > DISTANCE_FROM_CHECKPOINT) {
+                        tripPlanner.setNewRoute(LocationHandler.getCurrentLocationAsMapLocation(), getRoute().getFinalDestination(), null);
+                        closeToCheckpoint = false;
+                    }
+                } catch (InvalidRequestException e) {
+                    //TODO Create proper catch
+                    e.printStackTrace();
+                } catch (NoConnectionException e) {
+                    //TODO Create proper catch
+                    e.printStackTrace();
+                }
+            }
         }
         //region NewRouteEvent (This event is fired when the user requests a new route from RouteActivity.)
         if (event.isType(RouteRequestEvent.class)) {
