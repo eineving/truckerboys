@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-
-    <!-- Start route banner -->
-    <LinearLayout
+    <!-- Start Route Dialog -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/startRoute_dialog"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="90dp"
@@ -20,7 +20,6 @@
         android:background="@drawable/opacity_grey_gradient"
         android:paddingLeft="10dp"
         android:paddingTop="0dp"
-        android:id="@+id/startRoute_dialog"
         android:visibility="invisible" >
 
         <LinearLayout
@@ -54,28 +53,80 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:paddingTop="18dp"
             android:showDividers="middle|beginning|end"
-            android:divider="@color/basicblue_color"
             android:id="@+id/startRoute_button"
-            android:focusableInTouchMode="false">
+            android:focusableInTouchMode="false"
+            android:textAlignment="center">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/imageView2"
                 android:src="@android:drawable/ic_menu_directions"
-                android:layout_weight="1" />
+                android:layout_gravity="center" />
         </LinearLayout>
     </LinearLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exit Navigation"
-        android:id="@+id/exit_navigation"
+    <!-- Active Route Dialog -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/activeRoute_dialog"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="90dp"
         android:layout_gravity="left|bottom"
-        android:visibility="invisible" />
-    
+        android:background="@drawable/opacity_grey_gradient"
+        android:paddingLeft="10dp"
+        android:paddingTop="0dp"
+        android:visibility="invisible" >
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/stopRoute_button"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Next Checkpoint"
+                android:id="@+id/nextStop_text"
+                android:layout_gravity="center_horizontal" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="30m"
+                    android:id="@+id/nextStopDistance_text"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="5dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="1h 30min"
+                    android:id="@+id/nextStopETA_text"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>

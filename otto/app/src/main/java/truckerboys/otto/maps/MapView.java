@@ -7,8 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +21,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.swedspot.vil.distraction.DriverDistractionLevel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,11 +34,13 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.vehicle.IDistractionListener;
+import truckerboys.otto.vehicle.VehicleInterface;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  */
-public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener {
+public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener, IDistractionListener {
 
     private View rootView;
     private MapPresenter presenter;
@@ -51,8 +53,12 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     // Button that is clicked when the user wants to start following a route.
     private LinearLayout startRoute;
+    private ImageView stopRoute;
     private LinearLayout startRouteDialog;
-    private Button exitNavigation;
+    private LinearLayout activeRouteDialog;
+
+    // Last known distraction level. Used for optimizing (Not having to set new icon every time distractionlevel is changed.)
+    private int lastDistractionLevel;
 
     //region Camera Settings
     private float CAMERA_TILT = 45f;
@@ -74,6 +80,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
         EventTruck.getInstance().subscribe(this);
+        // Subscribe to DistractionLevelChanged, since we want to change marker when having a high distraction level.
+        VehicleInterface.subscribeToDistractionChange(this);
 
         //region Initiate GoogleMap
         // Get GoogleMap from Google.
@@ -89,7 +97,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
             // Add the positionmarker to the GoogleMap, making it possible to move it later on.
-            positionMarker = googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow)).position(new LatLng(0, 0)).flat(true));
+            positionMarker = googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue)).position(new LatLng(0, 0)).flat(true));
 
             // Add the empty polyline to the GoogleMap, making it possible to change the line later on.
             routePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.rgb(1, 87, 155)).width(20));
@@ -97,15 +105,17 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         //endregion
 
         startRouteDialog = (LinearLayout) rootView.findViewById(R.id.startRoute_dialog);
+        activeRouteDialog = (LinearLayout) rootView.findViewById(R.id.activeRoute_dialog);
         startRoute = (LinearLayout) rootView.findViewById(R.id.startRoute_button);
-        exitNavigation = (Button) rootView.findViewById(R.id.exit_navigation);
+        stopRoute = (ImageView) rootView.findViewById(R.id.stopRoute_button);
+
 
         startRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 presenter.startFollowRoute();
-                exitNavigation.setVisibility(View.VISIBLE);
-                startRouteDialog.setVisibility(View.INVISIBLE);
+                showStartRouteDialog(false);
+                showActiveRouteDialog(true);
                 setAllGestures(false);
             }
         });
@@ -126,17 +136,17 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         });
         //endregion
 
-        exitNavigation.setOnClickListener(new View.OnClickListener() {
+        stopRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                exitNavigation.setVisibility(View.INVISIBLE);
+                showActiveRouteDialog(false);
                 presenter.stopFollowRoute();
                 setAllGestures(true);
 
                 //If there currently is a route drawn on the map.
                 if(routePolyline.getPoints().size() > 0){
                     // Show Start route dialog again.
-                    startRouteDialog.setVisibility(View.VISIBLE);
+                    showStartRouteDialog(true);
                 }
             }
         });
@@ -209,7 +219,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
             // Add the new markers to the map.
             for (MapLocation location : mapLocations) {
-                checkpointMarkers.add(googleMap.addMarker(new MarkerOptions().position(location.getLatLng())));
+                checkpointMarkers.add(googleMap.addMarker(new MarkerOptions()
+                        .position(location.getLatLng())
+                        .title("Adress: " + location.getAddress() + ", ETA: " + location.getEta().getStandardMinutes())
+                ));
             }
         }
     }
@@ -222,7 +235,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * @requires setupPositionMarker() has been called.
      */
     public void followRoute() {
-        System.out.println("Following route");
         if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
@@ -319,5 +331,19 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     public void showStartRouteDialog(boolean visibility){
         startRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    public void showActiveRouteDialog(boolean visibility){
+        activeRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel) {
+        if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
+            positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+        } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
+            // TODO Get new arrow (red)
+            positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
+        }
     }
 }

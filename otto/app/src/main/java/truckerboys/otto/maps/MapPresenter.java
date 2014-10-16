@@ -70,6 +70,7 @@ public class MapPresenter implements IEventListener, IView {
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
             mapView.showStartRouteDialog(true);
+            mapView.showActiveRouteDialog(false);
 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             builder.include(LocationHandler.getCurrentLocationAsLatLng());

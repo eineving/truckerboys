@@ -4,6 +4,7 @@ import android.location.Address;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import truckerboys.otto.directionsAPI.Route;
@@ -22,8 +23,17 @@ import truckerboys.otto.utils.positions.MapLocation;
  * Created by Mikael Malmqvist on 2014-09-18.
  */
 public class MapModel implements IEventListener {
+
+    // The amount of meters that the GPS position is allowed to be outside the route.
+    private static final int OUTSIDE_ROUTE_DIFF = 10;
+
     private TripPlanner tripPlanner;
     private boolean activeRoute = false;
+
+    // The number of GPS coordinates in a row that have been distanceToRoute >= OUTSIDE_ROUTE_DIFF
+    private List<MapLocation> outsideRoute = new LinkedList<MapLocation>();
+
+
 
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
@@ -34,8 +44,6 @@ public class MapModel implements IEventListener {
     public void performEvent(Event event) {
         if (event.isType(GPSUpdateEvent.class)) {
             // TODO Check if outside current route, calculate new route.
-
-            // TODO Implement logics if you go outside route.
 
             // TODO Implement logics if you go beyond a checkpoint.
         }
