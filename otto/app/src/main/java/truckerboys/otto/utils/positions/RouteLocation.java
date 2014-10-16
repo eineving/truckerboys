@@ -14,22 +14,21 @@ public class RouteLocation extends MapLocation {
     private String name;
     private Duration eta;
     private String address;
+    private int distance;
 
     /**
      * Create a new rest location
      *
-     * @param latLng  coordinates
-     * @param name    name of the rest location
-     * @param address the address of the location
-     * @param type    type of rest location
-     * @param eta     estimated time til arrival
+     * @param latLng   coordinates
+     * @param address  the address of the location
+     * @param eta      estimated time til arrival
+     * @param distance distance to location in meters
      */
-    public RouteLocation(LatLng latLng, String name, String address, List<String> type, Duration eta) {
+    public RouteLocation(LatLng latLng, String address, Duration eta, int distance) {
         super(latLng);
-        this.name = name;
         this.address = address;
-        this.type = type;
         this.eta = eta;
+        this.distance = distance;
     }
 
     /**
@@ -52,6 +51,7 @@ public class RouteLocation extends MapLocation {
 
     /**
      * Get the estimated time til arrival
+     *
      * @return estimated time til arrival
      */
     public Duration getEta() {
@@ -60,9 +60,37 @@ public class RouteLocation extends MapLocation {
 
     /**
      * Get the address of the location
+     *
      * @return address of the location
      */
     public String getAddress() {
         return address;
+    }
+
+    /**
+     * Get the distance to the location.
+     *
+     * @return distance to location in meters.
+     */
+    public int getDistance() {
+        return distance;
+    }
+
+    /**
+     * Set what type of RouteLocation this is
+     *
+     * @param type type of location
+     */
+    public void setType(List<String> type) {
+        this.type = type;
+    }
+
+    /**
+     * Set name of the RouteLocation
+     *
+     * @param name name of the RouteLocation
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

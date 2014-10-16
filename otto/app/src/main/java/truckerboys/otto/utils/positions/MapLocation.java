@@ -10,9 +10,6 @@ import org.joda.time.Duration;
  * Created by Daniel on 2014-09-18.
  */
 public class MapLocation extends Location{
-    private String address = "";
-    private Duration eta = Duration.ZERO;
-
     public MapLocation(Location location){
         super(location);
     }
