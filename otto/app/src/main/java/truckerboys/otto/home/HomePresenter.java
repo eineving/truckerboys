@@ -57,10 +57,8 @@ public class HomePresenter implements IView, IEventListener {
         // If there's any sessions stored
         if (User.getInstance().getHistory().getSessions().size() > 0) {
 
-            // If the latest session is DRIVING show a dialog
-            if (User.getInstance().getHistory().getSessions().get
-                    (User.getInstance().getHistory().getSessions().size() - 1).getSessionType()
-                    == SessionType.RESTING){
+            // If the latest session is RESTING
+            if (User.getInstance().getHistory().getSessions().get(0).getSessionType() == SessionType.RESTING){
 
                 try {
                     // If the user can't drive because this would violate a time regulation show a dialog
