@@ -20,7 +20,7 @@
         android:background="@drawable/opacity_grey_gradient"
         android:paddingLeft="10dp"
         android:paddingTop="0dp"
-        android:visibility="invisible" >
+        android:visibility="visible" >
 
         <LinearLayout
             android:orientation="vertical"
@@ -34,18 +34,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Final Destination"
+                android:text="Stockholm, Sweden"
                 android:id="@+id/finalDestination_text"
                 android:layout_gravity="center_vertical"
                 android:layout_marginBottom="3dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="ETA"
-                android:id="@+id/eta_text"
-                android:layout_gravity="center_vertical" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="52km | "
+                    android:id="@+id/finalDestinationDist_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="1h 30min"
+                    android:id="@+id/finalDestinationETA_text" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout

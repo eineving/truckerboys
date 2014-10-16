@@ -15,6 +15,7 @@ import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.positions.MapLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -69,7 +70,18 @@ public class MapPresenter implements IEventListener, IView {
         if(event.isType(RouteRequestEvent.class)){
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
+            mapView.setFinalDestinationText(mapModel.getRoute().getFinalDestination().getAddress());
+            mapView.setFinalDestinationDistText(mapModel.getRoute().getDistance() + " | ");
+            mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardMinutes() + "");
             mapView.showStartRouteDialog(true);
+
+            // Get first checkpoint
+            MapLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
+
+            // Set first checkpoints in strings.
+            mapView.setNextCheckpointText(firstCheckpoint.getAddress());
+            //mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
+            mapView.setNextCheckpointETAText(Long.toString(firstCheckpoint.getEta().getStandardMinutes()));
             mapView.showActiveRouteDialog(false);
 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();

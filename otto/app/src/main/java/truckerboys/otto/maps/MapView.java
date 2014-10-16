@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -56,6 +57,14 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private ImageView stopRoute;
     private LinearLayout startRouteDialog;
     private LinearLayout activeRouteDialog;
+
+    // Texts
+    private TextView finalDestinationText;
+    private TextView finalDestinationETAText;
+    private TextView finalDestinationDistText;
+    private TextView nextCheckpointText;
+    private TextView nextCheckpointETAText;
+    private TextView nextCheckpointDistText;
 
     // Last known distraction level. Used for optimizing (Not having to set new icon every time distractionlevel is changed.)
     private int lastDistractionLevel;
@@ -108,6 +117,14 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         activeRouteDialog = (LinearLayout) rootView.findViewById(R.id.activeRoute_dialog);
         startRoute = (LinearLayout) rootView.findViewById(R.id.startRoute_button);
         stopRoute = (ImageView) rootView.findViewById(R.id.stopRoute_button);
+
+        //Initialize texts.
+        finalDestinationText = (TextView) rootView.findViewById(R.id.finalDestination_text);
+        finalDestinationETAText = (TextView) rootView.findViewById(R.id.finalDestinationETA_text);
+        finalDestinationDistText = (TextView) rootView.findViewById(R.id.finalDestinationDist_text);
+        nextCheckpointText = (TextView) rootView.findViewById(R.id.nextStop_text);
+        nextCheckpointETAText = (TextView) rootView.findViewById(R.id.nextStopETA_text);
+        nextCheckpointDistText = (TextView) rootView.findViewById(R.id.nextStopDistance_text);
 
 
         startRoute.setOnClickListener(new View.OnClickListener() {
@@ -345,5 +362,29 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             // TODO Get new arrow (red)
             positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
         }
+    }
+
+    public void setFinalDestinationText(String text) {
+        finalDestinationText.setText(text);
+    }
+
+    public void setFinalDestinationETAText(String text) {
+        finalDestinationETAText.setText(text);
+    }
+
+    public void setFinalDestinationDistText(String text) {
+        finalDestinationDistText.setText(text);
+    }
+
+    public void setNextCheckpointText(String text) {
+        nextCheckpointText.setText(text);
+    }
+
+    public void setNextCheckpointETAText(String text) {
+        nextCheckpointETAText.setText(text);
+    }
+
+    public void setNextCheckpointDistText(String text) {
+        nextCheckpointDistText.setText(text);
     }
 }
