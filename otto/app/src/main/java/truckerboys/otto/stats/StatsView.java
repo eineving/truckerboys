@@ -50,8 +50,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
     private static final String SETTINGS = "Settings_file";
     private static final String STATS = "Stats_file";
 
-    private Handler updateHandler = new Handler(Looper.getMainLooper());
-
     // Todays stats
     private TextView timeToday;
     private TextView distanceByFuel;
@@ -71,9 +69,46 @@ public class StatsView extends Fragment implements IView, IEventListener{
     private String distanceUnit = "";
     private String fuelUnit = "";
 
-
+    //region Runnables
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
+    private Runnable statsUpdater = new Runnable() {
+        public void run() {
+            updateStats();
+            updateHandler.postDelayed(statsUpdater, 600000); // Updates each 5sec
+        }
+    };
 
     public StatsView(){
+    }
+
+
+    /**
+     * Method for updating the stats.
+     * This method is run each 5min
+     */
+    public void updateStats() {
+        Duration durationToday;
+        Duration durationTotal;
+
+
+        if(User.getInstance().getHistory() != null) {
+
+            // Time driven today
+            durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
+
+            // Total time driven since start
+            durationTotal = User.getInstance().getHistory().getActiveTimeSince(new Instant(0));
+
+            double timeDrivenToday = durationToday.getStandardMinutes()/60;
+            double timeDrivenTotal = durationTotal.getStandardMinutes()/60;
+
+            timeToday.setText(timeDrivenToday + " h");
+            timeTotal.setText(timeDrivenTotal + " h");
+
+
+            EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
+        }
+
     }
 
     @Override
@@ -103,46 +138,11 @@ public class StatsView extends Fragment implements IView, IEventListener{
         // Restores preferences for settings in presenter
         EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
 
+        statsUpdater.run();
+
         return rootView;
     }
 
-
-    // TODO: Look over this method!
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        Duration durationToday;
-        Duration durationTotal;
-
-
-        // TODO UNCOMMENT THIS
-        durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
-
-        // TODO Change this to SessionHistory.getActiveTimeSince(Instant start)
-        durationTotal = User.getInstance().getHistory().getActiveTimeSince(new Instant(0));
-        // TODO Ask pegelow about this
-
-
-        double timeDrivenToday = durationToday.getStandardMinutes()/60;
-        double timeDrivenTotal = durationTotal.getStandardMinutes()/60;
-
-        // TEST VALUES
-        //double timeDrivenToday = 55.0/60.0;
-        //double timeDrivenTotal = 120.0/60.0;
-
-        //TODO UNCOMMENT IN NEXT MERGE
-        // timeToday.setText(timeDrivenToday + "h");
-        // timeTotal.setText(timeDrivenTotal + "h");
-
-        timeToday.setText(timeDrivenToday + " h");
-        timeTotal.setText(timeDrivenTotal + " h");
-
-
-        //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
-        EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
-
-    }
 
     /**
      * On stop, save the settings displayed in the view.
@@ -270,8 +270,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
         if(event.isType(TotalDistanceEvent.class)) {
             // Update view if new total distance signal is sent
-
-            //distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
 
             Runnable updateDistance = new Runnable() {
                 public void run() {
