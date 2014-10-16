@@ -143,7 +143,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
         return rootView;
     }
 
-
     /**
      * On stop, save the settings displayed in the view.
      */

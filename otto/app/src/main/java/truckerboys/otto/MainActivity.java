@@ -35,6 +35,16 @@ public class MainActivity extends Activity implements LocationListener{
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(isConnectedToGPS()){
+            launchOTTOActivity();
+        } else {
+            launchNoConnectionActivity();
+        }
+    }
+
     private boolean isConnectedToGPS(){
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
