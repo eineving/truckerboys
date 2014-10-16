@@ -54,7 +54,7 @@ public class TripPlannerTest extends TestCase {
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(kiruna));
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(stockholm));
 
-        assertTrue(activeRoute.getEta().isEqual(activeRoute.getEtaToFirstCheckpoint());
+        assertTrue(activeRoute.getEta().isEqual(activeRoute.getEtaToFirstCheckpoint()));
     }
 
     public void testPassedCheckpoint() throws Exception{
