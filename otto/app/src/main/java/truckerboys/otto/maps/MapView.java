@@ -2,14 +2,13 @@ package truckerboys.otto.maps;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,12 +28,10 @@ import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
-import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
-import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
 
@@ -44,6 +41,7 @@ import truckerboys.otto.utils.positions.MapLocation;
 public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener {
 
     private View rootView;
+    private MapPresenter presenter;
 
     // Objects that identify everything that is visible on the map.
     private GoogleMap googleMap;
@@ -51,9 +49,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private List<Marker> checkpointMarkers = new LinkedList<Marker>();
     private Polyline routePolyline;
 
-    // Currently visible (drawn) legs of the polyline.
-    private List<LatLng> routeSteps = new LinkedList<LatLng>();
+    // Button that is clicked when the user wants to start following a route.
     private LinearLayout startRoute;
+    private LinearLayout startRouteDialog;
+    private Button exitNavigation;
 
     //region Camera Settings
     private float CAMERA_TILT = 45f;
@@ -62,28 +61,11 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     //region Interpolation variables.
     // The frequency of the interpolation.
-    private static final int INTERPOLATION_FREQ = 25;
+    public static final int INTERPOLATION_FREQ = 25;
     // The step of the interpolation.
     private int index;
     private LinkedList<Double2> positions = new LinkedList<Double2>();
     private LinkedList<Float> bearings = new LinkedList<Float>();
-    //endregion
-
-    //region Runnables
-    private Handler updateHandler = new Handler(Looper.getMainLooper());
-    private Runnable updatePos = new Runnable() {
-        public void run() {
-            interpolateMarker();
-        }
-    };
-
-    private Handler drawPolylineHandler = new Handler();
-    private Runnable drawPolyline = new Runnable() {
-        @Override
-        public void run() {
-            routePolyline.setPoints(routeSteps);
-        }
-    };
     //endregion
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,11 +75,12 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
         EventTruck.getInstance().subscribe(this);
 
+        //region Initiate GoogleMap
         // Get GoogleMap from Google.
         googleMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        if (googleMap != null) /* If we were successfull in receiving a GoogleMap */ {
+        if (googleMap != null) /* If we were successful in receiving a GoogleMap */ {
             // Set all gestures disabled, truckdriver shouldn't be able to move the map.
-            googleMap.getUiSettings().setAllGesturesEnabled(true);
+            setAllGestures(true);
             googleMap.getUiSettings().setZoomControlsEnabled(false);
 
             googleMap.setOnCameraChangeListener(this);
@@ -111,21 +94,29 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             // Add the empty polyline to the GoogleMap, making it possible to change the line later on.
             routePolyline = googleMap.addPolyline(new PolylineOptions().color(Color.rgb(1, 87, 155)).width(20));
         }
+        //endregion
 
+        startRouteDialog = (LinearLayout) rootView.findViewById(R.id.startRoute_dialog);
         startRoute = (LinearLayout) rootView.findViewById(R.id.startRoute_button);
+        exitNavigation = (Button) rootView.findViewById(R.id.exit_navigation);
 
         startRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveCamera(true, LocationHandler.getCurrentLocationAsLatLng(), 16f, LocationHandler.getCurrentLocationAsMapLocation().getBearing());
+                presenter.startFollowRoute();
+                exitNavigation.setVisibility(View.VISIBLE);
+                startRouteDialog.setVisibility(View.INVISIBLE);
+                setAllGestures(false);
             }
         });
 
+        // Make the follow route button responsive.
+        //region StartRoute - OnTouchListener
         startRoute.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    startRoute.setBackgroundColor(R.color.textLightest);
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    startRoute.setBackgroundColor(getResources().getColor(R.color.textLightest));
                 } else {
                     startRoute.setBackgroundColor(Color.TRANSPARENT);
                 }
@@ -133,8 +124,22 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 return false;
             }
         });
+        //endregion
 
-        updatePos.run();
+        exitNavigation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exitNavigation.setVisibility(View.INVISIBLE);
+                presenter.stopFollowRoute();
+                setAllGestures(true);
+
+                //If there currently is a route drawn on the map.
+                if(routePolyline.getPoints().size() > 0){
+                    // Show Start route dialog again.
+                    startRouteDialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         return rootView;
     }
@@ -159,6 +164,23 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     /**
      * Helper method to move the camera across the map.
      *
+     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
+     * @param location The location to set the camera to.
+     * @param bearing  The bearing to set the camera to.
+     */
+    public void moveCamera(boolean animate, LatLng location, float zoom, float bearing, int durationMs) {
+        if (googleMap != null) {
+            if (animate) {
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)), durationMs, null);
+            } else {
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
+            }
+        }
+    }
+
+    /**
+     * Helper method to move the camera across the map.
+     *
      * @param animate True if you want the camera to be animated across the map. False if it should just move instantly.
      * @param bounds The bounds to zoom according to.
      */
@@ -170,32 +192,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
             }
         }
-    }
-
-    /**
-     * Helper method to move the camera across the map.
-     *
-     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
-     * @param location The location to set the camera to.
-     * @param bearing  The bearing to set the camera to.
-     */
-    public void moveCamera(boolean animate, LatLng location, float zoom, float bearing) {
-        if (googleMap != null) {
-            if (animate) {
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
-            } else {
-                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
-            }
-        }
-    }
-
-    /**
-     * Call this method when the polyline needs to be updated. Should not be updated to often, since
-     * it will decrease performance significantly.
-     */
-    public void drawPolyline() {
-        //Make the drawing of the polyline happen on a different thread.
-        drawPolylineHandler.post(drawPolyline);
     }
 
     /**
@@ -225,9 +221,9 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * @requires to be updated once every 1/INTERPOLATION_FREQ second to function properly.
      * @requires setupPositionMarker() has been called.
      */
-    public void interpolateMarker() {
+    public void followRoute() {
+        System.out.println("Following route");
         if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
-
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
             if (positions.size() >= 3) {
@@ -269,11 +265,9 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     bearings.removeFirst();
                     bearings.removeFirst();
                 }
-                moveCamera(false, positionMarker.getPosition(), positionMarker.getRotation());
             }
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(positionMarker.getPosition()));
         }
-
-        updateHandler.postDelayed(updatePos, LocationHandler.LOCATION_REQUEST_INTERVAL_MS / INTERPOLATION_FREQ);
     }
 
     @Override
@@ -294,23 +288,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             // Making it possible to interpolate theese values.
             positions.add(new Double2(newLocation.getLatitude(), newLocation.getLongitude()));
             bearings.add(newLocation.getBearing());
-
-            // TODO Implement logics if you go outside route.
-
-            // TODO Implement logics if you go beyond a checkpoint.
         }
         //endregion
-
-        if(event.isType(RouteRequestEvent.class)){
-            RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
-
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            builder.include(LocationHandler.getCurrentLocationAsLatLng());
-            builder.include(new LatLng(routeRequestEvent.getFinalDestion().getLatitude(), routeRequestEvent.getFinalDestion().getLongitude()));
-            LatLngBounds bounds = builder.build();
-
-            moveCamera(true, bounds);
-        }
     }
 
     @Override
@@ -324,14 +303,21 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * @param route The new route do draw on the map.
      */
     public void setRoute(Route route) {
-        //Clear old route
-        routeSteps.clear();
-
         //Add all new steps.
-        routeSteps.addAll(route.getDetailedPolyline());
+        routePolyline.setPoints(route.getDetailedPolyline());
     }
 
-    public LinearLayout getStartRouteButton(){
-        return startRoute;
+    public void setPresenter(MapPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    private void setAllGestures(boolean value){
+        if (googleMap != null) {
+            googleMap.getUiSettings().setAllGesturesEnabled(value);
+        }
+    }
+
+    public void showStartRouteDialog(boolean visibility){
+        startRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 }

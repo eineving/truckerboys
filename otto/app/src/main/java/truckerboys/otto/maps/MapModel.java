@@ -33,7 +33,11 @@ public class MapModel implements IEventListener {
     @Override
     public void performEvent(Event event) {
         if (event.isType(GPSUpdateEvent.class)) {
-            //TODO Check if outside current route, calculate new route.
+            // TODO Check if outside current route, calculate new route.
+
+            // TODO Implement logics if you go outside route.
+
+            // TODO Implement logics if you go beyond a checkpoint.
         }
         //region NewRouteEvent (This event is fired when the user requests a new route from RouteActivity.)
         if (event.isType(RouteRequestEvent.class)) {
