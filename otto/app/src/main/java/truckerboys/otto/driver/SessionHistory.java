@@ -320,6 +320,21 @@ public class SessionHistory {
                         //If not, it's a reduced one, check if that's valid. Since we can only have 3 per week.
                         if (getNumberOfReducedDailyRestsThisWeek() < 3) {
                             return new Instant(session.getEndTime());
+                        } else if (true) /* It might be a split daily rest */ {
+
+                            //If there's a rest longer than 3h before the one just found and occurs on the same day
+                            //the one just found is a normal rest.
+
+                            //Find the next daily break
+                            for (int j = i + 1; j < sessions.size() - 1; j++) {
+                                Session sessionTwo = sessions.get(j);
+                                if (sessionTwo.getDuration().isLongerThan(SPLIT_DAY_REST_FIRST) &&
+                                        sessionTwo.getDuration().isShorterThan(SPLIT_DAY_REST_SECOND) &&
+                                        (getDateOfSession(j).getDayOfYear() == getDateOfSession(i).getDayOfYear())) {
+                                    return new Instant(session.getEndTime());
+                                }
+                            }
+
                         } else /* It's not valid, check for the last valid one */ {
 
                             Session temp_session;
@@ -334,7 +349,7 @@ public class SessionHistory {
                                     if (temp_session.getDuration().isLongerThan(STANDARD_DAILY_REST)) {
                                         return new Instant(temp_session.getEndTime());
                                     } else {
-                                        //If not, count down untill we have a valid reduced daily break.
+                                        //If not, count down until we have a valid reduced daily break.
                                         validReducedBreakIn--;
 
                                         if (validReducedBreakIn <= 0) {
@@ -352,7 +367,10 @@ public class SessionHistory {
             }
         }
 
-        throw new NoValidBreakFound("No valid daily-break was found");
+        throw new
+
+                NoValidBreakFound("No valid daily-break was found");
+
     }
 
     /**
