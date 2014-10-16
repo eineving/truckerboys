@@ -117,7 +117,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
         views.add(new ClockPresenter());
 
-        views.add(new HomePresenter());
+        views.add(new HomePresenter((EURegulationHandler)regulationHandler));
 
         views.add(new StatsPresenter());
 

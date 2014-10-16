@@ -107,6 +107,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
     }
 
 
+    // TODO: Look over this method!
     @Override
     public void onResume() {
         super.onResume();
@@ -162,7 +163,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         editor.commit();
-
 
     }
 
