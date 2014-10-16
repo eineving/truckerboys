@@ -31,13 +31,49 @@ public class SessionHistory {
      * The list of past sessions, sorted with the last session first.
      */
     private List<Session> sessions = new ArrayList<Session>();
+    /**
+     * Adds a sessions to the history.
+     *
+     * @param session the past sessions
+     */
+    public void addSession(Session session) {
+        if(sessions.size() == 0){
+            sessions.add(session);
+        }else{
+            boolean added = false;
+            for (Session s : sessions) {
+                if (session.getStartTime().isAfter(s.getStartTime())) {
+                    sessions.add(sessions.indexOf(s), session);
+                    added = true;
+                    break;
+                }
+            }
+            if(!added){
+                sessions.add(session);
+            }
+        }
+    }
 
-    private HistoryOpenHelper historyDB;
+
+    public List<Session> getSessions() {
+        return sessions;
+    }
+
+    /** Regulation checks. */
 
 
-    public SessionHistory(Context context){
-        historyDB = new HistoryOpenHelper(context);
-        //sessions.addAll(historyDB.getAllSessions());
+    /**
+     * Get the duration since current break was started.
+     *
+     * @return Duration since break was started.
+     * @throws CurrentlyNotOnRestException if driver currently isn't on a break.
+     */
+    public Duration getTimeSinceRestStart() throws CurrentlyNotOnRestException {
+        if(sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.RESTING) {
+            return sessions.get(0).getDuration();
+        }
+
+        throw new CurrentlyNotOnRestException();
     }
 
     /**
@@ -71,45 +107,6 @@ public class SessionHistory {
 
         return false;
     }
-
-    /*
-     * Get the duration since current break was started.
-     *
-     * @return Duration since break was started.
-     * @throws CurrentlyNotOnRestException if driver currently isn't on a break.
-     */
-    public Duration getTimeSinceRestStart() throws CurrentlyNotOnRestException {
-        if(sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.RESTING) {
-            return sessions.get(0).getDuration();
-        }
-
-        throw new CurrentlyNotOnRestException();
-    }
-
-    /**
-     * Adds a sessions to the history.
-     *
-     * @param session the past sessions
-     */
-    public void addSession(Session session) {
-        if(sessions.size() == 0){
-            sessions.add(session);
-        }else{
-            boolean added = false;
-            for (Session s : sessions) {
-                if (session.getStartTime().isAfter(s.getStartTime())) {
-                    sessions.add(sessions.indexOf(s), session);
-                    added = true;
-                    break;
-                }
-            }
-            if(!added){
-                sessions.add(session);
-            }
-        }
-        historyDB.addSession(session);
-    }
-
     /**
      * Returns the total driving time since the a specified instant in time.
      *
@@ -435,18 +432,11 @@ public class SessionHistory {
         return getActiveTimeSince(latestWeeklyBreak);
     }
 
-    private void saveHistory(){
-
-    }
-
-    private void loadHistory(){
-
-    }
-
-    public List<Session> getSessions() {
-        return sessions;
-    }
-
+    /**
+     * Returns the Date of a given Sessions.
+     * @param sessionIndex The index of the session
+     * @return The DateTime of Session at index i.
+     */
     public DateTime getDateOfSession(int sessionIndex) {
         return new DateTime(sessions.get(sessionIndex).getStartTime());
     }

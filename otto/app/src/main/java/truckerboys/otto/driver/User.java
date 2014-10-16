@@ -1,6 +1,7 @@
 package truckerboys.otto.driver;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Created by Martin on 17/09/2014.
@@ -11,8 +12,23 @@ public class User {
     private SessionHistory history;
     private Session currentSession;
 
+    private HistoryOpenHelper historyDB;
+
     public User(Context context){
-        history = new SessionHistory(context);
+        history = new SessionHistory();
+
+        historyDB = new HistoryOpenHelper(context);
+        int i = 0;
+        for(Session s : historyDB.getAllSessions()){
+            history.addSession(s);
+            i++;
+        }
+        Log.w("SESSION", "LOADED " + history.getSessions().size()+ " past sessions. " + i);
+
+        if(history.getSessions().size() > 0 && history.getSessions().get(0).isActive()){
+            currentSession = history.getSessions().get(0);
+            Log.w("SESSION", "CONTINUED ");
+        }
     }
 
     /**
@@ -22,8 +38,10 @@ public class User {
         if(currentSession != null && currentSession.isActive()){
             endSession();
         }
+        Log.w("SESSIONS", "NEW SESSION STARTED");
         currentSession = new Session(type);
         history.addSession(currentSession);
+        historyDB.addSession(currentSession);
     }
 
     /**
@@ -31,6 +49,7 @@ public class User {
      */
     public void endSession(){
         currentSession.end();
+        historyDB.overwriteSession(currentSession);
     }
 
 

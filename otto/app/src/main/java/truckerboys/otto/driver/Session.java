@@ -114,7 +114,7 @@ public class Session {
 
     @Override
     public String toString(){
-        return "Session start="+ start + " end= "+ end + " type=" + type;
+        return "Session [start="+ start + " end= "+ end + " type=" + type + "]";
     }
 
 }

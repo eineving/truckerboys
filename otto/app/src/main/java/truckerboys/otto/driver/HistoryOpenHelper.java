@@ -35,6 +35,7 @@ public class HistoryOpenHelper extends SQLiteOpenHelper{
 
     public HistoryOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        Log.w("DB" , "DB HELPER CLASS CONSTRUCTOR");
     }
 
     @Override
@@ -52,33 +53,70 @@ public class HistoryOpenHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // not implemented.
     }
 
-
-
-    public void addSession(Session session){
-        //for logging
-        Log.d("Sessions saved", session.toString());
-
-        // 1. get reference to writable DB
+    /**
+     * Overwrites a Session in the database.
+     * @param session
+     */
+    public void overwriteSession(Session session){
+        Log.w("DB","Session overwritten: " + session.toString());
+        //TODO Nilsson Check what happens when to try to change non-existing values.
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
         values.put(KEY_TYPE, "" + session.getSessionType());
-        values.put(KEY_START, "" + session.getStartTime()); //get StartTime
-        values.put(KEY_END, "" + session.getEndTime()); // get EndTime
+        values.put(KEY_END, "" + session.getEndTime().getMillis()); // get EndTime
 
-        // 3. insert
-        db.insert(TABLE_SESSIONS, // table
-                null, //nullColumnHack
-                values); // key/value -> keys = column names/ values = column values
 
-        // 4. close
+        int result = db.update(TABLE_SESSIONS,
+                values,
+                KEY_START + " =  ?",
+                new String[]{String.valueOf(session.getStartTime().getMillis())});
+
+        //TODO Nilsson check for errors, research sqlite error codes...
         db.close();
     }
 
+    /**
+     * Adds a session to the Database.
+     * @param session The session to add.
+     */
+    public void addSession(Session session){
+        Log.w("DB","Session saved: " + session.toString());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TYPE, "" + session.getSessionType());
+        values.put(KEY_START, "" + session.getStartTime().getMillis());
+        values.put(KEY_END, "" + session.getEndTime().getMillis());
+
+        db.insert(TABLE_SESSIONS,
+                null, // All columns
+                values);
+
+        db.close();
+    }
+
+    /**
+     * Deletes a session from the Database.
+     * @param session
+     */
+    public void deleteSession(Session session){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_SESSIONS,
+                KEY_START + " = ?",
+                new String[]{String.valueOf(session.getStartTime().getMillis())});
+        db.close();
+        Log.w("DB", "Deleted " + session);
+    }
+
+    /**
+     * Returns a list of all the sessions in the database.
+     * @return
+     */
     public List<Session> getAllSessions() {
         Log.w("HISTORY", "READING SESSIONS");
         List<Session> sessions = new ArrayList<Session>();

@@ -142,7 +142,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     public void loadUserHistory() {
 
         SessionHistory userHistory = user.getHistory();
-
+        /*
         // Adds dummy session history
         userHistory.addSession(new Session(SessionType.DRIVING, new Instant(Instant.now().minus(2000000000)), new Instant(Instant.now().minus(1500000000)) ));
         userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now().minus(1000000000)), new Instant(Instant.now().minus(500000000))));
@@ -152,7 +152,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         for(Session session : userHistory.getSessions()){
             session.end();
         }
-
+        */
         String sessionString = "";
 
         // Update statsview with the new session string
