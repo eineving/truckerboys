@@ -52,8 +52,6 @@ public class HomePresenter implements IView, IEventListener {
      * and displays a dialog about this.
      */
     public void newRouteClicked() {
-        user.getHistory().addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
-
         // If there's any sessions stored
         if (user.getHistory().getSessions().size() > 0) {
 
