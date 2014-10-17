@@ -162,6 +162,14 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
     }
 
+    /**
+     * Clears the session adapter for the
+     * history list.
+     */
+    public void clearSessionAdapter() {
+        sessionAdapter.clear();
+        sessionAdapter.notifyDataSetChanged();
+    }
 
     /**
      * Update the switches with settings loaded from shared preference file
