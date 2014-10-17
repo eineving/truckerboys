@@ -356,15 +356,23 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     public void showActiveRouteDialog(boolean visibility){
         activeRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+
+        //If we have an active route, we don't want the user to be able to move the camera.
+        setAllGestures(!visibility);
     }
 
     @Override
-    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel) {
-        if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
-            positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
-        } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
-            positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
-        }
+    public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
+                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+                } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
+                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
+                }
+            }
+        });
     }
 
     public void setFinalDestinationText(String text) {

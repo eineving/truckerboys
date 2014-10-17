@@ -78,7 +78,7 @@ public class MapPresenter implements IEventListener, IView {
             mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
             mapView.showStartRouteDialog(true);
 
-            if(mapModel.getRoute().getCheckpoints().size() > 0) {
+            if(!mapModel.getRoute().getCheckpoints().isEmpty()) {
                 // Get first checkpoint
                 MapLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
 

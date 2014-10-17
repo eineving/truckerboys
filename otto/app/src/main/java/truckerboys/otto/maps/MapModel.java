@@ -1,6 +1,7 @@
 package truckerboys.otto.maps;
 
 import android.location.Address;
+import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -52,7 +53,7 @@ public class MapModel implements IEventListener {
             // TODO Check if outside current route, calculate new route.
 
             // If we have route and checkpoints in route.
-            if(getRoute() != null && getRoute().getCheckpoints().get(0) != null) {
+            if(getRoute() != null && getRoute().getCheckpoints().size() > 0) {
                 // If we got in range of the checkpoint since last update.
                 if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) < DISTANCE_FROM_CHECKPOINT && !closeToCheckpoint) {
                     closeToCheckpoint = true;
