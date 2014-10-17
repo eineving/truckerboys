@@ -362,12 +362,17 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     }
 
     @Override
-    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel) {
-        if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
-            positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
-        } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
-            positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
-        }
+    public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
+                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+                } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
+                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
+                }
+            }
+        });
     }
 
     public void setFinalDestinationText(String text) {
