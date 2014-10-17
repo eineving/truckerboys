@@ -1,10 +1,12 @@
 package truckerboys.otto.newroute;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +25,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import javax.xml.transform.Result;
 
 import truckerboys.otto.OTTOActivity;
 import truckerboys.otto.R;
@@ -75,13 +79,58 @@ public class RouteActivity extends Activity implements IEventListener {
 
     // Dialogs
     private NoDestinationDialog dialog = new NoDestinationDialog();
+    private ProgressDialog spinnerDialog;
 
+
+    private Handler locationHandler = new Handler();
     InputMethodManager keyboard;
 
 
     public static final String HISTORY = "History_file";
 
     public RouteActivity() {
+
+    }
+
+    public void startSpinner(View view) {
+
+        spinnerDialog = new ProgressDialog(this);
+        spinnerDialog.setMessage("Loading your route");
+        spinnerDialog.setTitle("Loading");
+        spinnerDialog.setCancelable(true);
+        spinnerDialog.show();
+
+
+        handleNavigate();
+
+    }
+
+    public void handleNavigate() {
+
+        if (finalDestination != null && coder != null && routePresenter != null) {
+            if (finalDestination.getText() != null
+                    && !finalDestination.getText().equals("")) {
+
+                routePresenter.sendLocation("" + finalDestination.getText().toString(),
+                        routeModel.getCheckpoints(), coder);
+
+                if (history != null) {
+                    routePresenter.saveHistory(history, ""
+                            + finalDestination.getText().toString());
+                }
+
+            } else {
+                // If no destination is set
+                // TODO UNCOMMENT THIS
+                // dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
+
+                // TODO REMVOE THIS
+                        routePresenter.sendLocation("" + history1Text.getText(),
+                                new ArrayList<String>(), coder);
+            }
+        }
+
+
 
     }
 
@@ -171,12 +220,13 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
-        navigate.setOnTouchListener(new View.OnTouchListener() {
+        /*navigate.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
 
                 if(!finalDestination.getText().equals("")){
+                   //ProgressDialog.show(RouteActivity.this, "Loading", "Loading your route");
                 }
 
                 if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
@@ -221,7 +271,7 @@ public class RouteActivity extends Activity implements IEventListener {
                     }
                 }
             }
-        });
+        });*/
 
         // Handles when user clicks "done" button on keyboard
         search.setOnKeyListener(new View.OnKeyListener() {
