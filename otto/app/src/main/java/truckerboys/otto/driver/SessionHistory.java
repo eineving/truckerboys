@@ -1,14 +1,11 @@
 package truckerboys.otto.driver;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
-import org.joda.time.JodaTimePermission;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -32,17 +29,42 @@ public class SessionHistory {
      */
     private List<Session> sessions = new ArrayList<Session>();
 
+
+    public SessionHistory(){
+
+    }
     /**
      * Creates a new SessionHistory.
      *
      * @param sessions
      */
     public SessionHistory(List<Session> sessions) {
-        this.sessions = new ArrayList<Session>();
-        this.sessions.addAll(sessions);
+        for(Session s : sessions){
+            addSession(s);
+        }
     }
 
-    public SessionHistory() {
+    /**
+     * Adds a sessions to the history.
+     *
+     * @param session the past sessions
+     */
+    public void addSession(Session session) {
+        if(sessions.size() == 0){
+            sessions.add(session);
+        }else{
+            boolean added = false;
+            for (Session s : sessions) {
+                if (session.getStartTime().isAfter(s.getStartTime())) {
+                    sessions.add(sessions.indexOf(s), session);
+                    added = true;
+                    break;
+                }
+            }
+            if(!added){
+                sessions.add(session);
+            }
+        }
     }
 
     /**
@@ -54,21 +76,14 @@ public class SessionHistory {
         return sessions;
     }
 
-    /**
-     * Ends the session first in the list, the session currently active.
-     */
-    public void endCurrentSession() {
-        if (sessions.size() > 0) {
-            sessions.get(0).end();
-        }
-    }
-
-    public void removeLastSession() {
-        if (sessions.size() > 0) {
+    public void removeLastSession(){
+        if(sessions.size() > 0 ){
             sessions.remove(0);
         }
-
     }
+
+
+    /** Regulation checks. */
 
     /**
      * Returns true if the driver is currently  resting.
@@ -102,8 +117,7 @@ public class SessionHistory {
 
         return false;
     }
-
-    /*
+    /**
      * Get the duration since current break was started.
      *
      * @return Duration since break was started.
@@ -116,22 +130,6 @@ public class SessionHistory {
         }
 
         throw new CurrentlyNotOnRestException();
-    }
-
-    /**
-     * Adds a sessions to the history.
-     *
-     * @param session the past sessions
-     */
-    public void addSession(Session session) {
-
-        for (Session s : sessions) {
-            if (session.getEndTime().isAfter(s.getEndTime())) {
-                endCurrentSession();
-                sessions.add(sessions.indexOf(s), session);
-                break;
-            }
-        }
     }
 
     /**
@@ -538,9 +536,12 @@ public class SessionHistory {
 
     }
 
+    /**
+     * Returns the Date of a given Sessions.
+     * @param sessionIndex The index of the session
+     * @return The DateTime of Session at index i.
+     */
     public DateTime getDateOfSession(int sessionIndex) {
         return new DateTime(sessions.get(sessionIndex).getStartTime());
     }
-
-
 }

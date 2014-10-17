@@ -15,6 +15,7 @@ import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.newroute.RouteActivity;
 import truckerboys.otto.planner.EURegulationHandler;
+import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -27,15 +28,16 @@ import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
  */
 public class HomePresenter implements IView, IEventListener {
 
-    private EURegulationHandler handler;
+    private IRegulationHandler handler;
     private HomeModel model;
     private HomeView view;
     private ActiveSessionDialogFragment dialog;
+    private User user;
 
-    public HomePresenter(EURegulationHandler handler) {
+    public HomePresenter(IRegulationHandler handler, User user) {
         this.model = new HomeModel();
         this.view = new HomeView();
-
+        this.user = user;
         this.handler = handler;
 
 
@@ -50,23 +52,21 @@ public class HomePresenter implements IView, IEventListener {
      * and displays a dialog about this.
      */
     public void newRouteClicked() {
-
-
-        User.getInstance().getHistory().addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
+        user.getHistory().addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
 
         // If there's any sessions stored
-        if (User.getInstance().getHistory().getSessions().size() > 0) {
+        if (user.getHistory().getSessions().size() > 0) {
 
             // If the latest session is RESTING
-            if (User.getInstance().getHistory().getSessions().get(0).getSessionType() == SessionType.RESTING){
+            if (user.getHistory().getSessions().get(0).getSessionType() == SessionType.RESTING){
 
                 try {
                     // If the user can't drive because this would violate a time regulation show a dialog
-                    if(handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().isLongerThan(Duration.ZERO)){
+                    if(handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().isLongerThan(Duration.ZERO)){
 
                         // Sends time left on break
                         dialog = new ActiveSessionDialogFragment().newInstance(
-                                handler.getTimeLeftOnBreak(User.getInstance().getHistory()).getTimeLeft().getMillis());
+                                handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().getMillis());
                         dialog.onAttach(view.getActivity());
 
 
@@ -78,8 +78,6 @@ public class HomePresenter implements IView, IEventListener {
                     Intent newRouteIntent = new Intent(view.getActivity(), RouteActivity.class);
                     view.getActivity().startActivity(newRouteIntent);
                 }
-
-
 
             } else { // If the latest session isn't active
 

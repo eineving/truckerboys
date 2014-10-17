@@ -48,8 +48,12 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     public static final String STATS = "Stats_file";
     public static final String SETTINGS = "Settings_file";
 
-    public StatsPresenter(){
+    private User user;
+
+    public StatsPresenter(User user){
+        this.user = user;
         this.view = new StatsView();
+        this.view.setUser(user);
         this.model = new StatsModel();
 
         // Subscribes to the signals wanted
@@ -137,20 +141,18 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
      */
     public void loadUserHistory() {
 
-        SessionHistory userHistory = User.getInstance().getHistory();
-
+        SessionHistory userHistory = user.getHistory();
+        /*
         // Adds dummy session history
-        userHistory.addSession(new Session(SessionType.DRIVING, new Instant(Instant.now())));
-        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
-        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
-        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now())));
-        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now())));
+        userHistory.addSession(new Session(SessionType.DRIVING, new Instant(Instant.now().minus(2000000000)), new Instant(Instant.now().minus(1500000000)) ));
+        userHistory.addSession(new Session(SessionType.RESTING, new Instant(Instant.now().minus(1000000000)), new Instant(Instant.now().minus(500000000))));
+        userHistory.addSession(new Session(SessionType.WORKING, new Instant(Instant.now().minus(5000000)), new Instant(Instant.now())));
 
         // Ends them
         for(Session session : userHistory.getSessions()){
             session.end();
         }
-
+        */
         String sessionString = "";
 
         // Update statsview with the new session string

@@ -102,7 +102,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
      */
     private void initiateOTTO(){
         regulationHandler = new EURegulationHandler();
-        user = User.getInstance();
+        user = new User(this);
         tripPlanner = new TripPlanner(regulationHandler, new GoogleDirections(), new GooglePlaces(), user);
 
         tachographHandler = new TachographHandler(user);
@@ -117,9 +117,9 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
         views.add(new ClockPresenter());
 
-        views.add(new HomePresenter((EURegulationHandler)regulationHandler));
+        views.add(new HomePresenter(regulationHandler, user));
 
-        views.add(new StatsPresenter());
+        views.add(new StatsPresenter(user));
 
         views.add(new SettingsView());
     }

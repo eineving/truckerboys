@@ -31,7 +31,7 @@ public class Session {
         this.type = type;
         if (start.isBefore(new Instant())) {
             this.start = start;
-        } else {
+        }else{
             this.start = new Instant();
         }
         active = true;
@@ -44,18 +44,15 @@ public class Session {
      * @param start The start time, the Instant must have occurred, no future Instants allowed.
      * @param end   The end time, the Instant must be after the start time.
      */
-    public Session(SessionType type, Instant start, Instant end) {
+    public Session(SessionType type , Instant start, Instant end ){
         this.type = type;
-        if (start.isBefore(new Instant())) {
-            this.start = start;
-        } else {
-            this.start = new Instant();
-        }
-        active = false;
-        if (end.isAfter(this.start)) {
+        this.start = start;
+
+        if(end.getMillis() == 0){
+            this.active = true;
+        }else{
+            this.active = false;
             this.end = end;
-        } else {
-            this.end = new Instant();
         }
     }
 
@@ -112,16 +109,20 @@ public class Session {
 
     /**
      * Returns the end time of the session
-     * <p/>
-     * If the Session is active, the method will return the current Instant as the end time.
-     *
-     * @return Now if active, the end time if the session is finished.
+     * If the Session is active, the method will return EPOCH as end.
+     * @return EPOCH if active, the end time if the session is finished.
      */
     public Instant getEndTime() {
-        if (active) {
-            return new Instant();
-        } else {
+        if(active){
+            return new Instant(0);
+        }else{
             return end;
         }
     }
+
+    @Override
+    public String toString(){
+        return "Session [start="+ start + " end= "+ end + " type=" + type + "]";
+    }
+
 }
