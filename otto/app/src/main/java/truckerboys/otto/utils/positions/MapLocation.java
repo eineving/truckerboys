@@ -25,7 +25,12 @@ public class MapLocation extends Location{
      * @param rhs Map location to compare with.
      * @return true if the locations have the same coordinates.
      */
-    public boolean equalCoordinates(MapLocation rhs){
+    public boolean equalCoordinates(MapLocation rhs) {
         return (rhs.getLatitude() == getLatitude() && rhs.getLongitude() == getLongitude());
+
+    }
+    
+    public LatLng getLatLng(){
+        return new LatLng(getLatitude(), getLongitude());
     }
 }
