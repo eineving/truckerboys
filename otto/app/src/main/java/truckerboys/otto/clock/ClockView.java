@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import org.joda.time.Duration;
@@ -21,9 +22,12 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RestLocation;
@@ -101,16 +105,15 @@ public class ClockView extends Fragment {
         View.OnClickListener stopClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String tag = ((RelativeLayout) view).getTag().toString();
-                //TODO: Add sending events + method for handling clickevents
+                String tag = view.getTag().toString();
                 if (tag.equalsIgnoreCase("firstAltStop")) {
-
+                    EventTruck.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
                 }
                 if (tag.equalsIgnoreCase("secAltStop")) {
-
+                    EventTruck.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
                 }
                 if(tag.equalsIgnoreCase("thirdAltStop")){
-
+                    EventTruck.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
                 }
             }
         };
@@ -182,14 +185,32 @@ public class ClockView extends Fragment {
     public void setAltStops(ArrayList<MapLocation> altStops) {
         this.altStops = altStops;
         if(altStops!=null){
-            firstAltStop = altStops.get(0);
-            secAltStop = altStops.get(1);
-            thirdAltStop = altStops.get(2);
+            Iterator it = altStops.iterator();
+            if(it.hasNext()) {
+                firstAltStop = (MapLocation)it.next();
+            }
+            if(it.hasNext()) {
+                secAltStop = (MapLocation)it.next();
+            }if(it.hasNext()) {
+                thirdAltStop = (MapLocation)it.next();
+            }
         }
     }
 
+    /**
+     * Sets the next destination of the route
+     * @param nextDestination The next destination
+     */
     public void setNextDestination(MapLocation nextDestination){
         this.nextDestination = nextDestination;
+    }
+
+    /**
+     * Displays a message on the screen
+     * @param message The message to be displayed
+     */
+    public void displayToast(String message){
+        Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_SHORT);
     }
 
     /**
@@ -209,7 +230,7 @@ public class ClockView extends Fragment {
     }
 
     /**
-     * Sets the labels of the time until violation and the reststops.
+     * Sets the labels of the time until violation and the stops.
      */
     private void setLabels() {
         timeLeft.setText(timeL);
@@ -237,6 +258,12 @@ public class ClockView extends Fragment {
         setStopUI(firstAltStop, firstAltStopETA, firstAltStopName, firstAltStopImage);
         setStopUI(secAltStop, secAltStopETA, secAltStopName, secAltStopImage);
         setStopUI(thirdAltStop, thirdAltStopETA, thirdAltStopName, thirdAltStopImage);
+
+        if(firstAltStop == null && secAltStop == null && thirdAltStop == null){
+            alternativeStopsButton.setVisibility(View.GONE);
+        }else{
+            alternativeStopsButton.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -266,26 +293,6 @@ public class ClockView extends Fragment {
             name.setText(stop.getAddress());
             image.setImageResource(R.drawable.reststop);
         }
-    }
-
-    /**
-     * Sets the visibility of the given stop
-     *
-     * @param visible True if visible, false if invisible
-     * @param eta     The ETA TextView
-     * @param name    The name TextView
-     * @param image   The image ImageView
-     */
-    private void setStopVisible(boolean visible, TextView eta, TextView name, ImageView image) {
-        int visibility;
-        if (visible) {
-            visibility = TextView.VISIBLE;
-        } else {
-            visibility = TextView.GONE;
-        }
-        eta.setVisibility(visibility);
-        name.setVisibility(visibility);
-        image.setVisibility(visibility);
     }
 
     /**

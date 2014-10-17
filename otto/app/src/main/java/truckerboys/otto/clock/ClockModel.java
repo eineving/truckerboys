@@ -5,13 +5,16 @@ import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TimeLeft;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
+import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
@@ -55,13 +58,21 @@ public class ClockModel {
         timeNow = new Instant();
         timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
         timeLeftDuration = timeLeftDuration.minus(timeDifference);
+        if(timeLeftDuration.getMillis()<0)
+            timeLeftDuration = Duration.ZERO;
         timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
+        if(timeLeftExtendedDuration.getMillis()<0)
+            timeLeftExtendedDuration = Duration.ZERO;
         if(recStop!=null)
         recStop.setEta(recStop.getEta().minus(timeDifference));
+        if(recStop.getEta().getMillis()<0)
+            recStop.setEta(Duration.ZERO);
         if(altStops!=null) {
             for (MapLocation stop : altStops) {
                 if (stop != null) {
                     stop.setEta(stop.getEta().minus(timeDifference));
+                    if(stop.getEta().getMillis()<0)
+                        stop.setEta(Duration.ZERO);
                 }
             }
         }
@@ -114,6 +125,17 @@ public class ClockModel {
 
     public MapLocation getNextDestination(){
         return nextDestination;
+    }
+
+    public boolean setChosenStop(MapLocation stop){
+        try {
+            tripPlanner.setChoosenStop(stop);
+            return true;
+        }catch (InvalidRequestException e){
+            return false;
+        }catch (NoConnectionException e){
+            return false;
+        }
     }
 
     /**

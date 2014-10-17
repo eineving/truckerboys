@@ -12,6 +12,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
+import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -67,6 +68,14 @@ public class ClockPresenter  implements IView, IEventListener {
             view.setRecommendedStop(model.getRecommendedStop());
             view.setAltStops(model.getAltStops());
             view.setNextDestination(model.getNextDestination());
+        }
+
+        if(event.isType(SetChosenStopEvent.class)){
+            if(model.setChosenStop(((SetChosenStopEvent)event).getStop())){
+                //No exceptions, the chosen stop was set
+            }else{
+                view.displayToast("No connection available");
+            }
         }
     }
 }
