@@ -53,7 +53,7 @@ public class PlannedRoute extends Route {
      *
      * @return recommended stop (null if no stop is recommended).
      */
-    public MapLocation getRecommendedStop() {
+    public RouteLocation getRecommendedStop() {
         return recommendedStop;
     }
 
