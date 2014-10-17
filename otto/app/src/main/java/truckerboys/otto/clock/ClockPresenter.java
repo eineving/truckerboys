@@ -1,45 +1,54 @@
 package truckerboys.otto.clock;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
+import truckerboys.otto.driver.User;
+import truckerboys.otto.planner.IRegulationHandler;
+import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
+import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
+import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  * The presenter class of the clock that acts as a bridge between the view and model.
  */
-public class ClockPresenter  implements IView {
+public class ClockPresenter  implements IView, IEventListener {
     private ClockModel model;
     private ClockView view;
+    private Handler updateHandler;
+    private Runnable update;
 
-    public ClockPresenter(){
-        model = new ClockModel();
+    public ClockPresenter(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user){
+        model = new ClockModel(tripPlanner, regulationHandler, user);
         view = new ClockView();
 
-        view.setRecommendedRestStop(model.getRecommendedRestStop());
-        view.setAltRestStops(model.getFirstAltReststop(), model.getSecondAltReststop());
+        EventTruck.getInstance().subscribe(this);
 
-        ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor)
-                Executors.newScheduledThreadPool(1);
-
-        Runnable update = new Runnable(){
+        updateHandler = new Handler(Looper.getMainLooper());
+        update = new Runnable(){
             public void run(){
                 update();
             }
         };
-        sch.scheduleWithFixedDelay(update, 0, 5, TimeUnit.SECONDS); // The timer
+        updateHandler.postDelayed(update, 1000);
+
     }
     /**
      * Updates the model and view.
      */
     public void update() {
-        model.update();
-        view.setTimeLeft(model.getTimeLeft());
-        view.updateUI();
+        if(model.getRoute()!=null) {
+            model.update();
+            view.setTimeLeft(model.getTimeLeft());
+            view.updateUI();
+        }
+        updateHandler.postDelayed(update, 5000);
     }
 
     @Override
@@ -50,5 +59,23 @@ public class ClockPresenter  implements IView {
     @Override
     public String getName() {
         return "Clock";
+    }
+
+    @Override
+    public void performEvent(Event event) {
+        if(event.isType(ChangedRouteEvent.class)){
+            model.processChangedRoute();
+            view.setRecommendedStop(model.getRecommendedStop());
+            view.setAltStops(model.getAltStops());
+            view.setNextDestination(model.getNextDestination());
+        }
+
+        if(event.isType(SetChosenStopEvent.class)){
+            if(model.setChosenStop(((SetChosenStopEvent)event).getStop())){
+                //No exceptions, the chosen stop was set
+            }else{
+                view.displayToast("No connection available");
+            }
+        }
     }
 }

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/alternative_stops_view">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="horizontal"
+        android:paddingTop="5dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            android:src="@drawable/arrowleft"
+            android:id="@+id/backButton"/>
+
+        <View
+            android:layout_width="1.5dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/textLightest" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:text="Alternatives"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/firstAltStop"
+        android:tag="firstAltStop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:padding="10dp"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/firstAltStopName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:text="Mc Donalds"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <ImageView
+            android:id="@+id/firstAltStopImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/firstAltStopName"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/reststop" />
+
+        <TextView
+            android:id="@+id/firstAltStopETA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/firstAltStopName"
+            android:text="01:25"
+            android:textColor="@color/textLight"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/secAltStop"
+        android:tag="secAltStop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:padding="10dp"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/secAltStopName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:text="Mc Donalds"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <ImageView
+            android:id="@+id/secAltStopImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/secAltStopName"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/reststop" />
+
+        <TextView
+            android:id="@+id/secAltStopETA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/secAltStopName"
+            android:text="01:25"
+            android:textColor="@color/textLight"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/thirdAltStop"
+        android:tag="thirdAltStop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:padding="10dp"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/thirdAltStopName"
+            android:tag="thirdAltStop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:text="Mc Donalds"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <ImageView
+            android:id="@+id/thirdAltStopImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/thirdAltStopName"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/reststop" />
+
+        <TextView
+            android:id="@+id/thirdAltStopETA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/thirdAltStopName"
+            android:text="01:25"
+            android:textColor="@color/textLight"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+</LinearLayout>

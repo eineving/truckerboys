@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/timeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:focusableInTouchMode="false"
+            android:text="Time to break"
+            android:layout_marginTop="10dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <TextView
+            android:id="@+id/clockETA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="-10dp"
+            android:layout_marginTop="-15dp"
+            android:text="00:00"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textDark"
+            android:textSize="112sp" />
+
+        <TextView
+            android:id="@+id/clockETAExtended"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="10dp"
+            android:text="Extended time: 02:32"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textLight"
+            android:textSize="24sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/recStopTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/textLight"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/recStopName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/recStopETA"
+                android:singleLine="true"
+                android:text="Mc Donalds"
+                android:textColor="@color/textLight"
+                android:textSize="45sp" />
+
+            <ImageView
+                android:id="@+id/recStopImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/reststop" />
+
+            <TextView
+                android:id="@+id/recStopETA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/recStopTitle"
+                android:text="01:25"
+                android:textColor="@color/textLight"
+                android:textSize="45sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/alternativesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/white_dropshadow"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:paddingTop="5dp">
+
+        <TextView
+            android:id="@+id/altStopsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:paddingBottom="10dp"
+            android:text="Alternatives"
+            android:textColor="@color/textLight"
+            android:textSize="45sp" />
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="28dp"
+            android:src="@drawable/arrowright" />
+
+    </LinearLayout>
+
+</LinearLayout>
