@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -84,9 +85,10 @@ public class MapModel implements IEventListener {
 
                     // We get the checkpoints as adresses in NewRouteEvent. Remake them to MapLocations
                     // making it possible to send them into tripplanner.
-                    MapLocation[] checkpoints = new MapLocation[((RouteRequestEvent) event).getCheckpoints().size()];
+                    ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+
                     for (Address address : adressList) {
-                        checkpoints[adressList.indexOf(address)] = new MapLocation(new LatLng(address.getLatitude(), address.getLongitude()));
+                       checkpoints.add(new MapLocation(new LatLng(address.getLatitude(), address.getLongitude())));
                     }
 
                     //Calculate new route with provided checkpoints
@@ -101,7 +103,7 @@ public class MapModel implements IEventListener {
                     tripPlanner.setNewRoute(
                             new MapLocation(LocationHandler.getCurrentLocationAsMapLocation()),
                             new MapLocation(new LatLng(((RouteRequestEvent) event).getFinalDestion().getLatitude(),
-                                    ((RouteRequestEvent) event).getFinalDestion().getLongitude())));
+                                    ((RouteRequestEvent) event).getFinalDestion().getLongitude())),null);
                 }
             } catch (InvalidRequestException e) {
                 //TODO Create proper catch

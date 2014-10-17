@@ -35,6 +35,7 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 
@@ -224,9 +225,9 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     /**
      * Function that will set the current markers on the map to a List of specified markers.
      *
-     * @param mapLocations The specified list of markers to add to the map.
+     * @param routeLocations The specified list of markers to add to the map.
      */
-    public void setMarkers(List<MapLocation> mapLocations) {
+    public void setMarkers(List<RouteLocation> routeLocations) {
         if (googleMap != null) {
             // Clear the old markers off the map.
             for (Marker marker : checkpointMarkers) {
@@ -235,7 +236,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             checkpointMarkers.clear();
 
             // Add the new markers to the map.
-            for (MapLocation location : mapLocations) {
+            for (RouteLocation location : routeLocations) {
                 checkpointMarkers.add(googleMap.addMarker(new MarkerOptions()
                         .position(location.getLatLng())
                         .title("Adress: " + location.getAddress() + ", ETA: " + location.getEta().getStandardMinutes())

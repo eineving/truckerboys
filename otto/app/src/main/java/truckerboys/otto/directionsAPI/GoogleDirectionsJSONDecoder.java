@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
-import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
@@ -31,13 +31,12 @@ public class GoogleDirectionsJSONDecoder {
      */
     public static Route stringToRoute(String response) throws InvalidRequestException {
 
-        MapLocation finalDestination;
+        RouteLocation finalDestination;
         Duration eta;
         int distance = 0;
         ArrayList<LatLng> overviewPolyline;
         ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
-        ArrayList<MapLocation> checkPoints = new ArrayList<MapLocation>();
-        Duration etaToFirstCheckpoint = null;
+        ArrayList<RouteLocation> checkPoints = new ArrayList<RouteLocation>();
         try {
 
             //Creating a HashMap from from the whole response
@@ -61,19 +60,6 @@ public class GoogleDirectionsJSONDecoder {
                     allSteps.add(step);
             }
 
-            //TODO remove printouts
-            Log.w("Routes", "" + routes.size());
-            Log.w("Legs", "" + allLegs.size());
-            Log.w("Steps", "" + allSteps.size());
-
-
-            //Creating the final destination
-            LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
-            LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
-                    ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
-            finalDestination = new MapLocation(coordinate);
-            finalDestination.setAddress((String) lastLeg.get("end_address"));
-
             //Creating ETA and distance
             int etaSeconds = 0;
             for (LinkedTreeMap<String, Object> leg : allLegs) {
@@ -94,33 +80,25 @@ public class GoogleDirectionsJSONDecoder {
             overviewPolyline = polylineDecoder(((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points"));
 
             //Getting checkpoints if there are any
-            if (allLegs.size() > 1) {
-                for (LinkedTreeMap<String, Object> leg : allLegs) {
-                    LinkedTreeMap<String, Double> startLocation =
-                            (LinkedTreeMap<String, Double>) leg.get("start_location");
-                    checkPoints.add(new MapLocation(new LatLng(
-                            startLocation.get("lat"), startLocation.get("lng"))));
-                }
-                //Getting the first checkpoints eta
-                LinkedTreeMap<String, Object> firstLeg = allLegs.get(0);
-                Log.w("firstCheckpoint" , ((LinkedTreeMap<String, Double>) firstLeg.get("duration")).get("value").toString());
-                int temp = 0;
-                temp += ((LinkedTreeMap<String, Double>) firstLeg.get("duration")).get("value");
-                    etaToFirstCheckpoint = new Duration( temp * 1000);
+            long checkpointETA = 0;
+            int checkpointDistance = 0;
+            for (LinkedTreeMap<String, Object> leg : allLegs) {
+                LinkedTreeMap<String, Double> endLocation = (LinkedTreeMap<String, Double>) leg.get("end_location");
+                LatLng coordinate = new LatLng(endLocation.get("lat"), endLocation.get("lng"));
+                String address = (String) leg.get("end_address");
+                checkpointETA += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value")*1000;
+                checkpointDistance += ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
+                checkPoints.add(new RouteLocation(coordinate, address, new Duration(checkpointETA), checkpointDistance));
             }
 
+            //Creating the final destination
+            finalDestination = checkPoints.get(checkPoints.size()-1);
 
-            //TODO remove printouts
-            Log.w("finalDestination", finalDestination.getAddress());
-            Log.w("ETA", eta.toStandardSeconds().getSeconds() + "");
-            Log.w("Distance", distance + "");
-            Log.w("CheckPoints", checkPoints.size() + "");
         } catch (Exception e) {
             e.printStackTrace();
             throw new InvalidRequestException(e.getMessage());
         }
-
-        return new Route(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkPoints, etaToFirstCheckpoint);
+        return new Route(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkPoints);
     }
 
     /**

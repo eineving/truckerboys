@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.joda.time.Duration;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import truckerboys.otto.utils.GoogleRequesterHandler;
@@ -20,7 +21,7 @@ public class GoogleDirections implements IDirections {
 
     @Override
     public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, RoutePreferences preferences,
-                          MapLocation... checkpoint) throws NoConnectionException, InvalidRequestException {
+                          List<MapLocation> checkpoint) throws NoConnectionException, InvalidRequestException {
 
         String response;
         try {
@@ -41,7 +42,7 @@ public class GoogleDirections implements IDirections {
     }
 
     @Override
-    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, MapLocation... checkpoint) throws NoConnectionException, InvalidRequestException {
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, List<MapLocation> checkpoint) throws NoConnectionException, InvalidRequestException {
         return getRoute(currentPosition, finalDestination, null, checkpoint);
     }
 
@@ -67,16 +68,16 @@ public class GoogleDirections implements IDirections {
     }
 
     private String jsonStringCreator(MapLocation currentPosition, MapLocation finalDestination,
-                                     RoutePreferences preferences, MapLocation[] checkpoint) {
+                                     RoutePreferences preferences, List<MapLocation> checkpoints) {
 
         String returnValue = "json?origin=" + currentPosition.getLatitude() + "," + currentPosition.getLongitude() +
                 "&destination=" + finalDestination.getLatitude() + "," + finalDestination.getLongitude();
 
-        if (checkpoint != null) {
+        if (checkpoints != null) {
             returnValue += "&waypoints=";
-            for (int i = 0; i < checkpoint.length; i++) {
-                returnValue += checkpoint[i].getLatitude() + "," + checkpoint[i].getLongitude();
-                if (i != checkpoint.length - 1) {
+            for (int i = 0; i < checkpoints.size(); i++) {
+                returnValue += checkpoints.get(i).getLatitude() + "," + checkpoints.get(i).getLongitude();
+                if (i != checkpoints.size() - 1) {
                     returnValue += "|";
                 }
             }
