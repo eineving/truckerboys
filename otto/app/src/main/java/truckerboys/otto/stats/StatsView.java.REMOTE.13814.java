@@ -13,18 +13,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 import truckerboys.otto.R;
-import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.StatsViewStoppedEvent;
-import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
 import truckerboys.otto.IView;
 
@@ -58,15 +53,10 @@ public class StatsView extends Fragment implements IView, IEventListener{
     // Updatehandler
     private Handler updateHandler = new Handler(Looper.getMainLooper());
 
-    private User user;
 
     public StatsView(){
     }
 
-
-    public void setUser(User user){
-        this.user = user;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -96,42 +86,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
         EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
 
         return rootView;
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        Duration durationToday;
-        Duration durationTotal;
-
-
-        // TODO UNCOMMENT THIS
-        durationToday = user.getHistory().getActiveTimeSinceLastDailyBreak();
-
-        // TODO Change this to SessionHistory.getActiveTimeSince(Instant start)
-        durationTotal = user.getHistory().getActiveTimeSince(new Instant(0));
-        // TODO Ask pegelow about this
-
-
-        double timeDrivenToday = durationToday.getStandardMinutes()/60;
-        double timeDrivenTotal = durationTotal.getStandardMinutes()/60;
-
-        // TEST VALUES
-        //double timeDrivenToday = 55.0/60.0;
-        //double timeDrivenTotal = 120.0/60.0;
-
-        //TODO UNCOMMENT IN NEXT MERGE
-        // timeToday.setText(timeDrivenToday + "h");
-        // timeTotal.setText(timeDrivenTotal + "h");
-
-        timeToday.setText(timeDrivenToday + " h");
-        timeTotal.setText(timeDrivenTotal + " h");
-
-
-        //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
-        EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
     }
 
     /**
