@@ -86,13 +86,13 @@ public class GoogleDirectionsJSONDecoder {
                 LinkedTreeMap<String, Double> endLocation = (LinkedTreeMap<String, Double>) leg.get("end_location");
                 LatLng coordinate = new LatLng(endLocation.get("lat"), endLocation.get("lng"));
                 String address = (String) leg.get("end_address");
-                checkpointETA += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
+                checkpointETA += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value")*1000;
                 checkpointDistance += ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
-                checkPoints.add(new RouteLocation(coordinate, address, Duration.millis(checkpointETA), checkpointDistance));
+                checkPoints.add(new RouteLocation(coordinate, address, new Duration(checkpointETA), checkpointDistance));
             }
 
             //Creating the final destination
-            finalDestination = checkPoints.get(checkPoints.size());
+            finalDestination = checkPoints.get(checkPoints.size()-1);
 
         } catch (Exception e) {
             e.printStackTrace();

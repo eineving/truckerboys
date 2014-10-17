@@ -18,6 +18,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
+
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class TripPlannerTest extends TestCase {
@@ -31,7 +33,7 @@ public class TripPlannerTest extends TestCase {
     private User user = User.getInstance();
     private TripPlanner tripPlanner;
 
-    private Route activeRoute;
+    private PlannedRoute activeRoute;
 
     @Before
     public void setUp() throws Exception {
@@ -57,24 +59,27 @@ public class TripPlannerTest extends TestCase {
 
     @Test
     public void testSetNewRoute() throws Exception {
-        tripPlanner.setNewRoute(currentLocation, kiruna, malmo,stockholm);
+        ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+        checkpoints.add(malmo);
+        checkpoints.add(stockholm);
+        tripPlanner.setNewRoute(currentLocation, kiruna, checkpoints);
         activeRoute = tripPlanner.getRoute();
 
         //First checkpoint should not have an ETA over 4,5 hours
-        assertFalse(activeRoute.getEtaToFirstCheckpoint().isLongerThan(Duration.standardMinutes(270)));
+        assertFalse(activeRoute.getCheckpoints().get(1).getEta().isLongerThan(Duration.standardMinutes(270)));
 
         //These are out of reach within one session
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(kiruna));
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(stockholm));
 
-        assertFalse(activeRoute.getEta().isEqual(activeRoute.getEtaToFirstCheckpoint()));
+        assertFalse(activeRoute.getEta().isEqual(activeRoute.getCheckpoints().get(0).getEta()));
 
         //Malmo is within reach
-        tripPlanner.setNewRoute(currentLocation, malmo);
+        tripPlanner.setNewRoute(currentLocation, malmo, null);
         activeRoute=tripPlanner.getRoute();
 
         assertTrue(activeRoute.getRecommendedStop().equalCoordinates(malmo));
-        assertTrue(activeRoute.getEta().isEqual(activeRoute.getEtaToFirstCheckpoint()));
+        assertTrue(activeRoute.getEta().isEqual(activeRoute.getCheckpoints().get(0).getEta()));
     }
 
     @Test

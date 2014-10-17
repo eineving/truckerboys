@@ -68,16 +68,16 @@ public class GoogleDirections implements IDirections {
     }
 
     private String jsonStringCreator(MapLocation currentPosition, MapLocation finalDestination,
-                                     RoutePreferences preferences, List<MapLocation> checkpoint) {
+                                     RoutePreferences preferences, List<MapLocation> checkpoints) {
 
         String returnValue = "json?origin=" + currentPosition.getLatitude() + "," + currentPosition.getLongitude() +
                 "&destination=" + finalDestination.getLatitude() + "," + finalDestination.getLongitude();
 
-        if (checkpoint != null) {
+        if (checkpoints != null) {
             returnValue += "&waypoints=";
-            for (int i = 0; i < checkpoint.size(); i++) {
-                returnValue += checkpoint.get(i).getLatitude() + "," + checkpoint.get(i).getLongitude();
-                if (i != checkpoint.size() - 1) {
+            for (int i = 0; i < checkpoints.size(); i++) {
+                returnValue += checkpoints.get(i).getLatitude() + "," + checkpoints.get(i).getLongitude();
+                if (i != checkpoints.size() - 1) {
                     returnValue += "|";
                 }
             }

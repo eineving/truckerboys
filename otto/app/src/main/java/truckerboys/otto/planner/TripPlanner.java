@@ -76,6 +76,10 @@ public class
         if (activeRoute == null) {
             throw new NoActiveRouteException("There is no active route");
         }
+        Log.w("NbrOfRouteChekpoints", activeRoute.getCheckpoints().size() + "");
+        Log.w("FirstRouteChekpoints", activeRoute.getCheckpoints().get(0).getAddress() + "");
+        Log.w("RecommendedStop", activeRoute.getRecommendedStop().getLatLng().toString());
+        Log.w("NbrOfAlternativeStops", activeRoute.getCheckpoints().size() + "");
         return activeRoute;
     }
 
@@ -115,15 +119,17 @@ public class
             activeRoute = null;
             checkpointFound = true;
         }
-        ArrayList<MapLocation> temp = new ArrayList<MapLocation>();
-        for (MapLocation checkpoint : checkpoints) {
-            if (passedCheckpoint.equalCoordinates(checkpoint)) {
-                checkpointFound = true;
-            } else {
-                temp.add(checkpoint);
+        if(checkpoints != null) {
+            ArrayList<MapLocation> temp = new ArrayList<MapLocation>();
+            for (MapLocation checkpoint : checkpoints) {
+                if (passedCheckpoint.equalCoordinates(checkpoint)) {
+                    checkpointFound = true;
+                } else {
+                    temp.add(checkpoint);
+                }
             }
+            checkpoints = temp;
         }
-        checkpoints = temp;
 
         if (!checkpointFound) {
             throw new CheckpointNotFoundException("does not exist");
@@ -279,7 +285,9 @@ public class
             LinkedList<MapLocation> tempList = new LinkedList<MapLocation>();
 
             tempList.add(new MapLocation(closeLocations.get(i)));
-            tempList.addAll(checkpoints);
+            if(checkpoints != null) {
+                tempList.addAll(checkpoints);
+            }
 
             //Checks if the restLocation is a possible stop and is faster than the previous
             Route temp = directionsProvider.getRoute(startLocation, finalDestination, tempList);
