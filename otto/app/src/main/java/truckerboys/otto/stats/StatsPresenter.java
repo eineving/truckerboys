@@ -161,6 +161,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
         String sessionString = "";
 
+        view.clearSessionAdapter();
+
         // Update statsview with the new session string
         for(Session session : userHistory.getSessions()) {
 
