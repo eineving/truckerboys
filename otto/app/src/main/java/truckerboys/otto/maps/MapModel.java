@@ -21,6 +21,7 @@ import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -62,7 +63,7 @@ public class MapModel implements IEventListener {
                     try {
                         // We left checkpoint range again, calculate new route to final destination.
                         if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) > DISTANCE_FROM_CHECKPOINT) {
-                            tripPlanner.setNewRoute(LocationHandler.getCurrentLocationAsMapLocation(), getRoute().getFinalDestination(), null);
+                            tripPlanner.updateRoute(LocationHandler.getCurrentLocationAsMapLocation());
                             closeToCheckpoint = false;
                         }
                     } catch (InvalidRequestException e) {
