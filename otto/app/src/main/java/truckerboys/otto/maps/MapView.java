@@ -356,6 +356,9 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     public void showActiveRouteDialog(boolean visibility){
         activeRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+
+        //If we have an active route, we don't want the user to be able to move the camera.
+        setAllGestures(!visibility);
     }
 
     @Override
