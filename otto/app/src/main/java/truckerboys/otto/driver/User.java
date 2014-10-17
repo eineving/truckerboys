@@ -1,26 +1,38 @@
 package truckerboys.otto.driver;
 
+import android.content.Context;
+import android.util.Log;
+
+import org.joda.time.Instant;
+import org.joda.time.Duration;
+
+
 /**
  * Created by Martin on 17/09/2014.
  * This class is singleton.
  */
 public class User {
 
-    private static User instance;
-    private SessionHistory history = new SessionHistory();
+    private SessionHistory history;
     private Session currentSession;
 
-    private User(){
-    }
+    private HistoryOpenHelper historyDB;
 
+    public User(Context context){
+        history = new SessionHistory();
 
-    public static User getInstance() {
-        if(instance == null) {
-            instance = new User();
+        historyDB = new HistoryOpenHelper(context);
+
+        for(Session s : historyDB.getAllSessions()){
+            if(s.getStartTime().isBefore((new Instant()).minus(Duration.standardDays(31)))){
+                historyDB.deleteSession(s); //Remove old sessions.
+            }else{
+                history.addSession(s);
+            }
         }
-
-        return instance;
-
+        if(history.getSessions().size() > 0 && history.getSessions().get(0).isActive()){
+            currentSession = history.getSessions().get(0);
+        }
     }
 
     /**
@@ -30,8 +42,10 @@ public class User {
         if(currentSession != null && currentSession.isActive()){
             endSession();
         }
+
         currentSession = new Session(type);
         history.addSession(currentSession);
+        historyDB.addSession(currentSession);
     }
 
     /**
@@ -39,6 +53,7 @@ public class User {
      */
     public void endSession(){
         currentSession.end();
+        historyDB.overwriteSession(currentSession);
     }
 
 

@@ -1,12 +1,9 @@
 package truckerboys.otto.stats;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
-import android.swedspot.automotiveapi.AutomotiveSignal;
-import android.swedspot.scs.data.SCSFloat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+
 import org.joda.time.Duration;
 import org.joda.time.Instant;
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
@@ -29,12 +23,9 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
-import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.StatsViewStoppedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
-import truckerboys.otto.vehicle.IVehicleListener;
-import truckerboys.otto.vehicle.VehicleInterface;
-import truckerboys.otto.vehicle.VehicleSignalID;
 import truckerboys.otto.IView;
 
 
@@ -47,10 +38,6 @@ import truckerboys.otto.IView;
 public class StatsView extends Fragment implements IView, IEventListener{
 
     private View rootView;
-    private static final String SETTINGS = "Settings_file";
-    private static final String STATS = "Stats_file";
-
-    private Handler updateHandler = new Handler(Looper.getMainLooper());
 
     // Todays stats
     private TextView timeToday;
@@ -68,12 +55,17 @@ public class StatsView extends Fragment implements IView, IEventListener{
     ArrayAdapter<String> sessionAdapter;
     private ListView historyList;
 
-    private String distanceUnit = "";
-    private String fuelUnit = "";
+    // Updatehandler
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
 
-
+    private User user;
 
     public StatsView(){
+    }
+
+
+    public void setUser(User user){
+        this.user = user;
     }
 
     @Override
@@ -116,10 +108,10 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         // TODO UNCOMMENT THIS
-        durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
+        durationToday = user.getHistory().getActiveTimeSinceLastDailyBreak();
 
         // TODO Change this to SessionHistory.getActiveTimeSince(Instant start)
-        durationTotal = User.getInstance().getHistory().getActiveTimeSince(new Instant(0));
+        durationTotal = user.getHistory().getActiveTimeSince(new Instant(0));
         // TODO Ask pegelow about this
 
 
@@ -140,29 +132,18 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
         //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
         EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
-
     }
 
     /**
-     * On stop, save the settings displayed in the view.
+     * On stop, notify the presenter through an event.
+     * The presenter will furthermore save the data from the model.
      */
     @Override
     public void onStop() {
         super.onStop();
 
-        //TODO Put this code in the presenter and get values from model
-
-        SharedPreferences.Editor editor = getActivity().getSharedPreferences(STATS, 0).edit();
-
-        editor.putFloat("timeToday", Float.parseFloat(timeToday.getText().toString().substring(0, timeToday.getText().toString().length() - 2)));
-        editor.putFloat("timeTotal", Float.parseFloat(timeTotal.getText().toString().substring(0, timeTotal.getText().toString().length() - 2)));
-        editor.putFloat("distanceTotal", Float.parseFloat(distanceTotal.getText().toString().substring(0, distanceTotal.getText().toString().length() - 3)));
-        editor.putFloat("fuelTotal", Float.parseFloat(fuelTotal.getText().toString().substring(0, fuelTotal.getText().toString().length() - 2)));
-        editor.putFloat("distanceByFuel", Float.parseFloat(distanceByFuel.getText().toString().substring(0, distanceByFuel.getText().toString().length() - 5)));
-
-
-        editor.commit();
-
+        // Notifies the presenter that the view has stopped
+        EventTruck.getInstance().newEvent(new StatsViewStoppedEvent());
 
     }
 
@@ -178,23 +159,6 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
         historyList.setLayoutParams(new LinearLayout.LayoutParams(
                 1000, historyList.getAdapter().getCount()*125));
-
-    }
-
-    /**
-     * Method for setting a new unit system.
-     * This method is to be called from the presenter.
-     * @param system metric/imperial
-     */
-    public void updateUnits(String system) {
-        if(system.equals("imperial")) {
-            fuelUnit = ""; // MILES
-            distanceUnit = ""; // GALLONS
-
-        } else {
-            fuelUnit = "";
-            distanceUnit = "";
-        }
 
     }
 
@@ -256,22 +220,9 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
     @Override
     public void performEvent(final Event event) {
-        if(event.isType(SettingsChangedEvent.class)) {
-
-            // read from file and set String called system based on that
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(SETTINGS, 0).edit();
-
-            editor.putString("system", ((SettingsChangedEvent) event).getSystem());
-
-            editor.commit();
-
-        }
-
 
         if(event.isType(TotalDistanceEvent.class)) {
             // Update view if new total distance signal is sent
-
-            //distanceTotal.setText(((TotalDistanceEvent)event).getTotalDistance() + " km");
 
             Runnable updateDistance = new Runnable() {
                 public void run() {

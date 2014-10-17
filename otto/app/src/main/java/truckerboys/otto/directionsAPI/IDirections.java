@@ -2,6 +2,8 @@ package truckerboys.otto.directionsAPI;
 
 import org.joda.time.Duration;
 
+import java.util.List;
+
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
@@ -19,7 +21,7 @@ public interface IDirections {
      * @param checkpoint       locations that the route needs to go to before the final destination
      * @return a new route
      */
-    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, RoutePreferences preferences, MapLocation... checkpoint) throws NoConnectionException, InvalidRequestException;
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, RoutePreferences preferences, List<MapLocation> checkpoint) throws NoConnectionException, InvalidRequestException;
 
     /**
      * Creates a new route
@@ -39,7 +41,7 @@ public interface IDirections {
      * @param checkpoint       locations that the route needs to go to before the final destination
      * @return a new route
      */
-    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, MapLocation... checkpoint) throws NoConnectionException, InvalidRequestException ;
+    public Route getRoute(MapLocation currentPosition, MapLocation finalDestination, List<MapLocation> checkpoint) throws NoConnectionException, InvalidRequestException ;
 
     /**
      * Creates a new route
