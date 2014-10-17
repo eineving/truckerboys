@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -28,9 +27,7 @@ import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
-import truckerboys.otto.utils.positions.GasStation;
-import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RestLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -49,9 +46,9 @@ public class ClockView extends Fragment {
     RelativeLayout firstAltStopClick, secAltStopClick, thirdAltStopClick;
     LinearLayout alternativeStopsButton;
 
-    MapLocation recStop, firstAltStop, secAltStop, thirdAltStop, nextDestination;
+    RouteLocation recStop, firstAltStop, secAltStop, thirdAltStop, nextDestination;
 
-    ArrayList<MapLocation> altStops = new ArrayList<MapLocation>();
+    ArrayList<RouteLocation> altStops = new ArrayList<RouteLocation>();
 
     Boolean variablesSet = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
@@ -173,7 +170,7 @@ public class ClockView extends Fragment {
      *
      * @param stop The new recommended stop
      */
-    public void setRecommendedStop(MapLocation stop) {
+    public void setRecommendedStop(RouteLocation stop) {
         recStop = stop;
     }
 
@@ -182,17 +179,17 @@ public class ClockView extends Fragment {
      *
      * @param altStops The list of the alternative stops
      */
-    public void setAltStops(ArrayList<MapLocation> altStops) {
+    public void setAltStops(ArrayList<RouteLocation> altStops) {
         this.altStops = altStops;
         if(altStops!=null){
             Iterator it = altStops.iterator();
             if(it.hasNext()) {
-                firstAltStop = (MapLocation)it.next();
+                firstAltStop = (RouteLocation)it.next();
             }
             if(it.hasNext()) {
-                secAltStop = (MapLocation)it.next();
+                secAltStop = (RouteLocation)it.next();
             }if(it.hasNext()) {
-                thirdAltStop = (MapLocation)it.next();
+                thirdAltStop = (RouteLocation)it.next();
             }
         }
     }
@@ -201,7 +198,7 @@ public class ClockView extends Fragment {
      * Sets the next destination of the route
      * @param nextDestination The next destination
      */
-    public void setNextDestination(MapLocation nextDestination){
+    public void setNextDestination(RouteLocation nextDestination){
         this.nextDestination = nextDestination;
     }
 
@@ -275,7 +272,7 @@ public class ClockView extends Fragment {
      * @param name  The TextView representing the name
      * @param image The ImageView with the image
      */
-    private void setStopUI(MapLocation stop, TextView eta, TextView name, ImageView image) {
+    private void setStopUI(RouteLocation stop, TextView eta, TextView name, ImageView image) {
         ViewGroup v = (ViewGroup)eta.getParent();
         if (stop == null) {
             v.setVisibility(ViewGroup.GONE);
@@ -283,14 +280,14 @@ public class ClockView extends Fragment {
         }
         v.setVisibility(ViewGroup.VISIBLE);
         eta.setText(getTimeAsFormattedString(stop.getEta()));
-        if (stop instanceof RestLocation) {
-            name.setText(((RestLocation) stop).getName());
-            image.setImageResource(R.drawable.reststop);
-        } else if (stop instanceof GasStation) {
-            name.setText(((GasStation) stop).getName());
+        if (stop.getType().contains("gas_station")) {
+            name.setText(stop.getName());
             image.setImageResource(R.drawable.gasstation);
-        } else {
+        } else if (stop.getType().isEmpty()) {
             name.setText(stop.getAddress());
+            image.setImageResource(R.drawable.reststop);
+        } else {
+            name.setText(stop.getName());
             image.setImageResource(R.drawable.reststop);
         }
     }

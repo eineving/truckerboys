@@ -223,7 +223,9 @@ public class
         } else {
             //TODO Don't do this here
             tempCheckpoints.add(chosenStop);
-            tempCheckpoints.addAll(checkpoints);
+            if(checkpoints != null) {
+                tempCheckpoints.addAll(checkpoints);
+            }
             optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
             tempStop = chosenStop;
             alternativeLocations.add(recommendedStop);

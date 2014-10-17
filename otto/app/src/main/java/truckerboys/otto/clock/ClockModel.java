@@ -10,12 +10,14 @@ import java.util.Map;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
+import truckerboys.otto.planner.PlannedRoute;
 import truckerboys.otto.planner.TimeLeft;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -27,15 +29,15 @@ public class ClockModel {
 
     private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
-    private MapLocation recStop, nextDestination;
+    private RouteLocation recStop, nextDestination;
     private long timeDifference;
 
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
     private User user;
-    private Route route;
+    private PlannedRoute route;
 
-    private ArrayList<MapLocation> altStops;
+    private ArrayList<RouteLocation> altStops;
 
     public ClockModel(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user) {
 
@@ -48,7 +50,7 @@ public class ClockModel {
         timeLeftExtendedDuration = new Duration(Duration.ZERO);
         timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
 
-        altStops = new ArrayList<MapLocation>();
+        altStops = new ArrayList<RouteLocation>();
     }
 
     /**
@@ -64,15 +66,15 @@ public class ClockModel {
         if(timeLeftExtendedDuration.getMillis()<0)
             timeLeftExtendedDuration = Duration.ZERO;
         if(recStop!=null)
-        recStop.setEta(recStop.getEta().minus(timeDifference));
+        recStop.decreaseETA(new Duration(timeDifference));
         if(recStop.getEta().getMillis()<0)
-            recStop.setEta(Duration.ZERO);
+            recStop.decreaseETA(recStop.getEta());
         if(altStops!=null) {
-            for (MapLocation stop : altStops) {
+            for (RouteLocation stop : altStops) {
                 if (stop != null) {
-                    stop.setEta(stop.getEta().minus(timeDifference));
+                    stop.decreaseETA(new Duration(timeDifference));
                     if(stop.getEta().getMillis()<0)
-                        stop.setEta(Duration.ZERO);
+                        stop.decreaseETA(stop.getEta());
                 }
             }
         }
@@ -111,7 +113,7 @@ public class ClockModel {
      * Returns the recommended stop
      * @return The recommended stop
      */
-    public MapLocation getRecommendedStop(){
+    public RouteLocation getRecommendedStop(){
         return recStop;
     }
 
@@ -119,15 +121,15 @@ public class ClockModel {
      * Returns the alternative stops
      * @return A list of the alternative stops
      */
-    public ArrayList<MapLocation> getAltStops(){
+    public ArrayList<RouteLocation> getAltStops(){
         return altStops;
     }
 
-    public MapLocation getNextDestination(){
+    public RouteLocation getNextDestination(){
         return nextDestination;
     }
 
-    public boolean setChosenStop(MapLocation stop){
+    public boolean setChosenStop(RouteLocation stop){
         try {
             tripPlanner.setChoosenStop(stop);
             return true;

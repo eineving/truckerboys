@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ public class RouteLocation extends MapLocation {
         this.address = address;
         this.eta = eta;
         this.distance = distance;
+        this.type = new ArrayList<String>();
     }
 
     /**
@@ -92,5 +94,14 @@ public class RouteLocation extends MapLocation {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Subtract time from ETA
+     *
+     * @param time time to subtract from ETA
+     */
+    public void decreaseETA(Duration time) {
+        this.eta = this.eta.minus(time);
     }
 }
