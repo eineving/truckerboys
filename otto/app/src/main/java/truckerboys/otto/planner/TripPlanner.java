@@ -9,7 +9,6 @@ import org.joda.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
@@ -76,10 +75,6 @@ public class
         if (activeRoute == null) {
             throw new NoActiveRouteException("There is no active route");
         }
-        Log.w("NbrOfRouteChekpoints", activeRoute.getCheckpoints().size() + "");
-        Log.w("FirstRouteChekpoints", activeRoute.getCheckpoints().get(0).getAddress() + "");
-        Log.w("RecommendedStop", activeRoute.getRecommendedStop().getLatLng().toString());
-        Log.w("NbrOfAlternativeStops", activeRoute.getCheckpoints().size() + "");
         return activeRoute;
     }
 
@@ -165,72 +160,77 @@ public class
     private PlannedRoute getCalculatedRoute() throws NoConnectionException, InvalidRequestException {
         Route optimalRoute;
         Duration sessionTimeLeft = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
+        ArrayList<RouteLocation> alternativeLocations = new ArrayList<RouteLocation>();
+        RouteLocation displayedRecommended;
 
         Route directRoute = directionsProvider.getRoute(currentLocation, finalDestination, checkpoints);
-        nbrOfDirCalls++;
-
-        ArrayList<RouteLocation> alternativeLocations = new ArrayList<RouteLocation>();
 
         //TODO Implement check if gas is enough for this session
+        if (chosenStop != null) {
+            //Setting the recommended as it will be in alternative stops
+            getOptimizedRoute(directRoute, Duration.standardMinutes(5));
 
-        //Returns the direct route if ETA is shorter than the time you have left to drive
-        if (directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft)) {
-            optimalRoute = directRoute;
-            alternativeLocations = (calculateAlternativeStops(directRoute,
-                    directRoute.getCheckpoints().get(0).getEta().dividedBy(2), directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
-        }
-
-        //If there is no time left on this session
-        else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
-            optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
-            alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15));
-        }
-
-        //If the location is within reach this day but not this session
-        else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft) &&
-                directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-
-            //If the ETA/2 is longer than time left on session
-            if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft());
-                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
-            } else {
-                optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2));
-                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2));
-            }
-        }
-
-        //If the location is not within reach this day (drive maximum distance)
-        else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-            optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
-            alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
-        } else {
-            throw new InvalidRequestException("Something is not right here");
-        }
-
-        ArrayList<MapLocation> tempCheckpoints = new ArrayList<MapLocation>();
-        RouteLocation tempStop;
-        if (chosenStop == null) {
-            if (checkpoints != null) {
-                if (optimalRoute.getCheckpoints().size() > 0) {
-                    tempStop = optimalRoute.getCheckpoints().get(0);
-                } else {
-                    tempStop = optimalRoute.getFinalDestination();
-                }
-            } else {
-                tempStop = optimalRoute.getFinalDestination();
-            }
-        } else {
-            //TODO Don't do this here
+            ArrayList<MapLocation> tempCheckpoints = new ArrayList<MapLocation>();
             tempCheckpoints.add(chosenStop);
-            if(checkpoints != null) {
+            if (checkpoints != null) {
                 tempCheckpoints.addAll(checkpoints);
             }
             optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
-            tempStop = chosenStop;
+
+            displayedRecommended = chosenStop;
+
             alternativeLocations.add(recommendedStop);
+            alternativeLocations.addAll(calculateAlternativeStops(directRoute,
+                    directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
+                    directRoute.getCheckpoints().get(0).getEta().dividedBy(3)));
+
+        } else {
+
+            //Returns the direct route if ETA is shorter than the time you have left to drive
+            if (directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft)) {
+
+                optimalRoute = directRoute;
+                alternativeLocations = (calculateAlternativeStops(directRoute,
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(2), directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
+            }
+
+            //If there is no time left on this session
+            else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
+                optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
+                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15));
+            }
+
+            //If the location is within reach this day but not this session
+            else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft) &&
+                    directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+
+                //If the ETA/2 is longer than time left on session
+                if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
+                    optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft());
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+                } else {
+                    optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2));
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2));
+                }
+            }
+
+            //If the location is not within reach this day (drive maximum distance)
+            else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
+                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+            } else {
+                throw new InvalidRequestException("Something is not right here");
+            }
+
+            if (optimalRoute.getCheckpoints().size() > 0) {
+                displayedRecommended = optimalRoute.getCheckpoints().get(0);
+            } else {
+                displayedRecommended = optimalRoute.getFinalDestination();
+            }
+            alternativeLocations.add(recommendedStop);
+
         }
-        return new PlannedRoute(optimalRoute, tempStop, alternativeLocations);
+        return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
 
     /**
@@ -335,7 +335,7 @@ public class
 
 
         while (etaToCoordinate.isShorterThan(timeLeft.minus(timeDiff)) ||
-                etaToCoordinate.isLongerThan(timeLeft.plus(timeDiff))) {
+                etaToCoordinate.isLongerThan(timeLeft)) {
             if (etaToCoordinate.isLongerThan(timeLeft)) {
                 topIndex = currentIndex;
             } else {

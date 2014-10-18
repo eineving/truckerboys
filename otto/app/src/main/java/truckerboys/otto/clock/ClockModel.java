@@ -99,6 +99,7 @@ public class ClockModel {
         timeLeftDuration = timeLeft.getTimeLeft();
         timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
 
+        //TODO Simon: What if exception
         recStop = route.getRecommendedStop();
         altStops = route.getAlternativeStops();
 

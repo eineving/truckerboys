@@ -102,6 +102,12 @@ public class RouteLocation extends MapLocation {
      * @param time time to subtract from ETA
      */
     public void decreaseETA(Duration time) {
-        this.eta = this.eta.minus(time);
+        try {
+            this.eta = this.eta.minus(time);
+        } catch (NullPointerException e) {
+            //TODO We should not do this
+            eta = Duration.ZERO;
+        }
     }
+
 }
