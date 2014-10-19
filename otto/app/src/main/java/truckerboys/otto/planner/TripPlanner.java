@@ -249,8 +249,13 @@ public class
         for (Duration eta : stopsETA) {
             LatLng tempCoordinate = findLatLngWithinDuration(directRoute, eta, Duration.standardMinutes(10));
             ArrayList<RouteLocation> response = placesProvider.getNearbyRestLocations(tempCoordinate);
-            if (response.size() > 0) {
-                incompleteInfo.add(response.get(0));
+
+            for (RouteLocation location : response) {
+                if (directionsProvider.getETA(currentLocation, location).
+                        isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
+                    incompleteInfo.add(location);
+                    break; //Can not afford to do more calls to check the optimum one
+                }
             }
         }
 
