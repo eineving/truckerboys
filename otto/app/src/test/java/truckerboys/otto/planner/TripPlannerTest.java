@@ -11,6 +11,7 @@ import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,15 +31,18 @@ public class TripPlannerTest extends TestCase {
     private final MapLocation kiruna = new MapLocation(new LatLng(67.853702, 20.2564299));
     private final MapLocation stockholm = new MapLocation(new LatLng(59.3261419, 17.9875456));
 
-    private User user = User.getInstance();
+    //TODO how to create a user properly?
+    private User user = new User(null);
     private TripPlanner tripPlanner;
 
     private PlannedRoute activeRoute;
 
+    private EURegulationHandler euRegulationHandler = new EURegulationHandler();
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        tripPlanner = new TripPlanner(new EURegulationHandler(), new GoogleDirections(), new GooglePlaces(), user);
+        tripPlanner = new TripPlanner(euRegulationHandler, new GoogleDirections(), new GooglePlaces(), user);
 
     }
 
@@ -48,7 +52,7 @@ public class TripPlannerTest extends TestCase {
     }
 
     @Test
-    public void testGestRoute() throws Exception {
+    public void testGetRoute() throws Exception {
         fail("Test not implemented");
     }
 
@@ -73,6 +77,10 @@ public class TripPlannerTest extends TestCase {
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(stockholm));
 
         assertFalse(activeRoute.getEta().isEqual(activeRoute.getCheckpoints().get(0).getEta()));
+
+        for(RouteLocation stop : activeRoute.getAlternativeStops()){
+            assertTrue(stop.getEta().isShorterThan(euRegulationHandler.getThisSessionTL(user.getHistory()).getExtendedTimeLeft()));
+        }
 
         //Malmo is within reach
         tripPlanner.setNewRoute(currentLocation, malmo, null);
