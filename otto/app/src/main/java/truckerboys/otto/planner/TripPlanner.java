@@ -8,6 +8,7 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
@@ -15,11 +16,12 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
+import truckerboys.otto.utils.exceptions.CheckpointNotFoundException;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RestLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 public class
         TripPlanner {
@@ -31,11 +33,17 @@ public class
 
 
     //Route preferences
+    private PlannedRoute activeRoute;
     private MapLocation startLocation;
     private MapLocation finalDestination;
-    private MapLocation[] checkpoints;
+    private List<MapLocation> checkpoints;
 
-    private MapLocation chosenStop;
+    private RouteLocation chosenStop;
+    private RouteLocation recommendedStop;
+
+
+    private int nbrOfDirCalls = 0;
+    private MapLocation currentLocation;
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
@@ -48,29 +56,79 @@ public class
      * Get an updated version of the route
      *
      * @param currentLocation Location of the device.
-     * @return an updated route.
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public Route getRoute(MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
-        //TODO also set ETA to alternative route but all this after getRoute
-        if (chosenStop != null) {
-            chosenStop.setEta(directionsProvider.getETA(currentLocation, chosenStop));
+    public void updateRoute(MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
+        this.currentLocation = currentLocation;
+        activeRoute = getCalculatedRoute();
+        EventTruck.getInstance().newEvent(new ChangedRouteEvent());
+    }
+
+    /**
+     * Get the active route
+     *
+     * @return the active route
+     * @throws NoActiveRouteException
+     */
+    public PlannedRoute getRoute() throws NoActiveRouteException {
+        if (activeRoute == null) {
+            throw new NoActiveRouteException("There is no active route");
         }
-        return getCalculatedRoute();
+        return activeRoute;
     }
 
     /**
      * Returns a route to the same destination with chosen stop added to map
      *
-     * @param chosenStop Where the driver wants to take a break.
-     * @return Optimum route for the given preferences
+     * @param chosenStop Where the driver wants to take  a break.
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public void updateChoosenStop(MapLocation chosenStop) throws InvalidRequestException, NoConnectionException {
+    public void setChoosenStop(RouteLocation chosenStop) throws InvalidRequestException, NoConnectionException {
         this.chosenStop = chosenStop;
-        EventTruck.getInstance().newEvent(new ChangedRouteEvent(getCalculatedRoute()));
+        activeRoute = getCalculatedRoute();
+        EventTruck.getInstance().newEvent(new ChangedRouteEvent());
+    }
+
+    /**
+     * Removes checkpoint from the route, and finishes the route if the checkpoint is the final destination.
+     *
+     * @param passedCheckpoint checkpoint that has been passed.
+     * @throws CheckpointNotFoundException
+     */
+    public void passedCheckpoint(MapLocation passedCheckpoint) throws CheckpointNotFoundException {
+        boolean checkpointFound = false;
+
+        if (passedCheckpoint.equalCoordinates(chosenStop)) {
+            chosenStop = null;
+            checkpointFound = true;
+        }
+
+        if (passedCheckpoint.equalCoordinates(recommendedStop)) {
+            recommendedStop = null;
+            checkpointFound = true;
+        }
+
+        if (passedCheckpoint.equalCoordinates(finalDestination)) {
+            activeRoute = null;
+            checkpointFound = true;
+        }
+        if (checkpoints != null) {
+            ArrayList<MapLocation> temp = new ArrayList<MapLocation>();
+            for (MapLocation checkpoint : checkpoints) {
+                if (passedCheckpoint.equalCoordinates(checkpoint)) {
+                    checkpointFound = true;
+                } else {
+                    temp.add(checkpoint);
+                }
+            }
+            checkpoints = temp;
+        }
+
+        if (!checkpointFound) {
+            throw new CheckpointNotFoundException("does not exist");
+        }
     }
 
     /**
@@ -79,16 +137,16 @@ public class
      * @param startLocation    The location that the route should start from.
      * @param finalDestination The location that the route should end at.
      * @param checkpoints      Checkpoints to visit before the end location
-     * @return optimized route with POIs along the route (null if connection to Google is not established)
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    public Route getNewRoute(MapLocation startLocation, MapLocation finalDestination, MapLocation... checkpoints) throws InvalidRequestException, NoConnectionException {
+    public void setNewRoute(MapLocation startLocation, MapLocation finalDestination, List<MapLocation> checkpoints) throws InvalidRequestException, NoConnectionException {
         this.startLocation = startLocation;
         this.finalDestination = finalDestination;
         this.checkpoints = checkpoints;
         this.chosenStop = null;
-        return getRoute(startLocation);
+        this.currentLocation = startLocation;
+        updateRoute(startLocation);
     }
 
     /**
@@ -99,62 +157,110 @@ public class
      * @throws NoConnectionException
      * @throws InvalidRequestException
      */
-    private Route getCalculatedRoute() throws NoConnectionException, InvalidRequestException {
-        Route optimalRoute = null;
+    private PlannedRoute getCalculatedRoute() throws NoConnectionException, InvalidRequestException {
+        Route optimalRoute;
         Duration sessionTimeLeft = regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft();
+        ArrayList<RouteLocation> alternativeLocations = new ArrayList<RouteLocation>();
+        RouteLocation displayedRecommended;
 
-        Route directRoute = directionsProvider.getRoute(startLocation, finalDestination, checkpoints);
+        Route directRoute = directionsProvider.getRoute(currentLocation, finalDestination, checkpoints);
 
         //TODO Implement check if gas is enough for this session
+        if (chosenStop != null) {
+            //Setting the recommended as it will be in alternative stops
+            getOptimizedRoute(directRoute, Duration.standardMinutes(5));
 
-        System.out.println("timeLeft: " + regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().getMillis());
-        System.out.println("timeLeft Extended: " + regulationHandler.getThisDayTL(user.getHistory()).getExtendedTimeLeft().getMillis());
-
-        //Returns the direct route if ETA is shorter than the time you have left to drive
-        if (directRoute.getEta().isShorterThan(sessionTimeLeft)) {
-            optimalRoute = directRoute;
-            optimalRoute.setAlternativeStops(calculateAlternativeStops(directRoute.getEta().dividedBy(2), directRoute.getEta().dividedBy(4)));
-        }
-
-        //If there is no time left on this session
-        else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
-            //TODO implement finding closest stop in the right direction
-        }
-
-        //If the location is within reach this day but not this session
-        else if (!directRoute.getEta().isShorterThan(sessionTimeLeft) &&
-                directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-
-            //If the ETA/2 is longer than time left on session
-            if (directRoute.getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().dividedBy(2));
-            } else {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().dividedBy(2));
+            ArrayList<MapLocation> tempCheckpoints = new ArrayList<MapLocation>();
+            tempCheckpoints.add(chosenStop);
+            if (checkpoints != null) {
+                tempCheckpoints.addAll(checkpoints);
             }
-            optimalRoute.setAlternativeStops(calculateAlternativeStops(sessionTimeLeft, sessionTimeLeft.dividedBy(2)));
-        }
+            optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
 
-        //If the location is not within reach this day (drive maximum distance)
-        else if (!directRoute.getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-            optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
-        }
+            displayedRecommended = chosenStop;
 
-        if (optimalRoute != null) {
-            optimalRoute.setTimeLeftOnSession(regulationHandler.getThisSessionTL(user.getHistory()));
-        }
+            alternativeLocations.add(recommendedStop);
+            alternativeLocations.addAll(calculateAlternativeStops(directRoute,
+                    directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
+                    directRoute.getCheckpoints().get(0).getEta().dividedBy(3)));
 
-        return optimalRoute;
+        } else {
+
+            //Returns the direct route if ETA is shorter than the time you have left to drive
+            if (directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft)) {
+
+                optimalRoute = directRoute;
+                alternativeLocations = (calculateAlternativeStops(directRoute,
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(2), directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
+            }
+
+            //If there is no time left on this session
+            else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
+                optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
+                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15));
+            }
+
+            //If the location is within reach this day but not this session
+            else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft) &&
+                    directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+
+                //If the ETA/2 is longer than time left on session
+                if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
+                    optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft());
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+                } else {
+                    optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2));
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2));
+                }
+            }
+
+            //If the location is not within reach this day (drive maximum distance)
+            else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
+                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
+                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+            } else {
+                throw new InvalidRequestException("Something is not right here");
+            }
+
+            if (optimalRoute.getCheckpoints().size() > 0) {
+                displayedRecommended = optimalRoute.getCheckpoints().get(0);
+            } else {
+                displayedRecommended = optimalRoute.getFinalDestination();
+            }
+            alternativeLocations.add(recommendedStop);
+
+        }
+        return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
 
     /**
      * Get a list of one stop location close to each wanted ETA.
      *
-     * @param stopsETA times that stops are wanted in.
+     * @param directRoute fastest route without rest locations added.
+     * @param stopsETA    times that stops are wanted in.
      * @return list if stop locations
      */
-    private ArrayList<MapLocation> calculateAlternativeStops(Duration... stopsETA) {
-        //TODO Implement this stuff
-        return null;
+    private ArrayList<RouteLocation> calculateAlternativeStops(Route directRoute, Duration... stopsETA)
+            throws InvalidRequestException, NoConnectionException {
+        ArrayList<RouteLocation> incompleteInfo = new ArrayList<RouteLocation>();
+        ArrayList<RouteLocation> completeInfo = new ArrayList<RouteLocation>();
+
+
+        for (Duration eta : stopsETA) {
+            LatLng tempCoordinate = findLatLngWithinDuration(directRoute, eta, Duration.standardMinutes(10));
+            ArrayList<RouteLocation> response = placesProvider.getNearbyRestLocations(tempCoordinate);
+            if (response.size() > 0) {
+                incompleteInfo.add(response.get(0));
+            }
+        }
+
+        //Creates new RouteLocations with all variables set
+        for (RouteLocation incompleteLocation : incompleteInfo) {
+            Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
+            completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
+                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(), tempRoute.getDistance()));
+        }
+        return completeInfo;
     }
 
 
@@ -167,34 +273,42 @@ public class
      */
     private Route getOptimizedRoute(Route directRoute, Duration within) throws InvalidRequestException, NoConnectionException {
         Route optimalRoute = null;
-        LatLng optimalLatLong = findLatLngWithinDuration(directRoute, within);
-        ArrayList<RestLocation> closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
-        Log.w("NBRofCloseLocations", closeLocations.size() + "");
+        LatLng optimalLatLong;
+        ArrayList<RouteLocation> closeLocations;
 
-        //Just calculating the ten best matches from Google
-        for (int i = 0; i < 10 && i < closeLocations.size(); i++) {
+        optimalLatLong = findLatLngWithinDuration(directRoute, within, Duration.standardMinutes(5));
+        closeLocations = placesProvider.getNearbyRestLocations(optimalLatLong);
+
+        if (closeLocations.size() == 0) {
+            Route tempRoute = directionsProvider.getRoute(currentLocation, new MapLocation(optimalLatLong), null, null);
+            RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(), tempRoute.getDistance());
+            forcedLocation.setName("No name location");
+            closeLocations.add(forcedLocation);
+        }
+
+        //Just calculating the five best matches from Google
+        for (int i = 0; i < 5 && i < closeLocations.size(); i++) {
             //Temporary creation
             LinkedList<MapLocation> tempList = new LinkedList<MapLocation>();
-            tempList.add(new MapLocation(closeLocations.get(i)));
+
+            tempList.add(closeLocations.get(i));
             if (checkpoints != null) {
-                for (MapLocation location : checkpoints) {
-                    tempList.add(location);
-                }
+                tempList.addAll(checkpoints);
             }
 
             //Checks if the restLocation is a possible stop and is faster than the previous
-            Route temp = directionsProvider.getRoute(startLocation, finalDestination, tempList.toArray(new MapLocation[tempList.size()]));
+            Route temp = directionsProvider.getRoute(startLocation, finalDestination, tempList);
 
-            //TODO Make this look better
             if (temp.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
                 if (optimalRoute == null) {
-                    this.chosenStop = closeLocations.get(i);
+                    this.recommendedStop = closeLocations.get(i);
                     optimalRoute = temp;
                 } else if (temp.getEta().isShorterThan(optimalRoute.getEta())) {
-                    this.chosenStop = closeLocations.get(i);
+                    this.recommendedStop = closeLocations.get(i);
                     optimalRoute = temp;
                 }
             }
+
         }
         return optimalRoute;
     }
@@ -204,56 +318,52 @@ public class
      *
      * @param directRoute Route from Google Directions without any rest or gas stops.
      * @param timeLeft    ETA that the coordinate should be close to.
+     * @param timeDiff    time that the ETA to the LatLng could differ from timeLeft.
      * @return The coordinate that matches time left the best.
      */
-    private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft) throws InvalidRequestException, NoConnectionException {
+    private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft, Duration timeDiff) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
 
+        Log.w("PolylineSize", coordinates.size() + "");
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
+        int currentIndex = (topIndex + bottomIndex) / 2;
 
         Duration etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
+                new MapLocation(coordinates.get(currentIndex)));
+        nbrOfDirCalls++;
 
 
-        while (etaToCoordinate.isShorterThan(timeLeft.minus(Duration.standardMinutes(2))) ||
-                etaToCoordinate.isLongerThan(timeLeft.plus(Duration.standardMinutes(2)))) {
+        while (etaToCoordinate.isShorterThan(timeLeft.minus(timeDiff)) ||
+                etaToCoordinate.isLongerThan(timeLeft)) {
             if (etaToCoordinate.isLongerThan(timeLeft)) {
-                topIndex = (topIndex + bottomIndex) / 2;
+                topIndex = currentIndex;
             } else {
-                bottomIndex = (topIndex + bottomIndex) / 2;
+                bottomIndex = currentIndex;
             }
 
+            currentIndex = (topIndex + bottomIndex) / 2;
             //Just to be safe
-            if (topIndex == bottomIndex) {
-                if (topIndex == bottomIndex) {
-                    break;
-                }
+            if (topIndex - bottomIndex < 2) {
+                break;
             }
+            Log.w("findLatLng", "topIndex: " + topIndex);
+            Log.w("findLatLng", "bottomIndex: " + bottomIndex);
             etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                    new MapLocation(coordinates.get((topIndex + bottomIndex) / 2)));
-            System.out.println(etaToCoordinate.getMillis());
+                    new MapLocation(coordinates.get(currentIndex)));
+            nbrOfDirCalls++;
+            Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
 
         }
-        return coordinates.get((topIndex + bottomIndex) / 2);
-    }
-
-    /**
-     * Calculate a new route based on a start location and end location provided
-     *
-     * @param startLocation The location that the route should start from.
-     * @param endLocation   The location that the route should end at.
-     */
-    public Route calculateRoute(MapLocation startLocation, MapLocation endLocation) throws
-            InvalidRequestException, NoConnectionException {
-        return getNewRoute(startLocation, endLocation, null);
+        Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
+        return coordinates.get(currentIndex);
     }
 
     /**
      * Checks if a MapLocation already exists in an ArrayList
      *
      * @param location Location that you want to see if the list contains
-     * @param list     List that might contain given locataion
+     * @param list     List that might contain given location
      * @return True if list contains a location with the same coordinates as the location
      */
     private boolean locationExistsInList(MapLocation location, ArrayList<? extends

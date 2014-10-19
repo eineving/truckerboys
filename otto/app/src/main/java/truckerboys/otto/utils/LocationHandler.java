@@ -1,6 +1,7 @@
 package truckerboys.otto.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -9,7 +10,10 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.maps.model.LatLng;
 
+import truckerboys.otto.NoConnectionActivity;
+import truckerboys.otto.newroute.RouteActivity;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.positions.MapLocation;
@@ -24,14 +28,14 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         GooglePlayServicesClient.ConnectionCallbacks,
         LocationListener {
 
-    private static final int LOCATION_REQUEST_INTERVAL_MS = 500;
+    public static final int LOCATION_REQUEST_INTERVAL_MS = 500;
 
-    private LocationClient locationClient;
+    private static LocationClient locationClient;
 
-    private static MapLocation currentLocation;
-    private static boolean connected = false;
+    private Context context;
 
     public LocationHandler(Context context){
+        this.context = context;
         locationClient = new LocationClient(context, this, this);
         locationClient.connect();
     }
@@ -46,29 +50,21 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
         //Request new location updates to this LocationListener.
         locationClient.requestLocationUpdates(locationRequest, this);
 
-        this.currentLocation = new MapLocation(locationClient.getLastLocation());
-
         //Define that the LocationHandler is connected to the GPS.
-        connected = true;
     }
 
     @Override
-    public void onDisconnected() {
-        connected = false;
-    }
+    public void onDisconnected() {}
 
     @Override
     public void onLocationChanged(Location location) {
         if(isMoreAccurate(location)) {
-            EventTruck.getInstance().newEvent(new GPSUpdateEvent(new MapLocation(location), getCurrentLocation()));
-            this.currentLocation = new MapLocation(location);
+            EventTruck.getInstance().newEvent(new GPSUpdateEvent(new MapLocation(location), getCurrentLocationAsMapLocation()));
         }
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     /**
      * Checks if a location is more accurate and trushworthy then the last one that was set in
@@ -83,10 +79,18 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
     }
 
     public static boolean isConnected() {
-        return connected;
+        return locationClient.isConnected();
     }
 
-    public static MapLocation getCurrentLocation() {
-        return currentLocation;
+    public static MapLocation getCurrentLocationAsMapLocation() {
+        return new MapLocation(locationClient.getLastLocation());
+    }
+
+    public static LatLng getCurrentLocationAsLatLng() {
+        return new LatLng(locationClient.getLastLocation().getLatitude(), locationClient.getLastLocation().getLongitude());
+    }
+
+    public static LocationClient getLocationClient() {
+        return locationClient;
     }
 }

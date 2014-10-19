@@ -1,7 +1,5 @@
 package truckerboys.otto.directionsAPI;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -12,16 +10,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
-import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
+ *
  * @author Daniel Eineving
  */
 public class GoogleDirectionsJSONDecoder {
     /**
      * Creates a route from a Google Direction JSON response
-     *
+     * <p/>
      * OBS: This method uses very much typecasting,
      * think twice before changing anything
      *
@@ -30,12 +29,12 @@ public class GoogleDirectionsJSONDecoder {
      */
     public static Route stringToRoute(String response) throws InvalidRequestException {
 
-            MapLocation finalDestination;
-            Duration eta;
-            int distance = 0;
-            ArrayList<LatLng> overviewPolyline;
-            ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
-            ArrayList<MapLocation> checkPoints = new ArrayList<MapLocation>();
+        RouteLocation finalDestination;
+        Duration eta;
+        int distance = 0;
+        ArrayList<LatLng> overviewPolyline;
+        ArrayList<LatLng> detailedPolyline = new ArrayList<LatLng>();
+        ArrayList<RouteLocation> checkPoints = new ArrayList<RouteLocation>();
         try {
 
             //Creating a HashMap from from the whole response
@@ -59,19 +58,6 @@ public class GoogleDirectionsJSONDecoder {
                     allSteps.add(step);
             }
 
-            //TODO remove printouts
-            Log.w("Routes", "" + routes.size());
-            Log.w("Legs", "" + allLegs.size());
-            Log.w("Steps", "" + allSteps.size());
-
-
-            //Creating the final destination
-            LinkedTreeMap<String, Object> lastLeg = allLegs.get(allLegs.size() - 1);
-            LatLng coordinate = new LatLng(((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lat"),
-                    ((LinkedTreeMap<String, Double>) lastLeg.get("end_location")).get("lng"));
-            finalDestination = new MapLocation(coordinate);
-            finalDestination.setAddress((String) lastLeg.get("end_address"));
-
             //Creating ETA and distance
             int etaSeconds = 0;
             for (LinkedTreeMap<String, Object> leg : allLegs) {
@@ -80,6 +66,7 @@ public class GoogleDirectionsJSONDecoder {
                 distance += ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
             }
             eta = new Duration(etaSeconds * 1000);
+
 
             //Creating big polyline
             for (LinkedTreeMap<String, Object> step : allSteps) {
@@ -91,31 +78,30 @@ public class GoogleDirectionsJSONDecoder {
             overviewPolyline = polylineDecoder(((LinkedTreeMap<String, String>) routes.get(0).get("overview_polyline")).get("points"));
 
             //Getting checkpoints if there are any
-            if (allLegs.size() > 1) {
-                for (LinkedTreeMap<String, Object> leg : allLegs) {
-                    LinkedTreeMap<String, Double> startLocation =
-                            (LinkedTreeMap<String, Double>) leg.get("start_location");
-                    checkPoints.add(new MapLocation(new LatLng(
-                            startLocation.get("lat"), startLocation.get("lng"))));
-                }
+            long checkpointETA = 0;
+            int checkpointDistance = 0;
+            for (LinkedTreeMap<String, Object> leg : allLegs) {
+                LinkedTreeMap<String, Double> endLocation = (LinkedTreeMap<String, Double>) leg.get("end_location");
+                LatLng coordinate = new LatLng(endLocation.get("lat"), endLocation.get("lng"));
+                String address = (String) leg.get("end_address");
+                checkpointETA += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value")*1000;
+                checkpointDistance += ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
+                checkPoints.add(new RouteLocation(coordinate, address, new Duration(checkpointETA), checkpointDistance));
             }
 
+            //Creating the final destination
+            finalDestination = checkPoints.get(checkPoints.size()-1);
 
-            //TODO remove printouts
-            Log.w("finalDestination", finalDestination.getAddress());
-            Log.w("ETA", eta.toStandardSeconds().getSeconds() + "");
-            Log.w("Distance", distance + "");
-            Log.w("CheckPoints", checkPoints.size() + "");
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new InvalidRequestException(e.getMessage());
         }
-
         return new Route(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkPoints);
     }
 
     /**
      * Decodes a polyline into an array of LatLng
-     *
+     * <p/>
      * Based on example from
      * http://wptrafficanalyzer.in/blog/drawing-driving-route-directions-between-two-locations-using-google-directions-in-google-map-android-api-v2/
      * Written by George Mathew
@@ -159,6 +145,7 @@ public class GoogleDirectionsJSONDecoder {
 
     /**
      * Creates a ETA duration from a Google Direction JSON response
+     *
      * @param response Google Direction JSON
      * @return ETA to requested location
      */
@@ -166,31 +153,31 @@ public class GoogleDirectionsJSONDecoder {
         int etaSeconds = 0;
         //Some shady typecasting here, take care when changing
 
-        try{
-        //Creating a HashMap from from the whole response
-        HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
+        try {
+            //Creating a HashMap from from the whole response
+            HashMap<String, Object> mapResponse = (HashMap<String, Object>) new Gson().fromJson(response, HashMap.class);
 
-        //Making all routes into HashMaps
-        ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
+            //Making all routes into HashMaps
+            ArrayList<LinkedTreeMap<String, Object>> routes = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("routes");
 
-        ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
-        ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
+            ArrayList<LinkedTreeMap<String, Object>> allLegs = new ArrayList<LinkedTreeMap<String, Object>>();
+            ArrayList<LinkedTreeMap<String, Object>> allSteps = new ArrayList<LinkedTreeMap<String, Object>>();
 
-        //Combines all the legs to one common array
-        for (LinkedTreeMap<String, Object> route : routes) {
-            for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
-                allLegs.add(leg);
+            //Combines all the legs to one common array
+            for (LinkedTreeMap<String, Object> route : routes) {
+                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
+                    allLegs.add(leg);
+            }
+
+            //Creating ETA
+
+            for (LinkedTreeMap<String, Object> leg : allLegs) {
+                etaSeconds += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
+            }
+        } catch (Exception e) {
+            throw new InvalidRequestException(e.getMessage());
         }
 
-        //Creating ETA
-
-        for (LinkedTreeMap<String, Object> leg : allLegs) {
-            etaSeconds +=  ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value");
-        }
-    }catch (Exception e){
-        throw new InvalidRequestException(e.getMessage());
-    }
-
-    return new Duration(etaSeconds * 1000);
+        return new Duration(etaSeconds * 1000);
     }
 }

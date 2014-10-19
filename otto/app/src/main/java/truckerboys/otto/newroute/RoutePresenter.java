@@ -9,19 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import truckerboys.otto.utils.eventhandler.EventTruck;
-import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
+import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 
 /**
- * Created by root on 2014-10-06.
+ * Created by Mikael Malmqvist on 2014-10-06.
+ * Class for handling some logic for the RouteActivity.
  */
-public class RoutePresenter implements IEventListener {
-
-    public RoutePresenter() {
-        EventTruck.getInstance().subscribe(this);
-    }
+public class RoutePresenter {
 
     /**
      * Sends the selected address (string) to the EventTruck by converting
@@ -47,7 +42,7 @@ public class RoutePresenter implements IEventListener {
             if(locations.size() > 0) {
                 Address location = locations.get(0);
                 //Address checkPoint = checkPoints.get(0);
-                EventTruck.getInstance().newEvent(new NewDestination(location, checkpointsArray));
+                EventTruck.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
             }
 
         } catch (IOException e) {
@@ -91,8 +86,4 @@ public class RoutePresenter implements IEventListener {
 
     }
 
-    @Override
-    public void performEvent(Event event) {
-
-    }
 }

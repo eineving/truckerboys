@@ -1,14 +1,17 @@
 package truckerboys.otto.stats;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
-import android.swedspot.automotiveapi.AutomotiveSignal;
-import android.swedspot.scs.data.SCSFloat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -17,13 +20,13 @@ import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
+import truckerboys.otto.utils.eventhandler.events.StatsViewStoppedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
-import truckerboys.otto.vehicle.IVehicleListener;
-import truckerboys.otto.vehicle.VehicleInterface;
-import truckerboys.otto.vehicle.VehicleSignalID;
-import utils.IView;
+import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
+import truckerboys.otto.IView;
 
 
 
@@ -32,12 +35,9 @@ import utils.IView;
  * Class for displaying statistics for the user.
  */
 
-public class StatsView extends Fragment implements IView, IEventListener, IVehicleListener {
+public class StatsView extends Fragment implements IView, IEventListener{
 
     private View rootView;
-    private StatsPresenter presenter;
-    private static final String SETTINGS = "Settings_file";
-    private static final String STATS = "Stats_file";
 
     // Todays stats
     private TextView timeToday;
@@ -51,24 +51,38 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
     // Violation stats
     private TextView violations;
 
-    private String distanceUnit = "";
-    private String fuelUnit = "";
+    // History stats
+    ArrayAdapter<String> sessionAdapter;
+    private ListView historyList;
 
+    // Updatehandler
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
 
+    private User user;
 
     public StatsView(){
-        presenter = new StatsPresenter(this);
+    }
+
+
+    public void setUser(User user){
+        this.user = user;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView  = inflater.inflate(R.layout.fragment_stats, container, false);
 
-        VehicleInterface.subscribe(this);
-
         // Creates TextViews from the fragment for daily stats
         timeToday = (TextView) rootView.findViewById(R.id.timeTodayTime);
         distanceByFuel = (TextView) rootView.findViewById(R.id.KmByFuel);
+
+        // Session history
+        historyList = (ListView) rootView.findViewById(R.id.sessionListView);
+
+        sessionAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_plain_text);
+
+        historyList.setAdapter(sessionAdapter);
+
 
         // Creates TextViews from the fragment for daily stats
         timeTotal = (TextView) rootView.findViewById(R.id.timeTotalTime);
@@ -79,8 +93,7 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         this.violations = (TextView) rootView.findViewById(R.id.numberOfViolations);
 
         // Restores preferences for settings in presenter
-        presenter.restorePreferences();
-
+        EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
 
         return rootView;
     }
@@ -95,10 +108,10 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
 
         // TODO UNCOMMENT THIS
-        durationToday = User.getInstance().getHistory().getActiveTimeSinceLastDailyBreak();
+        durationToday = user.getHistory().getActiveTimeSinceLastDailyBreak();
 
         // TODO Change this to SessionHistory.getActiveTimeSince(Instant start)
-        durationTotal = User.getInstance().getHistory().getActiveTimeSince(new Instant(0));
+        durationTotal = user.getHistory().getActiveTimeSince(new Instant(0));
         // TODO Ask pegelow about this
 
 
@@ -119,53 +132,44 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
 
         //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
         EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
-
     }
 
     /**
-     * On stop, save the settings displayed in the view.
+     * On stop, notify the presenter through an event.
+     * The presenter will furthermore save the data from the model.
      */
     @Override
     public void onStop() {
         super.onStop();
 
-        //TODO Put this code in the presenter and get values from model
-
-        SharedPreferences.Editor editor = getActivity().getSharedPreferences(STATS, 0).edit();
-
-        editor.putFloat("timeToday", Float.parseFloat(timeToday.getText().toString().substring(0, timeToday.getText().toString().length() - 2)));
-        editor.putFloat("timeTotal", Float.parseFloat(timeTotal.getText().toString().substring(0, timeTotal.getText().toString().length() - 2)));
-
-        // editor.putFloat("distanceToday", Float.parseFloat(distanceToday.getText().toString().substring(0, distanceToday.getText().toString().length() - 3)));
-        editor.putFloat("distanceTotal", Float.parseFloat(distanceTotal.getText().toString().substring(0, distanceTotal.getText().toString().length() - 3)));
-
-        // editor.putFloat("fuelToday", Float.parseFloat(fuelToday.getText().toString()));
-        editor.putFloat("fuelTotal", Float.parseFloat(fuelTotal.getText().toString().substring(0, fuelTotal.getText().toString().length() - 2)));
-        editor.putFloat("distanceByFuel", Float.parseFloat(distanceByFuel.getText().toString().substring(0, distanceByFuel.getText().toString().length() - 5)));
-
-
-        editor.commit();
+        // Notifies the presenter that the view has stopped
+        EventTruck.getInstance().newEvent(new StatsViewStoppedEvent());
 
     }
 
 
     /**
-     * Method for setting a new unit system.
-     * This method is to be called from the presenter.
-     * @param system metric/imperial
+     * Updates the list of previous sessions.
+     * @param sessionString data from previous sessions.
      */
-    public void updateUnits(String system) {
-        if(system.equals("imperial")) {
-            fuelUnit = ""; // MILES
-            distanceUnit = ""; // GALLONS
+    public void updateSessionHistory(String sessionString) {
+        sessionAdapter.add(sessionString);
 
-        } else {
-            fuelUnit = "";
-            distanceUnit = "";
-        }
+        sessionAdapter.notifyDataSetChanged();
+
+        historyList.setLayoutParams(new LinearLayout.LayoutParams(
+                1000, historyList.getAdapter().getCount()*125));
 
     }
 
+    /**
+     * Clears the session adapter for the
+     * history list.
+     */
+    public void clearSessionAdapter() {
+        sessionAdapter.clear();
+        sessionAdapter.notifyDataSetChanged();
+    }
 
     /**
      * Update the switches with settings loaded from shared preference file
@@ -181,7 +185,7 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         }
 
         if(distanceByFuel != null) {
-            distanceByFuel.setText(Math.floor(statsToday[1]*100)/100 + " km/L");
+            distanceByFuel.setText(Math.floor(statsToday[3]*100)/100 + " km/L");
         }
 
         if(timeTotal != null) {
@@ -203,7 +207,6 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         }
     }
 
-    @Override
     public Fragment getFragment() {
         return this;
     }
@@ -213,41 +216,39 @@ public class StatsView extends Fragment implements IView, IEventListener, IVehic
         return "Statistics";
     }
 
+    private void updateTotalDistance(TotalDistanceEvent e){
+        //The signals unit should be meters..
+        distanceTotal.setText(e.getTotalDistance()/1000 + " km");
+    }
+
+    private void updateFuelConsumption(DistanceByFuelEvent e){
+        distanceByFuel.setText(e.getDistanceByFuel() + " km/L");
+    }
+
 
     @Override
-    public void performEvent(Event event) {
-        if(event.isType(SettingsChangedEvent.class)) {
+    public void performEvent(final Event event) {
 
-            // read from file and set String called system based on that
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(SETTINGS, 0).edit();
+        if(event.isType(TotalDistanceEvent.class)) {
+            // Update view if new total distance signal is sent
 
-            editor.putString("system", ((SettingsChangedEvent) event).getSystem());
+            Runnable updateDistance = new Runnable() {
+                public void run() {
+                    updateTotalDistance((TotalDistanceEvent) event);
+                }
+            };
+            updateHandler.post(updateDistance);
+        }
 
-            editor.commit();
-
+        if(event.isType(DistanceByFuelEvent.class)) {
+            // Update view if new total distance/fuel signal is sent
+            Runnable updateFuelConsumption = new Runnable() {
+                public void run() {
+                    updateFuelConsumption((DistanceByFuelEvent)event);
+                }
+            };
+            updateHandler.post(updateFuelConsumption);
         }
     }
 
-    @Override
-    public void receive(AutomotiveSignal signal) {
-       // TODO Get fuel consumption
-
-        switch (signal.getSignalId()) {
-
-            case VehicleSignalID.KM_PER_LITER:
-
-                // TODO Set total km per liters
-                Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
-                distanceByFuel.setText(kmPerLiter + " km/L");
-
-            case VehicleSignalID.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE:
-
-                // TODO Set total distance driven
-                Float distance = ((SCSFloat) signal.getData()).getFloatValue();
-                distanceTotal.setText(distance + " km");
-
-            default:
-        }
-
-    }
 }

@@ -1,77 +1,87 @@
 package truckerboys.otto;
 
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
-import android.view.WindowManager;
 
-import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventTruck;
-import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.NewDestination;
-import truckerboys.otto.utils.tabs.SlidingTabLayout;
-import truckerboys.otto.utils.tabs.TabPagerAdapter;
+import truckerboys.otto.home.ActiveSessionDialogFragment;
 
-public class MainActivity extends FragmentActivity implements IEventListener {
-    private ViewPager viewPager;
-    private TabPagerAdapter pagerAdapter;
-    private LocationHandler locationHandler;
-    private OTTO otto;
+/**
+ * Created by Simon Petersson on 14/10/2014.
+ *
+ * The launch activity, this handles making sure that we have access to the GPS before launching
+ * the application, since it will not run without the GPS enabled. (There is no need for the
+ * application without GPS enabled, since it relies heavily on that.)
+ */
+public class MainActivity extends Activity implements LocationListener{
 
-    public static final String SETTINGS = "Settings_file";
-    public static final String STATS = "Stats_file";
-
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, this);
 
-        otto = new OTTO();
-        locationHandler = new LocationHandler(this);
-
-        //Create standard view with a ViewPager and corresponding tabs.
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), otto.getViews());
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.setCurrentItem(2);
-
-        /*
-         * Make sure we never have to reload any of the tabs after the app has been started.
-         * This makes the users interaction experience with the app alot smoother.
-         */
-        viewPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
-
-        //Use Googles 'SlidingTabLayout' to display tabs for all views.
-        SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
-        slidingTabLayout.setViewPager(viewPager);
-
-
-        // Turns display properties (alive on/off) based on saved settings file
-        if(getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true)) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if(isConnectedToGPS()){
+            launchOTTOActivity();
         } else {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            launchNoConnectionActivity();
         }
-
-        EventTruck.getInstance().subscribe(this);
-    }
-
-    public OTTO getOtto () {
-        return otto;
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onResume() {
+        super.onResume();
+        if(isConnectedToGPS()){
+            launchOTTOActivity();
+        } else {
+            launchNoConnectionActivity();
+        }
+    }
+
+    private boolean isConnectedToGPS(){
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     @Override
-    public void performEvent(Event event) {
-        // Sets the current page to Map if a new destination is set
-        if(event.isType(NewDestination.class)) {
-            viewPager.setCurrentItem(0);
-        }
+    public void onLocationChanged(Location location) {}
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {}
+
+    @Override
+    public void onProviderEnabled(String s) {
+        //If Connection has been established, close NoConnetionActivity.
+        NoConnectionActivity.getNoConnectionActivity().finish();
+        //Then launch OTTOActivity
+        launchOTTOActivity();
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+        //If provider isn't availible, launch NoConnecitonActivity.
+        launchNoConnectionActivity();
+    }
+
+    /**
+     * Simple method for launching the NoConnectionActivity.
+     */
+    private void launchNoConnectionActivity(){
+        Intent noConnectionIntent = new Intent(this, NoConnectionActivity.class);
+        startActivity(noConnectionIntent);
+    }
+
+    /**
+     * SImple method for launching the OTTOActivity.
+     */
+    private void launchOTTOActivity(){
+        Intent OTTOActivity = new Intent(this, OTTOActivity.class);
+        startActivity(OTTOActivity);
     }
 }

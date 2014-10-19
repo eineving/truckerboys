@@ -2,11 +2,13 @@
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:singleLine="true"
     android:layout_width="match_parent"
     android:textColor="@color/textLight"
     android:textSize="14dp"
-    android:padding="5dp"
+    android:gravity="center_vertical"
     android:textStyle="bold"
+    android:padding="5dp"
     android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
     android:text="Göteborg"
     android:layout_height="match_parent">

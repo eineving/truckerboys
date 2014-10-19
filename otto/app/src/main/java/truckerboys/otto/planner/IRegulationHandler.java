@@ -65,6 +65,7 @@ public interface IRegulationHandler {
 
     /**
      * The time left on your break and you are allowed to drive again.
+     * Returns the time with the error margin of max 1 minute.
      *
      * @param history All sessions from at least 30 days back
      * @return The time left before you are allowed to drive again.

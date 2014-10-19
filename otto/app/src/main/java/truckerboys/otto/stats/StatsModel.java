@@ -1,5 +1,9 @@
 package truckerboys.otto.stats;
 
+import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+
 import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
@@ -17,6 +21,8 @@ public class StatsModel{
     private double timeToday, fuelToday, distanceByFuel;
     private double timeTotal, distanceTotal, fuelTotal, fuelByDistanceTotal;
     private int violations;
+
+    ArrayList<String> sessionHistory = new ArrayList<String>();
 
     private String fuelUnit = "L";
     private String distanceUnit = "Km";
@@ -84,6 +90,14 @@ public class StatsModel{
 
     }
 
+    /**
+     * Updates the list of previous sessions.
+     * @param sessionString data from previous sessions.
+     */
+    public void updateSessionHistory(String sessionString) {
+        sessionHistory.add(sessionString);
+
+    }
 
     public double getTimeToday() {
         return timeToday;

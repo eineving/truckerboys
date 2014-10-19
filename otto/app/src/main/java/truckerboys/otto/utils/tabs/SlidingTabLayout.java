@@ -22,6 +22,8 @@ package truckerboys.otto.utils.tabs;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -86,6 +88,8 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
+
+    private Handler changeThemeHandler = new Handler(Looper.getMainLooper());
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -338,7 +342,16 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                 }
             };
             getRootView().post(setAdapter);
-        }else{
+
+            Runnable r = new Runnable(){
+                @Override
+                public void run() {
+                    mTabStrip.setSelectedIndicatorColors(0xFFE51C23);
+                }
+            };
+            changeThemeHandler.post(r);
+
+        } else {
             Runnable setAdapter = new Runnable() {
                 @Override
                 public void run() {
@@ -346,6 +359,13 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                     mViewPager.getAdapter().notifyDataSetChanged();
                 }
             };
+            Runnable r = new Runnable(){
+                @Override
+                public void run() {
+                    mTabStrip.setSelectedIndicatorColors(0xFF33B5E5);
+                }
+            };
+            changeThemeHandler.post(r);
             getRootView().post(setAdapter);
         }
     }
