@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -75,7 +76,8 @@ public class
         if (activeRoute == null) {
             throw new NoActiveRouteException("There is no active route");
         }
-        return activeRoute;
+        //Making it thread secure
+        return new PlannedRoute(activeRoute);
     }
 
     /**
@@ -167,37 +169,48 @@ public class
 
         //TODO Implement check if gas is enough for this session
         if (chosenStop != null) {
+            RouteLocation calculatedRecommendedStop;
+
             //Setting the recommended as it will be in alternative stops
-            getOptimizedRoute(directRoute, Duration.standardMinutes(5));
+            Route calculationRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
+            if (calculationRoute.getCheckpoints().size() > 0) {
+                calculatedRecommendedStop = calculationRoute.getCheckpoints().get(0);
+            } else {
+                calculatedRecommendedStop = calculationRoute.getFinalDestination();
+            }
+
 
             ArrayList<MapLocation> tempCheckpoints = new ArrayList<MapLocation>();
             tempCheckpoints.add(chosenStop);
             if (checkpoints != null) {
                 tempCheckpoints.addAll(checkpoints);
             }
-            optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
-
             displayedRecommended = chosenStop;
 
-            alternativeLocations.add(recommendedStop);
+            optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
+
+            alternativeLocations.add(calculatedRecommendedStop);
             alternativeLocations.addAll(calculateAlternativeStops(directRoute,
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(3)));
+
+
 
         } else {
 
             //Returns the direct route if ETA is shorter than the time you have left to drive
             if (directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft)) {
-
                 optimalRoute = directRoute;
                 alternativeLocations = (calculateAlternativeStops(directRoute,
-                        directRoute.getCheckpoints().get(0).getEta().dividedBy(2), directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(3),
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
             }
 
             //If there is no time left on this session
             else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
                 optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
-                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15));
+                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15), Duration.standardMinutes(20));
             }
 
             //If the location is within reach this day but not this session
@@ -207,17 +220,17 @@ public class
                 //If the ETA/2 is longer than time left on session
                 if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
                     optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft());
-                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
                 } else {
                     optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2));
-                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2));
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2),sessionTimeLeft.dividedBy(3));
                 }
             }
 
             //If the location is not within reach this day (drive maximum distance)
             else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
                 optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
-                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2),sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
             } else {
                 throw new InvalidRequestException("Something is not right here");
             }
@@ -227,8 +240,18 @@ public class
             } else {
                 displayedRecommended = optimalRoute.getFinalDestination();
             }
-            alternativeLocations.add(recommendedStop);
-
+        }
+        //TODO delete these
+        int index = 0;
+        Log.w("NbrOfAlternative" , alternativeLocations.size() + "");
+        for(RouteLocation temp : alternativeLocations) {
+            Log.w("AlternativeName " + index, "" + temp.getName());
+            Log.w("AlternativeAddress " + index, "" + temp.getAddress());
+            try{
+                Log.w("AlternativeETA " + index, "" + temp.getEta().toString());
+            }catch (Exception e){
+                Log.w("AlternativeETA " + index,  e.toString());
+            }
         }
         return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
@@ -249,8 +272,13 @@ public class
         for (Duration eta : stopsETA) {
             LatLng tempCoordinate = findLatLngWithinDuration(directRoute, eta, Duration.standardMinutes(10));
             ArrayList<RouteLocation> response = placesProvider.getNearbyRestLocations(tempCoordinate);
-            if (response.size() > 0) {
-                incompleteInfo.add(response.get(0));
+
+            for (RouteLocation location : response) {
+                if (directionsProvider.getETA(currentLocation, location).
+                        isShorterThan(regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft())) {
+                    incompleteInfo.add(location);
+                    break; //Can not afford to do more calls to check the optimum one
+                }
             }
         }
 
@@ -258,7 +286,7 @@ public class
         for (RouteLocation incompleteLocation : incompleteInfo) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
             completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
-                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(), tempRoute.getDistance()));
+                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(), Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance()));
         }
         return completeInfo;
     }
@@ -281,7 +309,8 @@ public class
 
         if (closeLocations.size() == 0) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, new MapLocation(optimalLatLong), null, null);
-            RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(), tempRoute.getDistance());
+            RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(),
+                    Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance());
             forcedLocation.setName("No name location");
             closeLocations.add(forcedLocation);
         }
@@ -308,7 +337,6 @@ public class
                     optimalRoute = temp;
                 }
             }
-
         }
         return optimalRoute;
     }
@@ -323,8 +351,6 @@ public class
      */
     private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft, Duration timeDiff) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
-
-        Log.w("PolylineSize", coordinates.size() + "");
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
         int currentIndex = (topIndex + bottomIndex) / 2;
@@ -347,13 +373,9 @@ public class
             if (topIndex - bottomIndex < 2) {
                 break;
             }
-            Log.w("findLatLng", "topIndex: " + topIndex);
-            Log.w("findLatLng", "bottomIndex: " + bottomIndex);
             etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
                     new MapLocation(coordinates.get(currentIndex)));
             nbrOfDirCalls++;
-            Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
-
         }
         Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
         return coordinates.get(currentIndex);

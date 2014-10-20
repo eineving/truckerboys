@@ -15,6 +15,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 import org.joda.time.Minutes;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
@@ -52,6 +53,7 @@ public class ClockView extends Fragment {
 
     Boolean variablesSet = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
+    Instant timeNow;
 
     public ClockView() {}
 
@@ -149,7 +151,8 @@ public class ClockView extends Fragment {
      *
      * @param timeLeft The remaining time
      */
-    public void setTimeLeft(TimeLeft timeLeft) {
+    public void setTimeLeft(TimeLeft timeLeft, Instant timeNow) {
+        this.timeNow = timeNow;
         if (variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
             if (timeLeft.getExtendedTimeLeft().getMillis() > 0) {
@@ -207,7 +210,7 @@ public class ClockView extends Fragment {
      * @param message The message to be displayed
      */
     public void displayToast(String message){
-        Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_SHORT);
+        Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -279,7 +282,11 @@ public class ClockView extends Fragment {
             return;
         }
         v.setVisibility(ViewGroup.VISIBLE);
-        eta.setText(getTimeAsFormattedString(stop.getEta()));
+        Duration time = new Duration(timeNow, stop.getTimeOfArrival());
+        if(time.getMillis()<0){
+            time = Duration.ZERO;
+        }
+        eta.setText(getTimeAsFormattedString(time));
         if (stop.getType().contains("gas_station")) {
             name.setText(stop.getName());
             image.setImageResource(R.drawable.gasstation);

@@ -65,19 +65,6 @@ public class ClockModel {
         timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
         if(timeLeftExtendedDuration.getMillis()<0)
             timeLeftExtendedDuration = Duration.ZERO;
-        if(recStop!=null)
-        recStop.decreaseETA(new Duration(timeDifference));
-        if(recStop.getEta().getMillis()<0)
-            recStop.decreaseETA(recStop.getEta());
-        if(altStops!=null) {
-            for (RouteLocation stop : altStops) {
-                if (stop != null) {
-                    stop.decreaseETA(new Duration(timeDifference));
-                    if(stop.getEta().getMillis()<0)
-                        stop.decreaseETA(stop.getEta());
-                }
-            }
-        }
 
         timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
 
@@ -147,6 +134,10 @@ public class ClockModel {
      */
     public TimeLeft getTimeLeft() {
         return timeLeft;
+    }
+
+    public Instant getTimeNow(){
+        return timeNow;
     }
 
     public Route getRoute(){
