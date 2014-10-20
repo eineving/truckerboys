@@ -60,7 +60,7 @@ public class MapModel implements IEventListener {
                     try {
                         // We left checkpoint range again, calculate new route to final destination.
                         if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) > DISTANCE_FROM_CHECKPOINT) {
-                            tripPlanner.setNewRoute(LocationHandler.getCurrentLocationAsMapLocation(), getRoute().getFinalDestination(), null);
+                            tripPlanner.updateRoute(LocationHandler.getCurrentLocationAsMapLocation());
                             closeToCheckpoint = false;
                         }
                     } catch (InvalidRequestException e) {

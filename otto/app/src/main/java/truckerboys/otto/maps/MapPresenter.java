@@ -4,6 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -46,16 +49,25 @@ public class MapPresenter implements IEventListener, IView {
 
         this.mapModel = new MapModel(tripPlanner);
         EventTruck.getInstance().subscribe(this);
+        updatePos.run();
     }
 
     public void startFollowRoute(){
         mapView.moveCamera(true, LocationHandler.getCurrentLocationAsLatLng(), 18f, LocationHandler.getCurrentLocationAsMapLocation().getBearing(), 1000);
-        mapModel.setActiveRoute(true);
+        mapView.moveCamera(
+                CameraUpdateFactory.newCameraPosition(new CameraPosition(LocationHandler.getCurrentLocationAsLatLng(), 18f, mapView.CAMERA_TILT,LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
+                new GoogleMap.CancelableCallback() {
+                    @Override
+                    public void onFinish() {
+                        //Make the camera follow the marker when we finished zooming in to marker.
+                        mapModel.setActiveRoute(true);
+                    }
 
-        //Make sure the handler doesnt run updatePos to many times.
-        updateHandler.removeCallbacks(updatePos);
-        //Wait 1000ms before running the updatePos runnable. Making the above animation finish before starting the next one.
-        updateHandler.postDelayed(updatePos, 2000);
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
     }
 
     public void stopFollowRoute(){
