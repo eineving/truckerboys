@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -72,8 +73,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private int lastDistractionLevel;
 
     //region Camera Settings
-    private float CAMERA_TILT = 45f;
-    private float CAMERA_ZOOM = 16f; //Default to 16f zoom.
+    public float CAMERA_TILT = 45f;
+    public float CAMERA_ZOOM = 16f; //Default to 16f zoom.
     //endregion
 
     //region Interpolation variables.
@@ -229,6 +230,19 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 }
             });
 
+        }
+    }
+
+    /**
+     * Helper method to move the camera across the map.
+     *
+     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
+     * @param location The location to set the camera to.
+     * @param bearing  The bearing to set the camera to.
+     */
+    public void moveCamera(CameraUpdate cameraUpdate, GoogleMap.CancelableCallback cancelableCallback) {
+        if (googleMap != null) {
+            googleMap.animateCamera(cameraUpdate, cancelableCallback);
         }
     }
 
