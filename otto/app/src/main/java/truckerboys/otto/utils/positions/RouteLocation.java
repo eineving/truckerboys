@@ -15,7 +15,7 @@ public class RouteLocation extends MapLocation {
     private List<String> type;
     private String name;
     private Duration eta;
-    private Instant timeOfArival;
+    private Instant timeOfArrival;
     private String address;
     private int distance;
 
@@ -32,7 +32,7 @@ public class RouteLocation extends MapLocation {
         this.address = address;
         this.eta = eta;
         this.distance = distance;
-        this.timeOfArival = timeOfArival;
+        this.timeOfArrival = timeOfArival;
         this.type = new ArrayList<String>();
     }
 
@@ -46,7 +46,7 @@ public class RouteLocation extends MapLocation {
         this.type = other.type;
         this.name = other.name;
         this.eta = new Duration(other.eta);
-        this.timeOfArival = new Instant(other.timeOfArival);
+        this.timeOfArrival = new Instant(other.timeOfArrival);
         this.address = other.address;
         this.distance = other.distance;
     }
@@ -115,7 +115,7 @@ public class RouteLocation extends MapLocation {
         this.name = name;
     }
 
-    public Instant getTimeOfArival() {
-        return timeOfArival;
+    public Instant getTimeOfArrival() {
+        return timeOfArrival;
     }
 }
