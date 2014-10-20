@@ -490,6 +490,7 @@ public class RouteActivity extends Activity implements IEventListener {
 
         // When a new destination is selected this activity is to be finished
         if (event.isType(RouteRequestEvent.class)) {
+            spinnerDialog.dismiss();
             // Sends user back to MainActivity after have chosen the destination
             finish();
         }
