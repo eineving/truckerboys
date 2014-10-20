@@ -169,16 +169,11 @@ public class
 
         //TODO Implement check if gas is enough for this session
         if (chosenStop != null) {
-            RouteLocation calculatedRecommendedStop;
-
             //Setting the recommended as it will be in alternative stops
             Route calculationRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
             if (calculationRoute.getCheckpoints().size() > 0) {
-                calculatedRecommendedStop = calculationRoute.getCheckpoints().get(0);
-            } else {
-                calculatedRecommendedStop = calculationRoute.getFinalDestination();
+                alternativeLocations.add(calculationRoute.getCheckpoints().get(0));
             }
-
 
             ArrayList<MapLocation> tempCheckpoints = new ArrayList<MapLocation>();
             tempCheckpoints.add(chosenStop);
@@ -189,13 +184,9 @@ public class
 
             optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
 
-            alternativeLocations.add(calculatedRecommendedStop);
             alternativeLocations.addAll(calculateAlternativeStops(directRoute,
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(3)));
-
-
-
         } else {
 
             //Returns the direct route if ETA is shorter than the time you have left to drive
@@ -210,7 +201,8 @@ public class
             //If there is no time left on this session
             else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
                 optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
-                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15), Duration.standardMinutes(20));
+                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10),
+                        Duration.standardMinutes(15), Duration.standardMinutes(20));
             }
 
             //If the location is within reach this day but not this session
