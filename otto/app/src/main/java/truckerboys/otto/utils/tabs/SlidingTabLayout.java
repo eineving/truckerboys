@@ -20,6 +20,7 @@ package truckerboys.otto.utils.tabs;
  */
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
@@ -30,12 +31,16 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import com.swedspot.vil.distraction.DriverDistractionLevel;
 
+import java.util.ArrayList;
+
+import truckerboys.otto.R;
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 
@@ -90,6 +95,10 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     private final SlidingTabStrip mTabStrip;
 
     private Handler changeThemeHandler = new Handler(Looper.getMainLooper());
+
+    private boolean nonDistractionModeOn = false;
+    private ArrayList<TextView> tabTitles = new ArrayList<TextView>();
+    private int tabTitleColor;
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -232,6 +241,8 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
             }
 
             tabTitleView.setText(adapter.getPageTitle(i));
+            tabTitles.add(tabTitleView);
+            tabTitleColor = tabTitleView.getCurrentTextColor();
             tabView.setOnClickListener(tabClickListener);
 
             mTabStrip.addView(tabView);
@@ -263,6 +274,17 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
             }
 
             scrollTo(targetScrollX, 0);
+        }
+    }
+
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if(nonDistractionModeOn){
+            if(ev.getX()>=mTabStrip.getChildAt(2).getX()-5){
+                return true;
+            }
+            return false;
+        }else{
+            return false;
         }
     }
 
@@ -333,11 +355,17 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
      */
     public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
         if(driverDistractionLevel.getLevel()>1) {
+            nonDistractionModeOn = true;
             Runnable setAdapter = new Runnable() {
                 @Override
                 public void run() {
+                    int item = mViewPager.getCurrentItem();
                     mViewPager.setAdapter(mViewPager.getAdapter());
-                    mViewPager.setCurrentItem(0);
+                    if(item==1){
+                       mViewPager.setCurrentItem(1);
+                    }else{
+                       mViewPager.setCurrentItem(0);
+                    }
                     mViewPager.getAdapter().notifyDataSetChanged();
                 }
             };
@@ -347,15 +375,25 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                 @Override
                 public void run() {
                     mTabStrip.setSelectedIndicatorColors(0xFFE51C23);
+                    for(int i = 2; i < tabTitles.size(); i++){
+                        tabTitles.get(i).setTextColor(0xFF9e9e9e);
+                    }
                 }
             };
             changeThemeHandler.post(r);
 
         } else {
+            nonDistractionModeOn = false;
             Runnable setAdapter = new Runnable() {
                 @Override
                 public void run() {
+                    int item = mViewPager.getCurrentItem();
                     mViewPager.setAdapter(mViewPager.getAdapter());
+                    if(item==1){
+                        mViewPager.setCurrentItem(1);
+                    }else{
+                        mViewPager.setCurrentItem(0);
+                    }
                     mViewPager.getAdapter().notifyDataSetChanged();
                 }
             };
@@ -363,6 +401,9 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
                 @Override
                 public void run() {
                     mTabStrip.setSelectedIndicatorColors(0xFF33B5E5);
+                    for(int i = 2; i < tabTitles.size(); i++){
+                        tabTitles.get(i).setTextColor(tabTitleColor);
+                    }
                 }
             };
             changeThemeHandler.post(r);
