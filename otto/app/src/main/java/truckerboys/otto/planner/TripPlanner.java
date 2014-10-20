@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -189,7 +190,6 @@ public class
 
             //Returns the direct route if ETA is shorter than the time you have left to drive
             if (directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft)) {
-
                 optimalRoute = directRoute;
                 alternativeLocations = (calculateAlternativeStops(directRoute,
                         directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
@@ -269,8 +269,8 @@ public class
         //Creates new RouteLocations with all variables set
         for (RouteLocation incompleteLocation : incompleteInfo) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
-            completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
-                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(), tempRoute.getDistance()));
+            assert completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
+                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(), Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance()));
         }
         return completeInfo;
     }
@@ -293,7 +293,8 @@ public class
 
         if (closeLocations.size() == 0) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, new MapLocation(optimalLatLong), null, null);
-            RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(), tempRoute.getDistance());
+            RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(),
+                    Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance());
             forcedLocation.setName("No name location");
             closeLocations.add(forcedLocation);
         }

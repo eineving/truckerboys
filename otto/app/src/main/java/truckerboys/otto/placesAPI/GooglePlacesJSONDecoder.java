@@ -13,13 +13,14 @@ import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Help class to decode a Google Direction JSON response
+ *
  * @author Daniel Eineving
  */
 public class GooglePlacesJSONDecoder {
 
     /**
      * Creates an autocomplete list from the Google Places API
-     *
+     * <p/>
      * OBS: This method uses very much typecasting,
      * think twice before changing anything
      *
@@ -40,7 +41,7 @@ public class GooglePlacesJSONDecoder {
                 decoded.add((String) prediction.get("description"));
             }
             return decoded;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new InvalidRequestException(e.getMessage());
         }
@@ -55,11 +56,11 @@ public class GooglePlacesJSONDecoder {
         //Making all results into HashMaps
         ArrayList<LinkedTreeMap<String, Object>> results = (ArrayList<LinkedTreeMap<String, Object>>) mapResponse.get("results");
 
-        for(LinkedTreeMap<String, Object> location : results) {
-            LinkedTreeMap<String, Double> coordinate = (LinkedTreeMap<String, Double>)((LinkedTreeMap<String, Object>) location.get("geometry")).get("location");
+        for (LinkedTreeMap<String, Object> location : results) {
+            LinkedTreeMap<String, Double> coordinate = (LinkedTreeMap<String, Double>) ((LinkedTreeMap<String, Object>) location.get("geometry")).get("location");
             LatLng position = new LatLng(coordinate.get("lat"), coordinate.get("lng"));
-            ArrayList<String> types = (ArrayList<String>)location.get("types");
-            RouteLocation temp = new RouteLocation(position,"" , null, -1);
+            ArrayList<String> types = (ArrayList<String>) location.get("types");
+            RouteLocation temp = new RouteLocation(position, "", null, null, -1);
             temp.setName((String) location.get("name"));
             temp.setType(types);
             decoded.add(temp);

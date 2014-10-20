@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +87,8 @@ public class GoogleDirectionsJSONDecoder {
                 String address = (String) leg.get("end_address");
                 checkpointETA += ((LinkedTreeMap<String, Double>) leg.get("duration")).get("value")*1000;
                 checkpointDistance += ((LinkedTreeMap<String, Double>) leg.get("distance")).get("value");
-                checkPoints.add(new RouteLocation(coordinate, address, new Duration(checkpointETA), checkpointDistance));
+                Duration tempEta = new Duration(checkpointETA);
+                checkPoints.add(new RouteLocation(coordinate, address, tempEta, Instant.now().plus(tempEta), checkpointDistance));
             }
 
             //Creating the final destination

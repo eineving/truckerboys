@@ -3,6 +3,7 @@ package truckerboys.otto.utils.positions;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class RouteLocation extends MapLocation {
     private List<String> type;
     private String name;
     private Duration eta;
+    private Instant timeOfArival;
     private String address;
     private int distance;
 
@@ -25,11 +27,12 @@ public class RouteLocation extends MapLocation {
      * @param eta      estimated time til arrival
      * @param distance distance to location in meters
      */
-    public RouteLocation(LatLng latLng, String address, Duration eta, int distance) {
+    public RouteLocation(LatLng latLng, String address, Duration eta, Instant timeOfArival , int distance) {
         super(latLng);
         this.address = address;
         this.eta = eta;
         this.distance = distance;
+        this.timeOfArival = timeOfArival;
         this.type = new ArrayList<String>();
     }
 
@@ -43,6 +46,7 @@ public class RouteLocation extends MapLocation {
         this.type = other.type;
         this.name = other.name;
         this.eta = new Duration(other.eta);
+        this.timeOfArival = new Instant(other.timeOfArival);
         this.address = other.address;
         this.distance = other.distance;
     }
@@ -111,13 +115,7 @@ public class RouteLocation extends MapLocation {
         this.name = name;
     }
 
-    /**
-     * Subtract time from ETA
-     *
-     * @param time time to subtract from ETA
-     */
-    public void decreaseETA(Duration time) {
-        this.eta = this.eta.minus(time);
+    public Instant getTimeOfArival() {
+        return timeOfArival;
     }
-
 }
