@@ -75,7 +75,8 @@ public class
         if (activeRoute == null) {
             throw new NoActiveRouteException("There is no active route");
         }
-        return activeRoute;
+        //Making it thread secure
+        return new PlannedRoute(activeRoute);
     }
 
     /**
