@@ -20,6 +20,11 @@ public class MapLocation extends Location{
         setLongitude(latLng.longitude);
     }
 
+    public MapLocation(MapLocation other) {
+        super(other);
+    }
+
+
     /**
      * Checks if the locations have the same coordinates.
      * @param rhs Map location to compare with.

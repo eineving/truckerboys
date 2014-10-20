@@ -47,6 +47,17 @@ public class PlannedRoute extends Route {
                 originalRoute.getCheckpoints(), recommendedStop, alternativeStops);
     }
 
+    /**
+     * Copy constructor.
+     *
+     * @param other PlannedRoute to copy.
+     */
+    public PlannedRoute(PlannedRoute other) {
+        super(other);
+        this.recommendedStop = other.recommendedStop;
+        this.alternativeStops = other.alternativeStops;
+    }
+
 
     /**
      * Get the recommended stop for the route.

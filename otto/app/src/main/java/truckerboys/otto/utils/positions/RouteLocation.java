@@ -34,6 +34,21 @@ public class RouteLocation extends MapLocation {
     }
 
     /**
+     * Copy constructor
+     *
+     * @param other RouteLocation to copy
+     */
+    public RouteLocation(RouteLocation other) {
+        super(other);
+        this.type = other.type;
+        this.name = other.name;
+        this.eta = new Duration(other.eta);
+        this.address = other.address;
+        this.distance = other.distance;
+    }
+
+
+    /**
      * What type of rest location this is
      *
      * @return type of rest location
@@ -102,12 +117,7 @@ public class RouteLocation extends MapLocation {
      * @param time time to subtract from ETA
      */
     public void decreaseETA(Duration time) {
-        try {
-            this.eta = this.eta.minus(time);
-        } catch (NullPointerException e) {
-            //TODO We should not do this
-            eta = Duration.ZERO;
-        }
+        this.eta = this.eta.minus(time);
     }
 
 }
