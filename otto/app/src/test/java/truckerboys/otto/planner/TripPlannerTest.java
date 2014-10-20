@@ -15,6 +15,7 @@ import truckerboys.otto.utils.positions.MapLocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -30,7 +31,7 @@ public class TripPlannerTest extends TestCase {
     private final MapLocation kiruna = new MapLocation(new LatLng(67.853702, 20.2564299));
     private final MapLocation stockholm = new MapLocation(new LatLng(59.3261419, 17.9875456));
 
-    private User user = User.getInstance();
+    private User user = new User(Robolectric.application);
     private TripPlanner tripPlanner;
 
     private PlannedRoute activeRoute;

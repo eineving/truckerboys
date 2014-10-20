@@ -99,6 +99,10 @@ public class StatsModel{
 
     }
 
+    public ArrayList<String> getSessionHistory() {
+        return sessionHistory;
+    }
+
     public double getTimeToday() {
         return timeToday;
     }

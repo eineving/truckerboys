@@ -70,6 +70,14 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         EventTruck.getInstance().subscribe(view);
     }
 
+    public StatsView getView() {
+        return view;
+    }
+
+    public StatsModel getModel() {
+        return model;
+    }
+
     /**
      * Method for restoring the saved preferences from
      * the user statistics
@@ -186,19 +194,26 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         model.updateSessionHistory(sessionString);
     }
 
+    /**
+     * Method for saving the current stats
+     * if the StatsView has stopped.
+     */
+    public void saveCurrentStats() {
+        SharedPreferences.Editor editor = view.getActivity().getSharedPreferences(STATS, 0).edit();
+
+        editor.putFloat("distanceTotal", (float)model.getDistanceTotal());
+        editor.putFloat("fuelTotal", (float)model.getFuelToday());
+        editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
+
+        editor.commit();
+    }
+
     @Override
     public void performEvent(Event event) {
 
         // If the view has stopped grab stats data from model and store them in a shared pref. file
         if(event.isType(StatsViewStoppedEvent.class)) {
-
-            SharedPreferences.Editor editor = view.getActivity().getSharedPreferences(STATS, 0).edit();
-
-            editor.putFloat("distanceTotal", (float)model.getDistanceTotal());
-            editor.putFloat("fuelTotal", (float)model.getFuelToday());
-            editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
-
-            editor.commit();
+            saveCurrentStats();
         }
 
         // Starts the update loop (10min interval)
@@ -217,6 +232,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         }
 
     }
+
+
 
     /**
      * Listens to signals from the truck and sends
