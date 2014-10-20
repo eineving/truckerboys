@@ -49,6 +49,8 @@ compile and run the tests. Other than this, you write JUnit tests just like you 
 <strong>IMPORTANT:</strong> If you want to test android-specific stuff, read up on Robolectric. It adds
 functionality in order to test android-elements.
 
+To run tests: In Android Studio's terminal, run ./gradlew clean test when standing in truckerboys/otto
+
 ## Course Information
 
 #### Supervision
