@@ -169,22 +169,32 @@ public class
 
         //TODO Implement check if gas is enough for this session
         if (chosenStop != null) {
+            RouteLocation calculatedRecommendedStop;
+
             //Setting the recommended as it will be in alternative stops
-            getOptimizedRoute(directRoute, Duration.standardMinutes(5));
+            Route calculationRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
+            if (calculationRoute.getCheckpoints().size() > 0) {
+                calculatedRecommendedStop = calculationRoute.getCheckpoints().get(0);
+            } else {
+                calculatedRecommendedStop = calculationRoute.getFinalDestination();
+            }
+
 
             ArrayList<MapLocation> tempCheckpoints = new ArrayList<MapLocation>();
             tempCheckpoints.add(chosenStop);
             if (checkpoints != null) {
                 tempCheckpoints.addAll(checkpoints);
             }
-            optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
-
             displayedRecommended = chosenStop;
 
-            alternativeLocations.add(recommendedStop);
+            optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
+
+            alternativeLocations.add(calculatedRecommendedStop);
             alternativeLocations.addAll(calculateAlternativeStops(directRoute,
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(3)));
+
+
 
         } else {
 
@@ -233,9 +243,15 @@ public class
         }
         //TODO delete these
         int index = 0;
+        Log.w("NbrOfAlternative" , alternativeLocations.size() + "");
         for(RouteLocation temp : alternativeLocations) {
             Log.w("AlternativeName " + index, "" + temp.getName());
             Log.w("AlternativeAddress " + index, "" + temp.getAddress());
+            try{
+                Log.w("AlternativeETA " + index, "" + temp.getEta().toString());
+            }catch (Exception e){
+                Log.w("AlternativeETA " + index,  e.toString());
+            }
         }
         return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
@@ -269,7 +285,7 @@ public class
         //Creates new RouteLocations with all variables set
         for (RouteLocation incompleteLocation : incompleteInfo) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
-            assert completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
+            completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
                     tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(), Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance()));
         }
         return completeInfo;
@@ -321,7 +337,6 @@ public class
                     optimalRoute = temp;
                 }
             }
-
         }
         return optimalRoute;
     }
@@ -336,8 +351,6 @@ public class
      */
     private LatLng findLatLngWithinDuration(Route directRoute, Duration timeLeft, Duration timeDiff) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
-
-        Log.w("PolylineSize", coordinates.size() + "");
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
         int currentIndex = (topIndex + bottomIndex) / 2;
@@ -360,13 +373,9 @@ public class
             if (topIndex - bottomIndex < 2) {
                 break;
             }
-            Log.w("findLatLng", "topIndex: " + topIndex);
-            Log.w("findLatLng", "bottomIndex: " + bottomIndex);
             etaToCoordinate = directionsProvider.getETA(new MapLocation(directRoute.getOverviewPolyline().get(0)),
                     new MapLocation(coordinates.get(currentIndex)));
             nbrOfDirCalls++;
-            Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
-
         }
         Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
         return coordinates.get(currentIndex);

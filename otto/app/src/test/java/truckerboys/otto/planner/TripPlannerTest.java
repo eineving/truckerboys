@@ -16,6 +16,7 @@ import truckerboys.otto.utils.positions.RouteLocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -32,7 +33,7 @@ public class TripPlannerTest extends TestCase {
     private final MapLocation stockholm = new MapLocation(new LatLng(59.3261419, 17.9875456));
 
     //TODO how to create a user properly?
-    private User user = new User(null);
+    private User user = new User(Robolectric.application);
     private TripPlanner tripPlanner;
 
     private PlannedRoute activeRoute;
