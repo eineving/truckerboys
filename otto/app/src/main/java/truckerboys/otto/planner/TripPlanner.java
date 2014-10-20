@@ -191,13 +191,15 @@ public class
 
                 optimalRoute = directRoute;
                 alternativeLocations = (calculateAlternativeStops(directRoute,
-                        directRoute.getCheckpoints().get(0).getEta().dividedBy(2), directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(3),
+                        directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
             }
 
             //If there is no time left on this session
             else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
                 optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5));
-                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15));
+                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10), Duration.standardMinutes(15), Duration.standardMinutes(20));
             }
 
             //If the location is within reach this day but not this session
@@ -207,17 +209,17 @@ public class
                 //If the ETA/2 is longer than time left on session
                 if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
                     optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft());
-                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
                 } else {
                     optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2));
-                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2));
+                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2),sessionTimeLeft.dividedBy(3));
                 }
             }
 
             //If the location is not within reach this day (drive maximum distance)
             else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
                 optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL));
-                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(4));
+                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2),sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
             } else {
                 throw new InvalidRequestException("Something is not right here");
             }
@@ -227,8 +229,12 @@ public class
             } else {
                 displayedRecommended = optimalRoute.getFinalDestination();
             }
-            alternativeLocations.add(recommendedStop);
-
+        }
+        //TODO delete these
+        int index = 0;
+        for(RouteLocation temp : alternativeLocations) {
+            Log.w("AlternativeName " + index, "" + temp.getName());
+            Log.w("AlternativeAddress " + index, "" + temp.getAddress());
         }
         return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
