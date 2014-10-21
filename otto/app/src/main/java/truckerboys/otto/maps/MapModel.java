@@ -49,7 +49,7 @@ public class MapModel implements IEventListener {
 
             //Call this runnable every 30 seconds.
             //TODO Uncomment
-            //updateRouteHandler.postDelayed(updateRoute, 30*1000);
+            //updateRouteHandler.postDelayed(updateRoute, 120*1000);
         }
     };
 
