@@ -43,6 +43,7 @@ public class StatsPresenterTest extends TestCase{
 
     @Test
     public void testSetStats() {
+
         int timeToday = 35;
         int distanceByFuel = 75;
         int timeTotal = 70;
@@ -66,7 +67,7 @@ public class StatsPresenterTest extends TestCase{
     /**
      * Method for setting dummy stats for testRestorePreferences.
      */
-    public void setDummyStats(int distanceByFuel, int distanceTotal, int fuelTotal, int violations) {
+    public void setDummyStats(float distanceByFuel, float distanceTotal, float fuelTotal, int violations) {
         SharedPreferences.Editor statsEditor = Robolectric.application.getSharedPreferences(STATS, 0).edit();
         statsEditor.putFloat("distanceByFuel", distanceByFuel);
         statsEditor.putFloat("distanceTotal", distanceTotal);
@@ -86,6 +87,7 @@ public class StatsPresenterTest extends TestCase{
 
     @Test
     public void testLoadUserHistory() {
+
         Session session = new Session(SessionType.WORKING, Instant.now());
         session.end();
 
@@ -105,6 +107,8 @@ public class StatsPresenterTest extends TestCase{
 
     @Test
     public void testSaveCurrentStats() {
+
+
         int distanceByFuel = 75;
         int distanceTotal = 350;
         int fuelTotal = 87;
@@ -114,7 +118,7 @@ public class StatsPresenterTest extends TestCase{
         int violations = 2;
 
         statsPresenter.setStats(statsToday, statsTotal, violations);
-        statsPresenter.saveCurrentStats();
+        statsPresenter.saveCurrentStats(Robolectric.application.getSharedPreferences(STATS,0));
 
         SharedPreferences stats = Robolectric.application.getSharedPreferences(STATS, 0);
         double[] statsFromFileToday = {0, 0, 0, stats.getFloat("distanceByFuel", 0)};
@@ -135,15 +139,15 @@ public class StatsPresenterTest extends TestCase{
     public void testRestorePreferences() {
 
         // Sets dummy stats
-        int distanceByFuel = 55;
-        int distanceTotal = 45;
-        int fuelTotal = 35;
+        float distanceByFuel = 55;
+        float distanceTotal = 45;
+        float fuelTotal = 35;
         int violaions = 25;
 
         setDummyStats(distanceByFuel, distanceTotal, fuelTotal, violaions);
 
         // Runs method to be tested
-        statsPresenter.restorePreferences();
+        statsPresenter.restorePreferences(Robolectric.application.getSharedPreferences(STATS, 0));
 
 
         // Compares values
