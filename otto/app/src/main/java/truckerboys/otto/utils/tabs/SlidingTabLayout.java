@@ -241,6 +241,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
             }
 
             tabTitleView.setText(adapter.getPageTitle(i));
+            tabTitleView.setBackgroundColor(Color.TRANSPARENT);
             tabTitles.add(tabTitleView);
             tabTitleColor = tabTitleView.getCurrentTextColor();
             tabView.setOnClickListener(tabClickListener);
