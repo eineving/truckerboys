@@ -20,7 +20,6 @@ package truckerboys.otto.utils.tabs;
  */
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
@@ -40,28 +39,29 @@ import android.widget.TextView;
 import com.swedspot.vil.distraction.DriverDistractionLevel;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import truckerboys.otto.R;
+import truckerboys.otto.IView;
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
  * the user's scroll progress.
- * <p>
+ * <p/>
  * To use the component, simply add it to your view hierarchy. Then in your
  * {@link android.app.Activity} or {@link android.support.v4.app.Fragment} call
  * {@link #setViewPager(ViewPager)} providing it the ViewPager this layout is being used for.
- * <p>
+ * <p/>
  * The colors can be customized in two ways. The first and simplest is to provide an array of colors
  * via {@link #setSelectedIndicatorColors(int...)} and {@link #setDividerColors(int...)}. The
  * alternative is via the {@link TabColorizer} interface which provides you complete control over
  * which color is used for any individual position.
- * <p>
+ * <p/>
  * The views used as tabs can be customized by calling {@link #setCustomTabView(int, int)},
  * providing the layout ID of your custom layout.
  */
-public class SlidingTabLayout extends HorizontalScrollView implements IDistractionListener{
+public class SlidingTabLayout extends HorizontalScrollView implements IDistractionListener {
 
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
@@ -82,7 +82,8 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
 
-    private TabPagerAdapter standardAdapter , distractedAdapter;
+    private TabPagerAdapter pagerAdapter;
+    private List<IView> views = new ArrayList<IView>();
 
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
@@ -130,7 +131,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
     /**
      * Set the custom {@link TabColorizer} to be used.
-     *
+     * <p/>
      * If you only require simple custmisation then you can use
      * {@link #setSelectedIndicatorColors(int...)} and {@link #setDividerColors(int...)} to achieve
      * similar effects.
@@ -170,7 +171,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
      * Set the custom layout to be inflated for the tab views.
      *
      * @param layoutResId Layout id to be inflated
-     * @param textViewId id of the {@link TextView} in the inflated view
+     * @param textViewId  id of the {@link TextView} in the inflated view
      */
     public void setCustomTabView(int layoutResId, int textViewId) {
         mTabViewLayoutId = layoutResId;
@@ -284,12 +285,12 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if(distractionMode){
-            if(ev.getX()>=mTabStrip.getChildAt(2).getX()-5){
+        if (distractionMode) {
+            if (ev.getX() >= mTabStrip.getChildAt(2).getX() - 5) {
                 return true;
             }
             return false;
-        }else{
+        } else {
             return false;
         }
     }
@@ -329,7 +330,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
         @Override
         public void onPageSelected(int position) {
-           if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
+            if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
                 scrollToTab(position, 0);
             }
@@ -354,66 +355,80 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
 
-    public void setAdapters(TabPagerAdapter standard, TabPagerAdapter distracted){
-        this.distractedAdapter = distracted;
-        this.standardAdapter = standard;
+    public void setAdapter(TabPagerAdapter adapter, List<IView> views) {
+        this.pagerAdapter = adapter;
+        this.views.addAll(views);
+
     }
 
     /**
      * Gets called when the distraction level of the truck driver changes.
      * Updates the ViewPager that changes has happened to the adapter of the tabs.
      * This method is the only code added to this class that was originally designed by Google.
+     *
      * @param driverDistractionLevel The distraction level
      */
-    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
-        Log.w("PAGER", "LEVEL CHANGED");
+    public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel) {
+        int level = driverDistractionLevel.getLevel();
+
+
+        //If the level hasn't passed the threshhold, no need to update anything.
+        if((level > 1 && distractionMode == false)||(level <= 1 && distractionMode == true)){
+            distractionMode = !distractionMode;
+
+            final int colour;
+            if(distractionMode){
+                distractionMode = true;
+                colour = 0xFFE51C23;
+            } else {
+                distractionMode = false;
+                colour = 0xFF33B5E5;
+            }
 
 
 
-        final int colour;
+            Runnable setAdapter = new Runnable() {
+                @Override
+                public void run() {
+                    int item = mViewPager.getCurrentItem();
 
-        if(driverDistractionLevel.getLevel()>1) {
-            distractionMode = true;
-            colour = 0xFFE51C23;
-        }else{
-            distractionMode = false;
-            colour = 0xFF33B5E5;
+
+                    if (distractionMode) {
+                        pagerAdapter.removeItem(views.get(2));
+                        pagerAdapter.removeItem(views.get(3));
+                        pagerAdapter.removeItem(views.get(4));
+                    } else {
+                        pagerAdapter.addItem(views.get(2));
+                        pagerAdapter.addItem(views.get(3));
+                        pagerAdapter.addItem(views.get(4));
+                    }
+
+                    if (item > 1) {
+                        mViewPager.setCurrentItem(0);
+                    } else {
+                        // mViewPager.setCurrentItem(item);
+                    }
+
+                }
+            };
+
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    mTabStrip.setSelectedIndicatorColors(colour);
+                    for (int i = 2; i < tabTitles.size(); i++) {
+                        tabTitles.get(i).setTextColor((distractionMode ? 0xFF9e9e9e : tabTitleColor));
+                    }
+                }
+            };
+
+            changeThemeHandler.post(r);
+            getRootView().post(setAdapter);
+
+
         }
 
-        Runnable setAdapter = new Runnable() {
-            @Override
-            public void run() {
-                int item = mViewPager.getCurrentItem();
-
-                TabPagerAdapter adapter = (distractionMode ? distractedAdapter : standardAdapter);
-
-                if(mViewPager.getAdapter() !=  adapter){
-                    mViewPager.setAdapter(adapter);
-                }
-                if(item > 1) {
-                    mViewPager.setCurrentItem(0);
-                }else{
-                    mViewPager.setCurrentItem(item);
-                }
-                mViewPager.getAdapter().notifyDataSetChanged();
-            }
-        };
-
-
-
-
-        Runnable r = new Runnable(){
-            @Override
-            public void run() {
-                mTabStrip.setSelectedIndicatorColors(colour);
-                for(int i = 2; i < tabTitles.size(); i++){
-                    tabTitles.get(i).setTextColor((distractionMode ? 0xFF9e9e9e :tabTitleColor));
-                }
-            }
-        };
-
-        changeThemeHandler.post(r);
-        getRootView().post(setAdapter);
 
     }
 

@@ -29,6 +29,38 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
 
     }
 
+
+    public void removeItem(IView item){
+        views.remove(item);
+        notifyDataSetChanged();
+    }
+
+    public void addItem(IView item){
+        views.add(item);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemPosition(Object item){
+
+        int pos = -1;
+
+        for(int i = 0; i < views.size(); i++){
+            if(item == views.get(i)){
+                pos = i;
+                break;
+            }
+        }
+
+
+        if(pos >= 0){
+            return pos;
+        }else{
+            return POSITION_NONE;
+        }
+    }
+
+
     @Override
     public Fragment getItem(int index) {
         return views.get(index).getFragment();

@@ -47,7 +47,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
     private List<IView> presenters = new ArrayList<IView>();
     private ViewPager viewPager;
-    private TabPagerAdapter pagerAdapter, distractedPagerAdapter;
+    private TabPagerAdapter pagerAdapter;
 
     private static OTTOActivity ottoActivity;
 
@@ -69,7 +69,6 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
         viewPager = (ViewPager) findViewById(R.id.pager);
 
         pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), getPresenters());
-        distractedPagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), getPresenters().subList(0,2));
 
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(2);
@@ -82,7 +81,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
         //Use Googles 'SlidingTabLayout' to display tabs for all presenters.
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
-        slidingTabLayout.setAdapters(pagerAdapter, distractedPagerAdapter);
+        slidingTabLayout.setAdapter(pagerAdapter, getPresenters());
         slidingTabLayout.setViewPager(viewPager);
 
         // Turns display properties (alive on/off) based on saved settings file
