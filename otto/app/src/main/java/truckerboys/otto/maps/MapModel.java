@@ -48,7 +48,8 @@ public class MapModel implements IEventListener {
             }
 
             //Call this runnable every 30 seconds.
-            updateRouteHandler.postDelayed(updateRoute, 30*1000);
+            //TODO Uncomment
+            //updateRouteHandler.postDelayed(updateRoute, 30*1000);
         }
     };
 
@@ -58,7 +59,8 @@ public class MapModel implements IEventListener {
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
         EventTruck.getInstance().subscribe(this);
-        updateRouteHandler.post(updateRoute);
+        //TODO Uncomment
+        //updateRouteHandler.post(updateRoute);
     }
 
     @Override
