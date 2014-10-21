@@ -81,6 +81,9 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
     }
 
+
+    private TabPagerAdapter standardAdapter , distractedAdapter;
+
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
     private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
@@ -350,6 +353,12 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
         }
     }
 
+
+    public void setAdapters(TabPagerAdapter standard, TabPagerAdapter distracted){
+        this.distractedAdapter = distracted;
+        this.standardAdapter = standard;
+    }
+
     /**
      * Gets called when the distraction level of the truck driver changes.
      * Updates the ViewPager that changes has happened to the adapter of the tabs.
@@ -359,22 +368,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
         Log.w("PAGER", "LEVEL CHANGED");
 
-        Runnable setAdapter = new Runnable() {
-            @Override
-            public void run() {
-                int item = mViewPager.getCurrentItem();
-                //mViewPager.setAdapter(mViewPager.getAdapter());
 
-                mViewPager.setAdapter(mViewPager.getAdapter());
-
-                if(item==1){
-                    mViewPager.setCurrentItem(1);
-                }else{
-                    mViewPager.setCurrentItem(0);
-                }
-                mViewPager.getAdapter().notifyDataSetChanged();
-            }
-        };
 
         final int colour;
 
@@ -385,6 +379,28 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
             distractionMode = false;
             colour = 0xFF33B5E5;
         }
+
+        Runnable setAdapter = new Runnable() {
+            @Override
+            public void run() {
+                int item = mViewPager.getCurrentItem();
+
+                TabPagerAdapter adapter = (distractionMode ? distractedAdapter : standardAdapter);
+
+                if(mViewPager.getAdapter() !=  adapter){
+                    mViewPager.setAdapter(adapter);
+                }
+                if(item > 1) {
+                    mViewPager.setCurrentItem(0);
+                }else{
+                    mViewPager.setCurrentItem(item);
+                }
+                mViewPager.getAdapter().notifyDataSetChanged();
+            }
+        };
+
+
+
 
         Runnable r = new Runnable(){
             @Override
