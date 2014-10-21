@@ -28,7 +28,7 @@ import truckerboys.otto.utils.positions.RouteLocation;
  */
 public class MapModel implements IEventListener {
     // The distance from a checkpoint (in meters) that we need to go to change route.
-    private static final int DISTANCE_FROM_CHECKPOINT = 1000;
+    private static final int DISTANCE_FROM_CHECKPOINT = 200;
 
     private TripPlanner tripPlanner;
 
