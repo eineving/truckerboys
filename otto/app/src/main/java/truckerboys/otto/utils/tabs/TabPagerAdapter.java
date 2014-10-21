@@ -56,7 +56,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         if(pos >= 0){
             return pos;
         }else{
-            return POSITION_NONE;
+            return POSITION_UNCHANGED;
         }
     }
 
