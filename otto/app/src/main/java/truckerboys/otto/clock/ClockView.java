@@ -64,7 +64,7 @@ public class ClockView extends Fragment {
 
         viewSwitcher = (ViewSwitcher) rootView.findViewById(R.id.clockViewSwitcher);
         viewSwitcher.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.slide_in_right));
-        viewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right));
+        viewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.slide_out_right));
 
         initiateVariables();
 
