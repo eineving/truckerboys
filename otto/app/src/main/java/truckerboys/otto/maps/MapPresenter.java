@@ -17,8 +17,8 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
+import truckerboys.otto.utils.eventhandler.events.FollowMarkerEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
-import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -30,11 +30,13 @@ public class MapPresenter implements IEventListener, IView {
     private MapModel mapModel;
     private MapView mapView;
 
+    private boolean followMarker;
+
     //region Runnables
     private Handler updateHandler = new Handler(Looper.getMainLooper());
     private Runnable updatePos = new Runnable() {
         public void run() {
-            if(mapModel.isActiveRoute()) {
+            if(followMarker) {
                 mapView.updatePositionMarker(true);
             } else {
                 mapView.updatePositionMarker(false);
@@ -46,43 +48,61 @@ public class MapPresenter implements IEventListener, IView {
 
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
-        mapView.setPresenter(this);
-
         this.mapModel = new MapModel(tripPlanner);
         EventTruck.getInstance().subscribe(this);
         updatePos.run();
     }
 
-    public void startFollowRoute(){
-        mapView.moveCamera(
-                CameraUpdateFactory.newCameraPosition(new CameraPosition(LocationHandler.getCurrentLocationAsLatLng(), 18f, mapView.CAMERA_TILT,LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
-                new GoogleMap.CancelableCallback() {
-                    @Override
-                    public void onFinish() {
-                        //Make the camera follow the marker when we finished zooming in to marker.
-                        mapModel.setActiveRoute(true);
+    /**
+     * Specifies that the camera should follow the marker, if it should follow the marker it zooms in
+     * on the marker and then starts following it.
+     *
+     * @param follow True if camera should follow the marker.
+     */
+    private void setFollowMarker(final boolean follow){
+        if(follow) {
+            mapView.moveCamera(
+                    CameraUpdateFactory.newCameraPosition(new CameraPosition(
+                            LocationHandler.getCurrentLocationAsLatLng(),
+                            18f,
+                            mapView.CAMERA_TILT,
+                            LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
+                    new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            //Make the camera follow the marker when we finished zooming in to marker.
+                            followMarker = true;
+                        }
+
+                        @Override
+                        public void onCancel() {
+                        }
                     }
-
-                    @Override
-                    public void onCancel() {
-
-                    }
-                }
-        );
-    }
-
-    public void stopFollowRoute(){
-        mapModel.setActiveRoute(false);
+            );
+        } else {
+            followMarker = false;
+        }
     }
 
     @Override
     public void performEvent(Event event) {
+        /*
+         * If the route has been changed (more specifically this should be called when the TripPlanner
+         * changes the route somehow) we need to listen to this and modify the MapView accordingly.
+         */
+        //region ChangedRouteEvent
         if (event.isType(ChangedRouteEvent.class)) {
             mapView.setRoute(mapModel.getRoute());
             mapView.setMarkers(mapModel.getRoute().getCheckpoints());
         }
+        //endregion
 
-        // If a new route is set in RouteActivity, zoom out to see all of the route.
+        /*
+         * When a Route is requested by the user (More specifically this is done from RouteActivity when
+         * the user presses 'Navigate'). We need to adjust the MapView accordingly by setting
+          * all UI Text-elements to the information that we need to provide.
+         */
+        //region RouteRequestEvent
         if(event.isType(RouteRequestEvent.class)){
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
@@ -91,20 +111,21 @@ public class MapPresenter implements IEventListener, IView {
             mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
             mapView.showStartRouteDialog(true);
 
+            // If we have any checkpoints in the new route, display the first one as the truck starts to move.
             if(!mapModel.getRoute().getCheckpoints().isEmpty()) {
                 // Get first checkpoint
                 RouteLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
 
-                // Set first checkpoints in strings.
+                // Display the adress of the first checkpoint to the driver.
                 mapView.setNextCheckpointText(firstCheckpoint.getAddress());
-                //mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
+                //TODO mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
                 mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardMinutes() + "");
             } else {
+                // If we didn't have any checkpoints in the new route, we display the next checkpoint as the final destination.
                 mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getAddress());
                 mapView.setNextCheckpointETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
                 mapView.setNextCheckpointDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
             }
-            mapView.showActiveRouteDialog(false);
 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             builder.include(LocationHandler.getCurrentLocationAsLatLng());
@@ -113,6 +134,17 @@ public class MapPresenter implements IEventListener, IView {
 
             mapView.moveCamera(true, bounds);
         }
+        //endregion
+
+        /**
+         * When the distractionlevel changes the app specifies that we need to follow the marker or not.
+         * This is done via the FollowMarkerEvent.
+         */
+        //region FollowMarkerEvent
+        if(event.isType(FollowMarkerEvent.class)){
+            setFollowMarker(((FollowMarkerEvent)event).getFollowMarker());
+        }
+        //endregion
     }
 
     @Override

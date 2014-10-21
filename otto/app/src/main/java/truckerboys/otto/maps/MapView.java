@@ -34,6 +34,7 @@ import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.FollowMarkerEvent;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
@@ -47,7 +48,6 @@ import truckerboys.otto.vehicle.VehicleInterface;
 public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener, IDistractionListener {
 
     private View rootView;
-    private MapPresenter presenter;
 
     // Objects that identify everything that is visible on the map.
     private GoogleMap googleMap;
@@ -86,25 +86,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private LinkedList<Float> bearings = new LinkedList<Float>();
     //endregion
 
-    @Override
-    public void onDestroyView() {
-
-        FragmentManager fm = getFragmentManager();
-
-        Fragment xmlFragment = fm.findFragmentById(R.id.map);
-        if (xmlFragment != null) {
-            fm.beginTransaction().remove(xmlFragment).commit();
-        }
-
-        super.onDestroyView();
-    }
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
         EventTruck.getInstance().subscribe(this);
+
         // Subscribe to DistractionLevelChanged, since we want to change marker when having a high distraction level.
         VehicleInterface.subscribeToDistractionChange(this);
 
@@ -142,16 +130,18 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         nextCheckpointETAText = (TextView) rootView.findViewById(R.id.nextStopETA_text);
         nextCheckpointDistText = (TextView) rootView.findViewById(R.id.nextStopDistance_text);
 
-
+        //region StartRoute - OnClickListener
         startRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.startFollowRoute();
+                //presenter.startFollowRoute();
+                EventTruck.getInstance().newEvent(new FollowMarkerEvent(true));
                 showStartRouteDialog(false);
                 showActiveRouteDialog(true);
                 setAllGestures(false);
             }
         });
+        //endregion
 
         // Make the follow route button responsive.
         //region StartRoute - OnTouchListener
@@ -169,11 +159,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         });
         //endregion
 
+        //region StopRoute - OnClickListener
         stopRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showActiveRouteDialog(false);
-                presenter.stopFollowRoute();
+                //presenter.stopFollowRoute();
+                EventTruck.getInstance().newEvent(new FollowMarkerEvent(false));
                 setAllGestures(true);
 
                 //If there currently is a route drawn on the map.
@@ -183,6 +175,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 }
             }
         });
+        //endregion
 
         return rootView;
     }
@@ -213,32 +206,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     /**
      * Helper method to move the camera across the map.
      *
-     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
-     * @param location The location to set the camera to.
-     * @param bearing  The bearing to set the camera to.
-     */
-    public void moveCamera(final boolean animate, final LatLng location, final float zoom, final float bearing, final int durationMs) {
-        if (googleMap != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (animate) {
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)), durationMs, null);
-                    } else {
-                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
-                    }
-                }
-            });
-
-        }
-    }
-
-    /**
-     * Helper method to move the camera across the map.
-     *
-     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
-     * @param location The location to set the camera to.
-     * @param bearing  The bearing to set the camera to.
+     * @param cameraUpdate The camera update object to base the camera movement on.
+     * @param cancelableCallback The callback that is to be called onCancel and onFinish.
      */
     public void moveCamera(CameraUpdate cameraUpdate, GoogleMap.CancelableCallback cancelableCallback) {
         if (googleMap != null) {
@@ -359,6 +328,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void performEvent(Event event) {
+        /**
+         * When the LocationHandler registers that the location has changed, we fire an GPSUpdateEvent.
+         * We need to catch this here in order to move the camera, interpolate the markers etc.
+         */
         //region GPSUpdateEvent
         if (event.isType(GPSUpdateEvent.class)) {
             final MapLocation newLocation = ((GPSUpdateEvent) event).getNewPosition();
@@ -390,6 +363,18 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         CAMERA_ZOOM = cameraPosition.zoom;
     }
 
+    @Override
+    public void onDestroyView() {
+        FragmentManager fm = getFragmentManager();
+
+        Fragment xmlFragment = fm.findFragmentById(R.id.map);
+        if (xmlFragment != null) {
+            fm.beginTransaction().remove(xmlFragment).commit();
+        }
+
+        super.onDestroyView();
+    }
+
     /**
      * Set the new route to draw.
      *
@@ -404,10 +389,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             }
         });
 
-    }
-
-    public void setPresenter(MapPresenter presenter) {
-        this.presenter = presenter;
     }
 
     private void setAllGestures(final boolean value){
@@ -450,15 +431,17 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
+                if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
-                    System.out.println("changed Distraction Level: " + driverDistractionLevel.getLevel());
+                    EventTruck.getInstance().newEvent(new FollowMarkerEvent(true));
                 } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
-                    System.out.println("changed Distraction Level: " + driverDistractionLevel.getLevel() + " woop");
+                    //TODO Show X to stop following marker.
                 }
             }
         });
+
+        lastDistractionLevel = driverDistractionLevel.getLevel();
     }
 
     public void setFinalDestinationText(final String text) {
