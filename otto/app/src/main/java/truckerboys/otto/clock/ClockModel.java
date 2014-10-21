@@ -84,7 +84,24 @@ public class ClockModel {
         return nextDestination;
     }
 
-    public void setChosenStop(RouteLocation stop){
+    public void setChosenStop(final RouteLocation stop){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tripPlanner.setChoosenStop(stop);
+                }catch (InvalidRequestException e){
+                    //Will never be thrown
+                }catch (NoConnectionException e){
+                    //Will never be thrown because if the app has no connection
+                    // the view will have changed and the button to
+                    // choose a stop won't be displayed
+                }
+            }
+        }).start();
+    }
+
+    private void tryChosenStop(RouteLocation stop){
         try {
             tripPlanner.setChoosenStop(stop);
         }catch (InvalidRequestException e){

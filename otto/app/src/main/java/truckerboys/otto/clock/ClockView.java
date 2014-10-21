@@ -1,5 +1,6 @@
 package truckerboys.otto.clock;
 
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -40,6 +41,7 @@ public class ClockView extends Fragment {
     View rootView;
 
     ViewSwitcher viewSwitcher;
+    ProgressDialog spinnerDialog;
 
     TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, thirdAltStopETA,
             recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle;
@@ -106,14 +108,17 @@ public class ClockView extends Fragment {
                 String tag = view.getTag().toString();
                 if (tag.equalsIgnoreCase("firstAltStop")) {
                     viewSwitcher.showPrevious();
+                    startSpinner();
                     EventTruck.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
                 }
                 if (tag.equalsIgnoreCase("secAltStop")) {
                     viewSwitcher.showPrevious();
+                    startSpinner();
                     EventTruck.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
                 }
                 if(tag.equalsIgnoreCase("thirdAltStop")){
                     viewSwitcher.showPrevious();
+                    startSpinner();
                     EventTruck.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
                 }
             }
@@ -245,6 +250,8 @@ public class ClockView extends Fragment {
      * Sets the labels of the time until violation and the stops.
      */
     private void setLabels() {
+        if(spinnerDialog!=null && spinnerDialog.isShowing())
+            spinnerDialog.dismiss();
         timeLeft.setText(timeL);
         if (timeLE.equalsIgnoreCase("0")) {
             timeLeftExtended.setVisibility(TextView.GONE);
@@ -309,6 +316,16 @@ public class ClockView extends Fragment {
             name.setText(stop.getName());
             image.setImageResource(R.drawable.reststop);
         }
+    }
+
+    private void startSpinner() {
+
+        spinnerDialog = new ProgressDialog(getActivity());
+        spinnerDialog.setMessage("Loading your route");
+        spinnerDialog.setTitle("Loading");
+        spinnerDialog.setCancelable(false);
+        spinnerDialog.show();
+
     }
 
     /**
