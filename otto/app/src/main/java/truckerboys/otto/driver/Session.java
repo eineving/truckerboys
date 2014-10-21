@@ -3,7 +3,7 @@ package truckerboys.otto.driver;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-/**
+/**Describes a session. A session can be driving, working and resting.
  * Created by Martin on 17/09/2014.
  */
 public class Session {
@@ -24,7 +24,7 @@ public class Session {
     /**
      * Starts a session with a specified start time.
      *
-     * @param type
+     * @param type the type of the session
      * @param start The start time, the Instant must have occurred, no future Instants allowed.
      */
     public Session(SessionType type, Instant start) {
@@ -40,7 +40,7 @@ public class Session {
     /**
      * Starts a session with a specified start and end time.
      *
-     * @param type
+     * @param type the type of the session
      * @param start The start time, the Instant must have occurred, no future Instants allowed.
      * @param end   The end time, the Instant must be after the start time.
      */

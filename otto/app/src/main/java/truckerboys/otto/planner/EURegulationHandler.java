@@ -10,7 +10,10 @@ import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.SessionType;
 
-/**
+/**Class which handles all the Regulations regarding driving times in the EU.
+ * All answers will be based on the history represented by SessionHistory
+ * and all answers will be based on the current time, non of the methods will return
+ * the same value twice id called repeatedly.
  * Created by Daniel on 2014-09-17.
  */
 public class EURegulationHandler implements IRegulationHandler {
@@ -24,9 +27,6 @@ public class EURegulationHandler implements IRegulationHandler {
 
     private final Duration SPLIT_SESSION_REST_15 = Duration.standardMinutes(15);
     private final Duration SPLIT_SESSION_REST_30 = Duration.standardMinutes(30);
-
-    private final Duration REDUCED_WEEKLY_REST = Duration.standardHours(24);
-    private final Duration STANDARD_WEEKLY_REST = Duration.standardHours(45);
 
     private final Duration MAX_DAY_LENGTH_EXTENDED = Duration.standardHours(10);
     private final Duration DAY = Duration.standardDays(1);
@@ -245,7 +245,6 @@ public class EURegulationHandler implements IRegulationHandler {
 
         } else {
             throw new CurrentlyNotOnRestException("Driver currently isn't on a break, can't call getTimeLeftOnBreak");
-            //TODO Alternatively return new TimeLeft(Duration.ZERO, Duration.ZERO);
         }
     }
 
