@@ -314,8 +314,14 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history1Text.getText(),
-                        new ArrayList<String>(), coder);
+                if (finalDestination != null && history1Text.getText() != null
+                        && !history1Text.getText().equals("")) {
+
+                    finalDestination.setText(history1Text.getText());
+                    tempLocation = history1Text.getText().toString();
+
+                    removeDestinationButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -334,8 +340,14 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history2Text.getText(),
-                        new ArrayList<String>(), coder);
+                if (finalDestination != null && history2Text.getText() != null
+                        && !history2Text.getText().equals("")) {
+
+                    finalDestination.setText(history2Text.getText());
+                    tempLocation = history2Text.getText().toString();
+
+                    removeDestinationButton.setVisibility(View.VISIBLE);
+                }
 
             }
         });
@@ -355,8 +367,14 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history3Text.getText(),
-                        new ArrayList<String>(), coder);
+                if (finalDestination != null && history3Text.getText() != null
+                        && !history3Text.getText().equals("")) {
+
+                    finalDestination.setText(history3Text.getText());
+                    tempLocation = history3Text.getText().toString();
+
+                    removeDestinationButton.setVisibility(View.VISIBLE);
+                }
 
             }
         });

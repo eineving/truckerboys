@@ -85,7 +85,7 @@ public class RoutePresenter {
 
         // Switch them places
         place3 = place2;
-        place2 = place1;Ro
+        place2 = place1;
         place1 = locationName;
 
         SharedPreferences.Editor editor = history.edit();
