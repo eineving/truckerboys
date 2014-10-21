@@ -2,6 +2,7 @@ package truckerboys.otto.driver;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+
 /**
  * Created by Martin on 17/09/2014.
  */
@@ -14,7 +15,7 @@ public class Session {
     /**
      * Creates a new Session with the current time as a start Time.
      */
-    public Session(SessionType type){
+    public Session(SessionType type) {
         start = new Instant();
         active = true;
         this.type = type;
@@ -31,17 +32,38 @@ public class Session {
         if (start.isBefore(new Instant())) {
             this.start = start;
         }else{
-            start = new Instant();
+            this.start = new Instant();
         }
         active = true;
+    }
+
+    /**
+     * Starts a session with a specified start and end time.
+     *
+     * @param type
+     * @param start The start time, the Instant must have occurred, no future Instants allowed.
+     * @param end   The end time, the Instant must be after the start time.
+     */
+    public Session(SessionType type , Instant start, Instant end ){
+        this.type = type;
+        this.start = start;
+
+        if(end.getMillis() == 0){
+            this.active = true;
+        }else{
+            this.active = false;
+            this.end = end;
+        }
     }
 
 
     /**
      * Ends the session.
      */
-    public void end(){
-        end = new Instant();
+    public void end() {
+        if (end == null) {
+            end = new Instant();
+        }
         active = false;
     }
 
@@ -53,7 +75,7 @@ public class Session {
     public Duration getDuration() {
         if (active) {
             return new Duration(start, new Instant());
-        }else{
+        } else {
             return new Duration(start, end);
         }
     }
@@ -63,7 +85,7 @@ public class Session {
      *
      * @return true if the session is in progress, false if the session has stopped.
      */
-    public boolean isActive(){
+    public boolean isActive() {
         return active;
     }
 
@@ -78,24 +100,29 @@ public class Session {
 
     /**
      * Returns the type of the Session.
+     *
      * @return The type of the session.
      */
-    public SessionType getSessionType(){
+    public SessionType getSessionType() {
         return type;
     }
 
     /**
      * Returns the end time of the session
-     *
-     * If the Session is active, the method will return the current Instant as the end time.
-     *
-     * @return Now if active, the end time if the session is finished.
+     * If the Session is active, the method will return EPOCH as end.
+     * @return EPOCH if active, the end time if the session is finished.
      */
     public Instant getEndTime() {
         if(active){
-            return new Instant();
+            return new Instant(0);
         }else{
             return end;
         }
     }
+
+    @Override
+    public String toString(){
+        return "Session [start="+ start + " end= "+ end + " type=" + type + "]";
+    }
+
 }

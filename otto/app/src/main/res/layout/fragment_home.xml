@@ -39,48 +39,11 @@
 
         </LinearLayout>
 
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_column="22"
-            android:clickable="true"
-            android:id="@+id/continueRouteButton">
-
-            <ImageView
-                android:layout_margin="45dp"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/continueroutenotext"
-                android:scaleType="centerInside"
-                android:background="#00ffffff"
-                android:layout_gravity="center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="14dp"
-                android:textColor="@color/textLight"
-                android:layout_marginTop="-20dp"
-                android:text="Continue Route"/>
-
-        </LinearLayout>
-
-    </TableRow>
-
-    <TableRow
-        android:layout_marginTop="-20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="6"
             android:clickable="true"
             android:id="@+id/mapsButton">
 
@@ -102,11 +65,20 @@
                 android:text="Maps"/>
         </LinearLayout>
 
+    </TableRow>
+
+    <TableRow
+        android:layout_marginTop="-20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="22"
+            android:layout_column="6"
             android:clickable="true"
             android:id="@+id/clockButton">
 
@@ -129,19 +101,11 @@
 
         </LinearLayout>
 
-    </TableRow>
-
-    <TableRow
-        android:layout_marginTop="-20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="6"
+            android:layout_column="22"
             android:clickable="true"
             android:id="@+id/statsButton">
 
@@ -164,11 +128,21 @@
 
         </LinearLayout>
 
+    </TableRow>
+
+    <TableRow
+        android:layout_marginTop="-20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="22"
+            android:layout_column="6"
             android:clickable="true"
             android:id="@+id/settingsButton">
 

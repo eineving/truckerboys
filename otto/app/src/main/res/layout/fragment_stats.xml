@@ -3,7 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity"
     android:orientation="vertical"
     android:background="@color/background_color"
@@ -16,103 +16,202 @@
         android:layout_width="fill_parent"
         android:fadeScrollbars="false"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <TextView
-            android:id="@+id/dailyStats"
-            android:textColor="@color/textLighter"
-            android:textSize="14dp"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Daily Statistics"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true">
 
-        <View
-            android:id="@+id/divider0"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/dailyStats"
-            android:layout_height="1dp"
-            android:background="@color/textLightest"/>
+            <TextView
+                android:id="@+id/dailyStats"
+                android:textColor="@color/textLighter"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daily Statistics"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
-        <TextView
-            android:id="@+id/timeTodayTime"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/divider0"
-            android:text="38 min"
-            android:layout_alignParentEnd="true" />
+            <View
+                android:id="@+id/divider0"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/dailyStats"
+                android:layout_height="1dp"
+                android:background="@color/textLightest"/>
 
-        <TextView
-            android:id="@+id/timeTodayText"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider0"
-            android:text="Time driven:"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <!--<View
-            android:id="@+id/divider1"
-            android:layout_marginTop="15dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/timeTodayTime"
-            android:layout_height="1dp"
-            android:background="@color/textLightest"/>
-
-
-        <TextView
-            android:id="@+id/distanceTodaydistance"
-            android:layout_width="wrap_content"
-            android:layout_below="@+id/divider1"
-            android:textColor="@color/textLight"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="23 km"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-
-        <TextView
-            android:id="@+id/distanceTodayText"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Distance driven:"
-            android:layout_below="@+id/divider1"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />-->
-
-        <View
-            android:id="@+id/divider2"
-            android:layout_marginTop="15dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/timeTodayText"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-
-                <!--<TextView
-                    android:id="@+id/fuelTodayFuel"
+            <RelativeLayout
+                android:layout_below="@+id/divider0"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <TextView
+                    android:id="@+id/timeTodayText"
+                    android:textColor="@color/textLight"
+                    android:textSize="16dp"
                     android:layout_width="wrap_content"
-                    android:layout_below="@+id/divider2"
+                    android:layout_height="wrap_content"
+                    android:text="Time driven:"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+                <TextView
+                    android:id="@+id/timeTodayTime"
+                    android:textColor="@color/textLight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="38 min"
+                    android:layout_alignParentEnd="true" />
+            </RelativeLayout>
+
+
+
+
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_marginTop="15dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/timeTodayText"
+                android:layout_height="0.5dp"
+                android:background="@color/textLightest"/>
+
+
+            <RelativeLayout
+                android:layout_below="@+id/divider2"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:id="@+id/KmByFuel"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/textLight"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="0.09 Km/L"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+                <TextView
+                    android:id="@+id/distanceByFuel"
+                    android:textColor="@color/textLight"
+                    android:textSize="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="Distance/Fuel"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/totalStats"
+                android:textColor="@color/textLighter"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Total Statistics"
+                android:layout_below="@+id/distanceByFuel"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+            <View
+                android:id="@+id/divider4"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/totalStats"
+                android:layout_height="1dp"
+                android:background="@color/textLightest"/>
+
+
+            <RelativeLayout
+                android:layout_below="@+id/divider4"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:id="@+id/timeTotalTime"
+                    android:textColor="@color/textLight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="38 min"
+                    android:layout_alignParentEnd="true" />
+
+                <TextView
+                    android:id="@+id/timeTotalText"
+                    android:textColor="@color/textLight"
+                    android:textSize="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time driven:"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/divider5"
+                android:layout_marginTop="15dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/timeTotalTime"
+                android:layout_height="0.5dp"
+                android:background="@color/textLightest"/>
+
+            <RelativeLayout
+                android:layout_below="@+id/divider5"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:id="@+id/distanceTotaldistance"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/textLight"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="23 km"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+                <TextView
+                    android:id="@+id/distanceTotalText"
+                    android:textColor="@color/textLight"
+                    android:textSize="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="Distance driven:"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/divider6"
+                android:layout_marginTop="15dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/distanceTotalText"
+                android:layout_height="0.5dp"
+                android:background="@color/textLightest"/>
+            <RelativeLayout
+                android:layout_below="@+id/divider6"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+
+                <TextView
+                    android:id="@+id/fuelTotalFuel"
+                    android:layout_width="wrap_content"
                     android:textColor="@color/textLight"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
@@ -121,518 +220,102 @@
                     android:layout_alignParentEnd="true" />
 
                 <TextView
-                    android:id="@+id/fuelTodayText"
+                    android:id="@+id/fuelTotalText"
                     android:textColor="@color/textLight"
                     android:textSize="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:text="Fuel consumption"
-                    android:layout_below="@+id/divider2"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true" />
-
-                <View
-                    android:id="@+id/divider3"
-                    android:layout_marginTop="15dp"
-                    android:layout_width="fill_parent"
-                    android:layout_below="@+id/fuelTodayText"
-                    android:layout_height="1dp"
-                    android:background="@color/textLighter"/>-->
+            </RelativeLayout>
 
 
-        <TextView
-            android:id="@+id/KmByFuel"
-            android:layout_width="wrap_content"
-            android:layout_below="@+id/divider2"
-            android:textColor="@color/textLight"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="0.09 Km/L"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/distanceByFuel"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Distance/Fuel"
-            android:layout_below="@+id/divider2"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <TextView
+                android:id="@+id/violationsTitle"
+                android:textColor="@color/textLighter"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Violations"
+                android:layout_below="@+id/fuelTotalText"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
-        <TextView
-            android:id="@+id/totalStats"
-            android:textColor="@color/textLighter"
-            android:textSize="14dp"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="Total Statistics"
-            android:layout_below="@+id/distanceByFuel"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-        <View
-            android:id="@+id/divider4"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/totalStats"
-            android:layout_height="1dp"
-            android:background="@color/textLightest"/>
+            <View
+                android:id="@+id/divider8"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/violationsTitle"
+                android:layout_height="1dp"
+                android:background="@color/textLightest"/>
 
-        <TextView
-            android:id="@+id/timeTotalTime"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/divider4"
-            android:text="38 min"
-            android:layout_alignParentEnd="true" />
+            <RelativeLayout
+                android:layout_below="@+id/divider8"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-        <TextView
-            android:id="@+id/timeTotalText"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider4"
-            android:text="Time driven:"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <View
-            android:id="@+id/divider5"
-            android:layout_marginTop="15dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/timeTotalTime"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/distanceTotaldistance"
-            android:layout_width="wrap_content"
-            android:layout_below="@+id/divider5"
-            android:textColor="@color/textLight"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="23 km"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-
-        <TextView
-            android:id="@+id/distanceTotalText"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Distance driven:"
-            android:layout_below="@+id/divider5"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <View
-            android:id="@+id/divider6"
-            android:layout_marginTop="15dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/distanceTotalText"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/fuelTotalFuel"
-            android:layout_width="wrap_content"
-            android:layout_below="@+id/divider6"
-            android:textColor="@color/textLight"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="3 L"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-
-        <TextView
-            android:id="@+id/fuelTotalText"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Fuel consumption"
-            android:layout_below="@+id/divider6"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-                <!--<View
-                    android:id="@+id/divider7"
-                    android:layout_marginTop="15dp"
-                    android:layout_width="fill_parent"
-                    android:layout_below="@+id/fuelTotalText"
-                    android:layout_height="1dp"
-                    android:background="@color/textLighter"/>
 
                 <TextView
-                    android:id="@+id/fuelByKmTotalFuel"
-                    android:layout_width="wrap_content"
-                    android:layout_below="@+id/divider7"
+                    android:id="@+id/numberOfViolations"
                     android:textColor="@color/textLight"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="0.09 L/Km"
                     android:layout_alignParentRight="true"
+                    android:text="4"
                     android:layout_alignParentEnd="true" />
 
                 <TextView
-                    android:id="@+id/fuelByKmTotalText"
+                    android:id="@+id/violationsText"
                     android:textColor="@color/textLight"
                     android:textSize="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="Fuel/distance"
-                    android:layout_below="@+id/divider7"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true" />-->
-
-                <TextView
-                    android:id="@+id/violationsTitle"
-                    android:textColor="@color/textLighter"
-                    android:textSize="14dp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
                     android:text="Violations"
-                    android:layout_below="@+id/fuelTotalText"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true" />
-
-                <View
-                    android:id="@+id/divider8"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_width="fill_parent"
-                    android:layout_below="@+id/violationsTitle"
-                    android:layout_height="1dp"
-                    android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/numberOfViolations"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/divider8"
-            android:text="4"
-            android:layout_alignParentEnd="true" />
-
-        <TextView
-            android:id="@+id/violationsText"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider8"
-            android:text="Violations"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            </RelativeLayout>
 
 
-        <TextView
-            android:id="@+id/sessionTitle"
-            android:textColor="@color/textLighter"
-            android:textSize="14dp"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="Driver History"
-            android:layout_below="@+id/violationsText"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <TextView
+                android:id="@+id/sessionTitle"
+                android:textColor="@color/textLighter"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Driver History"
+                android:layout_below="@+id/violationsText"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
-        <View
-            android:id="@+id/divider9"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/sessionTitle"
-            android:layout_height="1dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/history_date_1"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider9"
-            android:text=""
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:id="@+id/history_time_1"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider9"
-            android:text=""
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/history_date_1"/>
-
-        <TextView
-            android:id="@+id/type_of_work_1"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:text=""
-            android:layout_below="@+id/divider9" />
-
-        <ImageView
-            android:id="@+id/violation_warning_1"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:src="@drawable/ic_dialog_alert_holo_light"
-            android:layout_below="@+id/divider9"
-            android:layout_toLeftOf="@+id/type_of_work_1"
-            android:layout_toStartOf="@+id/type_of_work_1"
-            android:layout_alignBottom="@+id/history_date_1" />
-
-        <View
-            android:id="@+id/divider10"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/violation_warning_1"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/history_date_2"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider10"
-            android:text=""
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:id="@+id/history_time_2"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider10"
-            android:text=""
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/history_date_2"/>
-
-        <TextView
-            android:id="@+id/type_of_work_2"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:text=""
-            android:layout_below="@+id/divider10" />
-
-        <ImageView
-            android:id="@+id/violation_warning_2"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:src="@drawable/ic_dialog_alert_holo_light"
-            android:layout_below="@+id/divider10"
-            android:layout_toLeftOf="@+id/type_of_work_2"
-            android:layout_toStartOf="@+id/type_of_work_2"
-            android:layout_alignBottom="@+id/history_date_2" />
-
-        <View
-            android:id="@+id/divider11"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/violation_warning_2"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/history_date_3"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider11"
-            android:text=""
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:id="@+id/history_time_3"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider11"
-            android:text=""
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/history_date_3"/>
-
-        <TextView
-            android:id="@+id/type_of_work_3"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:text=""
-            android:layout_below="@+id/divider11" />
-
-        <ImageView
-            android:id="@+id/violation_warning_3"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:src="@drawable/ic_dialog_alert_holo_light"
-            android:layout_below="@+id/divider11"
-            android:layout_toLeftOf="@+id/type_of_work_3"
-            android:layout_toStartOf="@+id/type_of_work_3"
-            android:layout_alignBottom="@+id/history_date_3" />
-
-        <View
-            android:id="@+id/divider12"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/violation_warning_3"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/history_date_4"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider12"
-            android:text="2014-10-22: "
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:id="@+id/history_time_4"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider12"
-            android:text=""
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/history_date_4"/>
-
-        <TextView
-            android:id="@+id/type_of_work_4"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:text=""
-            android:layout_below="@+id/divider12" />
-
-        <ImageView
-            android:id="@+id/violation_warning_4"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:src="@drawable/ic_dialog_alert_holo_light"
-            android:layout_below="@+id/divider12"
-            android:layout_toLeftOf="@+id/type_of_work_4"
-            android:layout_toStartOf="@+id/type_of_work_4"
-            android:layout_alignBottom="@+id/history_date_4" />
-
-        <View
-            android:id="@+id/divider13"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="fill_parent"
-            android:layout_below="@+id/violation_warning_4"
-            android:layout_height="0.5dp"
-            android:background="@color/textLightest"/>
-
-        <TextView
-            android:id="@+id/history_date_5"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider13"
-            android:text=""
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <View
+                android:id="@+id/divider9"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="fill_parent"
+                android:layout_below="@+id/sessionTitle"
+                android:layout_height="1dp"
+                android:background="@color/textLightest"/>
 
 
-        <TextView
-            android:id="@+id/history_time_5"
-            android:textColor="@color/textLight"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/divider13"
-            android:text=""
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/history_date_5"/>
+            <ListView
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/sessionListView"
+                android:layout_below="@+id/sessionTitle"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
-        <TextView
-            android:id="@+id/type_of_work_5"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:text=""
-            android:layout_below="@+id/divider13" />
 
-        <ImageView
-            android:id="@+id/violation_warning_5"
-            android:textColor="@color/textLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:src="@drawable/ic_dialog_alert_holo_light"
-            android:layout_below="@+id/divider13"
-            android:layout_toLeftOf="@+id/type_of_work_5"
-            android:layout_toStartOf="@+id/type_of_work_5"
-            android:layout_alignBottom="@+id/history_date_5" />
-
-    </RelativeLayout>
+        </LinearLayout>
 
 
     </ScrollView>

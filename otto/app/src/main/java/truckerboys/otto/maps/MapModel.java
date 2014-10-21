@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,8 +18,10 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -83,9 +86,10 @@ public class MapModel implements IEventListener {
 
                     // We get the checkpoints as adresses in NewRouteEvent. Remake them to MapLocations
                     // making it possible to send them into tripplanner.
-                    MapLocation[] checkpoints = new MapLocation[((RouteRequestEvent) event).getCheckpoints().size()];
+                    ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+
                     for (Address address : adressList) {
-                        checkpoints[adressList.indexOf(address)] = new MapLocation(new LatLng(address.getLatitude(), address.getLongitude()));
+                       checkpoints.add(new MapLocation(new LatLng(address.getLatitude(), address.getLongitude())));
                     }
 
                     //Calculate new route with provided checkpoints
@@ -100,7 +104,7 @@ public class MapModel implements IEventListener {
                     tripPlanner.setNewRoute(
                             new MapLocation(LocationHandler.getCurrentLocationAsMapLocation()),
                             new MapLocation(new LatLng(((RouteRequestEvent) event).getFinalDestion().getLatitude(),
-                                    ((RouteRequestEvent) event).getFinalDestion().getLongitude())));
+                                    ((RouteRequestEvent) event).getFinalDestion().getLongitude())),null);
                 }
             } catch (InvalidRequestException e) {
                 //TODO Create proper catch
@@ -114,7 +118,13 @@ public class MapModel implements IEventListener {
     }
 
     public Route getRoute() {
-        return tripPlanner.getRoute();
+        try {
+            return tripPlanner.getRoute();
+        } catch (NoActiveRouteException e) {
+            //TODO catch this properly!!!
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean isActiveRoute() {

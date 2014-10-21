@@ -56,8 +56,6 @@ public class SettingsView extends Fragment implements IView, IEventListener {
         tankSize = (EditText) rootView.findViewById(R.id.tankEditText);
 
         // Sets listeners in presenter
-        // TODO Remove unit switch in final design
-        // presenter.setListeners(soundSwitch, displaySwitch, (Switch) rootView.findViewById(R.id.unitSwitch));
         presenter.setListeners(soundSwitch, displaySwitch, tankSize);
 
         SharedPreferences settings = getActivity().getSharedPreferences(SETTINGS, 0);

@@ -3,25 +3,24 @@ package truckerboys.otto.placesAPI;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.GasStation;
-import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RestLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 public interface IPlaces {
     /**
-     * Get the closest rest locations to given position (gas stations included).
+     * Get the closest route locations to given position (gas stations included).
+     *
      * @param position target position to calculate from.
-     * @return rest locations nearby given positions (gas stations included).
+     * @return rest locations nearby given positions (gas stations included) and contains null fields.
      */
-    public ArrayList<MapLocation> getNearbyRestLocations(LatLng position);
+    public ArrayList<RouteLocation> getNearbyRestLocations(LatLng position);
 
     /**
-     * Get the closest gas stations to given position.
+     * Get the closest route locations to given position.
+     *
      * @param position target position to calculate from.
-     * @return gas stations nearby given positions.
+     * @return gas stations nearby given positions and contains null fields.
      */
-    public ArrayList<GasStation> getNearbyGasStations(LatLng position) throws NoConnectionException;
+    public ArrayList<RouteLocation> getNearbyGasStations(LatLng position) throws NoConnectionException;
 }

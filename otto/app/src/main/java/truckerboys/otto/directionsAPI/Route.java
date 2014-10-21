@@ -6,24 +6,17 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.planner.TimeLeft;
-import truckerboys.otto.utils.positions.GasStation;
 import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RestLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
-/**
- * Created by Daniel on 2014-09-24.
- */
+
 public class Route {
-    private MapLocation finalDestination;
+    private RouteLocation finalDestination;
     private Duration eta;
     private int distance;
     private ArrayList<LatLng> overviewPolyline;
     private ArrayList<LatLng> detailedPolyline;
-    private ArrayList<MapLocation> checkpoints;
-    private MapLocation recommendedStop;
-    private ArrayList<MapLocation> alternativeStops;
-    private Duration etaToFirstCheckpoint = null;
+    private ArrayList<RouteLocation> checkpoints;
 
 
     /**
@@ -36,44 +29,49 @@ public class Route {
      * @param distance         distance to final destination in meters
      * @param checkpoints      checkpoints
      */
-    public Route(MapLocation finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
-                 ArrayList<LatLng> detailedPolyline, ArrayList<MapLocation> checkpoints) {
+    public Route(RouteLocation finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
+                 ArrayList<LatLng> detailedPolyline, ArrayList<RouteLocation> checkpoints) {
         this.finalDestination = finalDestination;
         this.eta = eta;
         this.overviewPolyline = overviewPolyline;
         this.detailedPolyline = detailedPolyline;
         this.distance = distance;
         this.checkpoints = checkpoints;
-        this.etaToFirstCheckpoint = eta;
     }
 
     /**
-     * Creates a new route
+     * Copy constructor.
      *
-     * @param finalDestination     target destination
-     * @param eta                  time till estimated arrival
-     * @param overviewPolyline     polyline overview
-     * @param detailedPolyline     polyline details (mush larger than overview)
-     * @param distance             distance to final destination in meters
-     * @param checkpoints          checkpoints
-     * @param etaToFirstCheckpoint ETA to the first checkpoint
+     * @param other Route to copy.
      */
-    public Route(MapLocation finalDestination, Duration eta, int distance, ArrayList<LatLng> overviewPolyline,
-                 ArrayList<LatLng> detailedPolyline, ArrayList<MapLocation> checkpoints, Duration etaToFirstCheckpoint) {
-        this(finalDestination, eta, distance, overviewPolyline, detailedPolyline, checkpoints);
-        if (etaToFirstCheckpoint == null) {
-            this.etaToFirstCheckpoint = eta;
-        } else {
-            this.etaToFirstCheckpoint = etaToFirstCheckpoint;
+    public Route(Route other) {
+        this.finalDestination = new RouteLocation(other.finalDestination);
+        this.eta = new Duration(other.eta);
+        this.distance = other.distance;
+
+        this.overviewPolyline = new ArrayList<LatLng>();
+        for (LatLng point : other.overviewPolyline) {
+            this.overviewPolyline.add(new LatLng(point.latitude, point.longitude));
+        }
+
+        this.detailedPolyline = new ArrayList<LatLng>();
+        for (LatLng point : other.detailedPolyline) {
+            this.detailedPolyline.add(new LatLng(point.latitude, point.longitude));
+        }
+
+        this.checkpoints = new ArrayList<RouteLocation>();
+        for (RouteLocation temp : other.checkpoints) {
+            this.checkpoints.add(new RouteLocation(temp));
         }
     }
+
 
     /**
      * Get target destination
      *
      * @return target destination
      */
-    public MapLocation getFinalDestination() {
+    public RouteLocation getFinalDestination() {
         return finalDestination;
     }
 
@@ -118,52 +116,9 @@ public class Route {
      *
      * @return route checkpoints
      */
-    public ArrayList<MapLocation> getCheckpoints() {
+    public ArrayList<RouteLocation> getCheckpoints() {
         return checkpoints;
     }
 
-    /**
-     * Get the recommended stop for the route.
-     *
-     * @return recommended stop (null if no stop is recommended).
-     */
-    public MapLocation getRecommendedStop() {
-        return recommendedStop;
-    }
 
-    /**
-     * Set the recommended stop for the route.
-     *
-     * @param recommendedStop the recommended stop for the route.
-     */
-    public void setRecommendedStop(MapLocation recommendedStop) {
-        this.recommendedStop = recommendedStop;
-    }
-
-    /**
-     * Get the alternative stops for this route.
-     *
-     * @return alternative stops.
-     */
-    public ArrayList<MapLocation> getAlternativeStops() {
-        return alternativeStops;
-    }
-
-    /**
-     * Set the alternative stops for this route.
-     *
-     * @param alternativeStops the alternative stops for the route.
-     */
-    public void setAlternativeStops(ArrayList<MapLocation> alternativeStops) {
-        this.alternativeStops = alternativeStops;
-    }
-
-    /**
-     * Get the time to the first checkpoint on the route
-     *
-     * @return ETA to first checkpoint. ETA to final destination if no checkpoint exists
-     */
-    public Duration getEtaToFirstCheckpoint() {
-        return etaToFirstCheckpoint;
-    }
 }

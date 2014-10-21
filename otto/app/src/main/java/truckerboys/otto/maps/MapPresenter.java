@@ -19,6 +19,7 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -92,7 +93,7 @@ public class MapPresenter implements IEventListener, IView {
 
             if(!mapModel.getRoute().getCheckpoints().isEmpty()) {
                 // Get first checkpoint
-                MapLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
+                RouteLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
 
                 // Set first checkpoints in strings.
                 mapView.setNextCheckpointText(firstCheckpoint.getAddress());

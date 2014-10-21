@@ -10,9 +10,6 @@ import org.joda.time.Duration;
  * Created by Daniel on 2014-09-18.
  */
 public class MapLocation extends Location{
-    private String address = "";
-    private Duration eta = Duration.ZERO;
-
     public MapLocation(Location location){
         super(location);
     }
@@ -23,30 +20,21 @@ public class MapLocation extends Location{
         setLongitude(latLng.longitude);
     }
 
-    public String getAddress() {
-        return address;
+    public MapLocation(MapLocation other) {
+        super(other);
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     /**
-     * Get ETA to location
-     * @return ETA to location (ZERO if no ETA is set)
+     * Checks if the locations have the same coordinates.
+     * @param rhs Map location to compare with.
+     * @return true if the locations have the same coordinates.
      */
-    public Duration getEta() {
-        return eta;
-    }
+    public boolean equalCoordinates(MapLocation rhs) {
+        return (rhs.getLatitude() == getLatitude() && rhs.getLongitude() == getLongitude());
 
-    /**
-     * Set ETA to location
-     * @param eta eta to location
-     */
-    public void setEta(Duration eta) {
-        this.eta = eta;
     }
-
+    
     public LatLng getLatLng(){
         return new LatLng(getLatitude(), getLongitude());
     }

@@ -3,6 +3,7 @@ package truckerboys.otto.maps;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +37,7 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 
@@ -83,6 +85,19 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private LinkedList<Double2> positions = new LinkedList<Double2>();
     private LinkedList<Float> bearings = new LinkedList<Float>();
     //endregion
+
+    @Override
+    public void onDestroyView() {
+
+        FragmentManager fm = getFragmentManager();
+
+        Fragment xmlFragment = fm.findFragmentById(R.id.map);
+        if (xmlFragment != null) {
+            fm.beginTransaction().remove(xmlFragment).commit();
+        }
+
+        super.onDestroyView();
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -179,13 +194,19 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * @param location The location to set the camera to.
      * @param bearing  The bearing to set the camera to.
      */
-    public void moveCamera(boolean animate, LatLng location, float bearing) {
+    public void moveCamera(final boolean animate, final LatLng location, final float bearing) {
         if (googleMap != null) {
-            if (animate) {
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
-            } else {
-                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
-            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (animate) {
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+                    } else {
+                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+                    }
+                }
+            });
+
         }
     }
 
@@ -196,13 +217,32 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * @param location The location to set the camera to.
      * @param bearing  The bearing to set the camera to.
      */
-    public void moveCamera(boolean animate, LatLng location, float zoom, float bearing, int durationMs) {
+    public void moveCamera(final boolean animate, final LatLng location, final float zoom, final float bearing, final int durationMs) {
         if (googleMap != null) {
-            if (animate) {
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)), durationMs, null);
-            } else {
-                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
-            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (animate) {
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)), durationMs, null);
+                    } else {
+                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
+                    }
+                }
+            });
+
+        }
+    }
+
+    /**
+     * Helper method to move the camera across the map.
+     *
+     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
+     * @param location The location to set the camera to.
+     * @param bearing  The bearing to set the camera to.
+     */
+    public void moveCamera(CameraUpdate cameraUpdate, GoogleMap.CancelableCallback cancelableCallback) {
+        if (googleMap != null) {
+            googleMap.animateCamera(cameraUpdate, cancelableCallback);
         }
     }
 
@@ -225,36 +265,48 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      * @param animate True if you want the camera to be animated across the map. False if it should just move instantly.
      * @param bounds The bounds to zoom according to.
      */
-    public void moveCamera(boolean animate, LatLngBounds bounds) {
+    public void moveCamera(final boolean animate, final LatLngBounds bounds) {
         if (googleMap != null) {
-            if (animate) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
-            } else {
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
-            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (animate) {
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
+                    } else {
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 20));
+                    }
+                }
+            });
+
         }
     }
 
     /**
      * Function that will set the current markers on the map to a List of specified markers.
      *
-     * @param mapLocations The specified list of markers to add to the map.
+     * @param routeLocations The specified list of markers to add to the map.
      */
-    public void setMarkers(List<MapLocation> mapLocations) {
+    public void setMarkers(final List<RouteLocation> routeLocations) {
         if (googleMap != null) {
-            // Clear the old markers off the map.
-            for (Marker marker : checkpointMarkers) {
-                marker.remove();
-            }
-            checkpointMarkers.clear();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // Clear the old markers off the map.
+                    for (Marker marker : checkpointMarkers) {
+                        marker.remove();
+                    }
+                    checkpointMarkers.clear();
 
-            // Add the new markers to the map.
-            for (MapLocation location : mapLocations) {
-                checkpointMarkers.add(googleMap.addMarker(new MarkerOptions()
-                        .position(location.getLatLng())
-                        .title("Adress: " + location.getAddress() + ", ETA: " + location.getEta().getStandardMinutes())
-                ));
-            }
+                    // Add the new markers to the map.
+                    for (RouteLocation location : routeLocations) {
+                        checkpointMarkers.add(googleMap.addMarker(new MarkerOptions()
+                                        .position(location.getLatLng())
+                                        .title("Adress: " + location.getAddress() + ", ETA: " + location.getEta().getStandardMinutes())
+                        ));
+                    }
+                }
+            });
+
         }
     }
 
@@ -321,14 +373,20 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     public void performEvent(Event event) {
         //region GPSUpdateEvent
         if (event.isType(GPSUpdateEvent.class)) {
-            MapLocation newLocation = ((GPSUpdateEvent) event).getNewPosition();
+            final MapLocation newLocation = ((GPSUpdateEvent) event).getNewPosition();
 
             // If we just initiated the map, we should move to first received GPS position.
             // For better user experience. (THIS ONLY HAPPENS ONCE)
             if (positions.size() == 0) {
                 moveCamera(true, new LatLng(newLocation.getLatitude(), newLocation.getLongitude()), newLocation.getBearing());
-                positionMarker.setPosition(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()));
-                positionMarker.setRotation(newLocation.getBearing());
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        positionMarker.setPosition(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()));
+                        positionMarker.setRotation(newLocation.getBearing());
+                    }
+                });
+
             }
 
             // Everytime we get a GPS Position Update we add that position and the bearing to a list
@@ -349,30 +407,54 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      *
      * @param route The new route do draw on the map.
      */
-    public void setRoute(Route route) {
-        //Add all new steps.
-        routePolyline.setPoints(route.getDetailedPolyline());
+    public void setRoute(final Route route) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //Add all new steps.
+                routePolyline.setPoints(route.getDetailedPolyline());
+            }
+        });
+
     }
 
     public void setPresenter(MapPresenter presenter) {
         this.presenter = presenter;
     }
 
-    private void setAllGestures(boolean value){
+    private void setAllGestures(final boolean value){
         if (googleMap != null) {
-            googleMap.getUiSettings().setAllGesturesEnabled(value);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    googleMap.getUiSettings().setAllGesturesEnabled(value);
+                }
+            });
+
         }
     }
 
-    public void showStartRouteDialog(boolean visibility){
-        startRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+    public void showStartRouteDialog(final boolean visibility){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                startRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
+
     }
 
-    public void showActiveRouteDialog(boolean visibility){
-        activeRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+    public void showActiveRouteDialog(final boolean visibility){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activeRouteDialog.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
 
-        //If we have an active route, we don't want the user to be able to move the camera.
-        setAllGestures(!visibility);
+                //If we have an active route, we don't want the user to be able to move the camera.
+                setAllGestures(!visibility);
+            }
+        });
+
     }
 
     @Override
@@ -382,34 +464,70 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             public void run() {
                 if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+                    System.out.println("changed Distraction Level: " + driverDistractionLevel.getLevel());
                 } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
+                    System.out.println("changed Distraction Level: " + driverDistractionLevel.getLevel() + " woop");
                 }
             }
         });
     }
 
-    public void setFinalDestinationText(String text) {
-        finalDestinationText.setText(text);
+    public void setFinalDestinationText(final String text) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                finalDestinationText.setText(text);
+            }
+        });
+
     }
 
-    public void setFinalDestinationETAText(String text) {
-        finalDestinationETAText.setText(text);
+    public void setFinalDestinationETAText(final String text) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                finalDestinationETAText.setText(text);
+            }
+        });
+
     }
 
-    public void setFinalDestinationDistText(String text) {
-        finalDestinationDistText.setText(text);
+    public void setFinalDestinationDistText(final String text) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                finalDestinationDistText.setText(text);
+            }
+        });
+
     }
 
-    public void setNextCheckpointText(String text) {
-        nextCheckpointText.setText(text);
+    public void setNextCheckpointText(final String text) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                nextCheckpointText.setText(text);
+            }
+        });
+
     }
 
-    public void setNextCheckpointETAText(String text) {
-        nextCheckpointETAText.setText(text);
+    public void setNextCheckpointETAText(final String text) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                nextCheckpointETAText.setText(text);
+            }
+        });
     }
 
-    public void setNextCheckpointDistText(String text) {
-        nextCheckpointDistText.setText(text);
+    public void setNextCheckpointDistText(final String text) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                nextCheckpointDistText.setText(text);
+            }
+        });
     }
 }
