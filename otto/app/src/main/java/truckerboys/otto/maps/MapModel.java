@@ -2,6 +2,7 @@ package truckerboys.otto.maps;
 
 import android.location.Address;
 import android.location.Location;
+import android.os.Handler;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -32,12 +33,32 @@ public class MapModel implements IEventListener {
 
     private TripPlanner tripPlanner;
 
+    private Handler updateRouteHandler = new Handler();
+    private Runnable updateRoute = new Runnable() {
+        @Override
+        public void run() {
+            if(tripPlanner != null && LocationHandler.isConnected()){
+                try {
+                    tripPlanner.updateRoute(LocationHandler.getCurrentLocationAsMapLocation());
+                } catch (InvalidRequestException e) {
+                    e.printStackTrace();
+                } catch (NoConnectionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //Call this runnable every 30 seconds.
+            updateRouteHandler.postDelayed(updateRoute, 30*1000);
+        }
+    };
+
     // If we've been close to a checkpoint on the route.
     private boolean closeToCheckpoint = false;
 
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
         EventTruck.getInstance().subscribe(this);
+        updateRouteHandler.post(updateRoute);
     }
 
     @Override
@@ -48,6 +69,7 @@ public class MapModel implements IEventListener {
          *
          * TODO Implement the fact that you can also be outside the route. If so, calculate a new one.
          */
+        //region GPSUpdateEvent
         if (event.isType(GPSUpdateEvent.class)) {
             GPSUpdateEvent gpsUpdateEvent = (GPSUpdateEvent) event;
 
@@ -76,6 +98,7 @@ public class MapModel implements IEventListener {
                 }
             }
         }
+        //endregion
 
         /*
          * When a Route is requested by the user (More specifically this is done from RouteActivity when
