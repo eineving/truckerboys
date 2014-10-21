@@ -8,7 +8,11 @@
 <a href="https://dashboard.genmymodel.com/projectProperties/_tNRVQDzhEeSn3ZXpVIPWYw" target="_blank">UML Diagram</a>
 
 ## Development Instructions
+We do currently only have 2500 request to Google Directions, so when the standard key is out, change the key temporary in GoogleDirections.class to the following:
 
+<ul>
+<li>AIzaSyAzs9paI7laxOVUA3Fgb7vad-ihaUj2OIA
+</ul>
 
 ### Installing the SDK
 
