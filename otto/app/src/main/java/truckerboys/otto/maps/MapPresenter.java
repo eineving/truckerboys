@@ -39,7 +39,7 @@ public class MapPresenter implements IEventListener, IView {
             } else {
                 mapView.updatePositionMarker(false);
             }
-            updateHandler.postDelayed(updatePos, LocationHandler.LOCATION_REQUEST_INTERVAL_MS / MapView.INTERPOLATION_FREQ);
+            updateHandler.postDelayed(updatePos, (LocationHandler.LOCATION_REQUEST_INTERVAL_MS  * 2)/ MapView.INTERPOLATION_FREQ);
         }
     };
     //endregion
@@ -54,7 +54,6 @@ public class MapPresenter implements IEventListener, IView {
     }
 
     public void startFollowRoute(){
-        mapView.moveCamera(true, LocationHandler.getCurrentLocationAsLatLng(), 18f, LocationHandler.getCurrentLocationAsMapLocation().getBearing(), 1000);
         mapView.moveCamera(
                 CameraUpdateFactory.newCameraPosition(new CameraPosition(LocationHandler.getCurrentLocationAsLatLng(), 18f, mapView.CAMERA_TILT,LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
                 new GoogleMap.CancelableCallback() {
@@ -68,7 +67,8 @@ public class MapPresenter implements IEventListener, IView {
                     public void onCancel() {
 
                     }
-                });
+                }
+        );
     }
 
     public void stopFollowRoute(){

@@ -79,7 +79,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     //region Interpolation variables.
     // The frequency of the interpolation.
-    public static final int INTERPOLATION_FREQ = 25;
+    public static final int INTERPOLATION_FREQ = 50;
     // The step of the interpolation.
     private int index;
     private LinkedList<Double2> positions = new LinkedList<Double2>();
@@ -249,19 +249,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     /**
      * Helper method to move the camera across the map.
      *
-     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
-     * @param location The location to set the camera to.
-     * @param bearing  The bearing to set the camera to.
-     */
-    public void moveCamera(CameraUpdate cameraUpdate, GoogleMap.CancelableCallback cancelableCallback) {
-        if (googleMap != null) {
-            googleMap.animateCamera(cameraUpdate, cancelableCallback);
-        }
-    }
-
-    /**
-     * Helper method to move the camera across the map.
-     *
      * @param animate True if you want the camera to be animated across the map. False if it should just move instantly.
      * @param bounds The bounds to zoom according to.
      */
@@ -344,7 +331,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 float rot1 = bearings.get(0);
                 float rot2 = bearings.get(2);
 
-                float step = (rot2 - rot1) / INTERPOLATION_FREQ;
+                float deltaRot = rot2 - rot1;
+                float step = (float)Math.min(deltaRot, 2*Math.PI - deltaRot) / INTERPOLATION_FREQ;
 
                 float smoothBearing = rot1 + step * index;
 
