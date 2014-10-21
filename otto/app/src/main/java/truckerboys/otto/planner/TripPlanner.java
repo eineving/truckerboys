@@ -268,7 +268,7 @@ public class
     private ArrayList<RouteLocation> calculateAlternativeStops(Route directRoute, boolean gasStationNeeded, Duration... stopsETA)
             throws InvalidRequestException, NoConnectionException {
         if (gasStationNeeded) {
-            return calculateAlterantiveGasStations(directRoute, stopsETA[0], (fuelTank.getMileage() * 1000) / 2,
+            return calculateAlternativeGasStations(directRoute, stopsETA[0], (fuelTank.getMileage() * 1000) / 2,
                     (fuelTank.getMileage() * 1000) / 3, (fuelTank.getMileage() * 1000) / 4);
         } else {
             return calculateAlternativeRestLocations(directRoute, stopsETA);
@@ -321,7 +321,7 @@ public class
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    private ArrayList<RouteLocation> calculateAlterantiveGasStations(Route directRoute, Duration stopETA, int... distances)
+    private ArrayList<RouteLocation> calculateAlternativeGasStations(Route directRoute, Duration stopETA, int... distances)
             throws InvalidRequestException, NoConnectionException {
         ArrayList<RouteLocation> incompleteInfo = new ArrayList<RouteLocation>();
         ArrayList<RouteLocation> completeInfo = new ArrayList<RouteLocation>();
