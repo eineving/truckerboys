@@ -1,11 +1,8 @@
 package truckerboys.otto.clock;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
@@ -16,7 +13,6 @@ import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -25,12 +21,8 @@ import truckerboys.otto.utils.positions.RouteLocation;
  */
 public class ClockModel {
 
-    private Instant lastTimeUpdate, timeNow;
-
-    private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
     private RouteLocation recStop, nextDestination;
-    private long timeDifference;
 
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
@@ -45,56 +37,31 @@ public class ClockModel {
         this.regulationHandler = regulationHandler;
         this.user = user;
 
-        lastTimeUpdate = new Instant();
-        timeLeftDuration = new Duration(Duration.ZERO);
-        timeLeftExtendedDuration = new Duration(Duration.ZERO);
-        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
+        timeLeft = new TimeLeft(Duration.ZERO, Duration.ZERO);
 
         altStops = new ArrayList<RouteLocation>();
     }
 
     /**
-     * Updates the ETAs of the stops and the time left until violation
-     */
-    public void update() {
-        timeNow = new Instant();
-        timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
-        timeLeftDuration = timeLeftDuration.minus(timeDifference);
-        if(timeLeftDuration.getMillis()<0)
-            timeLeftDuration = Duration.ZERO;
-        timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
-        if(timeLeftExtendedDuration.getMillis()<0)
-            timeLeftExtendedDuration = Duration.ZERO;
-
-        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
-
-        lastTimeUpdate = timeNow;
-    }
-
-    /**
      * Sets the time left until violation and the stops.
-     * Called when the route is changed.
+     * Called when the route is changed or updated.
      */
     public void processChangedRoute() {
 
         try {
             route = tripPlanner.getRoute();
+            recStop = route.getRecommendedStop();
+            altStops = route.getAlternativeStops();
+
+            if(route.getCheckpoints() == null || route.getCheckpoints().size() == 0){
+                nextDestination = route.getFinalDestination();
+            }else{
+                nextDestination = route.getCheckpoints().get(0);
+            }
         }catch (NoActiveRouteException e){
             route = null;
         }
         timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
-        timeLeftDuration = timeLeft.getTimeLeft();
-        timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
-
-        //TODO Simon: What if exception
-        recStop = route.getRecommendedStop();
-        altStops = route.getAlternativeStops();
-
-        if(route.getCheckpoints() == null || route.getCheckpoints().size() == 0){
-            nextDestination = route.getFinalDestination();
-        }else{
-            nextDestination = route.getCheckpoints().get(0);
-        }
     }
 
     /**
@@ -117,14 +84,32 @@ public class ClockModel {
         return nextDestination;
     }
 
-    public boolean setChosenStop(RouteLocation stop){
+    public void setChosenStop(final RouteLocation stop){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tripPlanner.setChoosenStop(stop);
+                }catch (InvalidRequestException e){
+                    //Will never be thrown
+                }catch (NoConnectionException e){
+                    //Will never be thrown because if the app has no connection
+                    // the view will have changed and the button to
+                    // choose a stop won't be displayed
+                }
+            }
+        }).start();
+    }
+
+    private void tryChosenStop(RouteLocation stop){
         try {
             tripPlanner.setChoosenStop(stop);
-            return true;
         }catch (InvalidRequestException e){
-            return false;
+            //Will never be thrown
         }catch (NoConnectionException e){
-            return false;
+            //Will never be thrown because if the app has no connection
+            // the view will have changed and the button to
+            // choose a stop won't be displayed
         }
     }
 
@@ -134,10 +119,6 @@ public class ClockModel {
      */
     public TimeLeft getTimeLeft() {
         return timeLeft;
-    }
-
-    public Instant getTimeNow(){
-        return timeNow;
     }
 
     public Route getRoute(){

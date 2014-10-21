@@ -1,9 +1,8 @@
 package truckerboys.otto.clock;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 
+import truckerboys.otto.IView;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
@@ -11,7 +10,6 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 
 /**
@@ -21,8 +19,6 @@ import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 public class ClockPresenter  implements IView, IEventListener {
     private ClockModel model;
     private ClockView view;
-    private Handler updateHandler;
-    private Runnable update;
 
     public ClockPresenter(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user){
         model = new ClockModel(tripPlanner, regulationHandler, user);
@@ -30,25 +26,6 @@ public class ClockPresenter  implements IView, IEventListener {
 
         EventTruck.getInstance().subscribe(this);
 
-        updateHandler = new Handler(Looper.getMainLooper());
-        update = new Runnable(){
-            public void run(){
-                update();
-            }
-        };
-        updateHandler.postDelayed(update, 1000);
-
-    }
-    /**
-     * Updates the model and view.
-     */
-    public void update() {
-        if(model.getRoute()!=null) {
-            model.update();
-            view.setTimeLeft(model.getTimeLeft(), model.getTimeNow());
-            view.updateUI();
-        }
-        updateHandler.postDelayed(update, 5000);
     }
 
     @Override
@@ -68,14 +45,12 @@ public class ClockPresenter  implements IView, IEventListener {
             view.setRecommendedStop(model.getRecommendedStop());
             view.setAltStops(model.getAltStops());
             view.setNextDestination(model.getNextDestination());
+            view.setTimeLeft(model.getTimeLeft());
+            view.updateUI();
         }
 
         if(event.isType(SetChosenStopEvent.class)){
-            if(model.setChosenStop(((SetChosenStopEvent)event).getStop())){
-                //No exceptions, the chosen stop was set
-            }else{
-                view.displayToast("No connection available");
-            }
+            model.setChosenStop(((SetChosenStopEvent) event).getStop());
         }
     }
 }

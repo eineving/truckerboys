@@ -1,9 +1,11 @@
 package truckerboys.otto.clock;
 
+import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -11,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import org.joda.time.Duration;
@@ -40,12 +41,13 @@ public class ClockView extends Fragment {
     View rootView;
 
     ViewSwitcher viewSwitcher;
+    ProgressDialog spinnerDialog;
 
     TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, thirdAltStopETA,
             recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle;
-    ImageView recStopImage, firstAltStopImage, secAltStopImage, thirdAltStopImage, backButton;
+    ImageView recStopImage, firstAltStopImage, secAltStopImage, thirdAltStopImage;
     RelativeLayout firstAltStopClick, secAltStopClick, thirdAltStopClick;
-    LinearLayout alternativeStopsButton;
+    LinearLayout alternativeStopsButton, backButton;
 
     RouteLocation recStop, firstAltStop, secAltStop, thirdAltStop, nextDestination;
 
@@ -53,7 +55,6 @@ public class ClockView extends Fragment {
 
     Boolean variablesSet = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
-    Instant timeNow;
 
     public ClockView() {}
 
@@ -99,21 +100,41 @@ public class ClockView extends Fragment {
         thirdAltStopClick = (RelativeLayout) rootView.findViewById(R.id.thirdAltStop);
 
         alternativeStopsButton = (LinearLayout) rootView.findViewById(R.id.alternativesButton);
-        backButton = (ImageView) rootView.findViewById(R.id.backButton);
+        backButton = (LinearLayout) rootView.findViewById(R.id.backButton);
 
         View.OnClickListener stopClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String tag = view.getTag().toString();
                 if (tag.equalsIgnoreCase("firstAltStop")) {
+                    viewSwitcher.showPrevious();
+                    startSpinner();
                     EventTruck.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
                 }
                 if (tag.equalsIgnoreCase("secAltStop")) {
+                    viewSwitcher.showPrevious();
+                    startSpinner();
                     EventTruck.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
                 }
                 if(tag.equalsIgnoreCase("thirdAltStop")){
+                    viewSwitcher.showPrevious();
+                    startSpinner();
                     EventTruck.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
                 }
+            }
+        };
+
+        View.OnTouchListener touchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    view.setBackgroundColor(Color.LTGRAY);
+
+                }else {
+                    view.setBackgroundColor(Color.TRANSPARENT);
+                    view.setBackgroundResource(R.drawable.white_dropshadow);
+                }
+                return false;
             }
         };
 
@@ -121,7 +142,12 @@ public class ClockView extends Fragment {
         secAltStopClick.setOnClickListener(stopClickListener);
         thirdAltStopClick.setOnClickListener(stopClickListener);
 
-        Log.w("Null", "recStopETA is null? " + (recStopETA == null));
+        firstAltStopClick.setOnTouchListener(touchListener);
+        secAltStopClick.setOnTouchListener(touchListener);
+        thirdAltStopClick.setOnTouchListener(touchListener);
+        backButton.setOnTouchListener(touchListener);
+        alternativeStopsButton.setOnTouchListener(touchListener);
+
         alternativeStopsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -151,8 +177,7 @@ public class ClockView extends Fragment {
      *
      * @param timeLeft The remaining time
      */
-    public void setTimeLeft(TimeLeft timeLeft, Instant timeNow) {
-        this.timeNow = timeNow;
+    public void setTimeLeft(TimeLeft timeLeft) {
         if (variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
             if (timeLeft.getExtendedTimeLeft().getMillis() > 0) {
@@ -206,14 +231,6 @@ public class ClockView extends Fragment {
     }
 
     /**
-     * Displays a message on the screen
-     * @param message The message to be displayed
-     */
-    public void displayToast(String message){
-        Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
      * Updates the UI
      */
     public void updateUI() {
@@ -233,6 +250,8 @@ public class ClockView extends Fragment {
      * Sets the labels of the time until violation and the stops.
      */
     private void setLabels() {
+        if(spinnerDialog!=null && spinnerDialog.isShowing())
+            spinnerDialog.dismiss();
         timeLeft.setText(timeL);
         if (timeLE.equalsIgnoreCase("0")) {
             timeLeftExtended.setVisibility(TextView.GONE);
@@ -282,7 +301,7 @@ public class ClockView extends Fragment {
             return;
         }
         v.setVisibility(ViewGroup.VISIBLE);
-        Duration time = new Duration(timeNow, stop.getTimeOfArrival());
+        Duration time = new Duration(new Instant(), stop.getTimeOfArrival());
         if(time.getMillis()<0){
             time = Duration.ZERO;
         }
@@ -297,6 +316,16 @@ public class ClockView extends Fragment {
             name.setText(stop.getName());
             image.setImageResource(R.drawable.reststop);
         }
+    }
+
+    private void startSpinner() {
+
+        spinnerDialog = new ProgressDialog(getActivity());
+        spinnerDialog.setMessage("Loading your route");
+        spinnerDialog.setTitle("Loading");
+        spinnerDialog.setCancelable(false);
+        spinnerDialog.show();
+
     }
 
     /**
