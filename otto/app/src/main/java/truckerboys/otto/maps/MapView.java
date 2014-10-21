@@ -446,16 +446,21 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */ {
+                if(driverDistractionLevel.getLevel() >= 2 && lastDistractionLevel < 2) /* High distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+                    System.out.println("distractionLevel high");
 
                     // Fire event to make sure that the camera follows the marker.
                     EventTruck.getInstance().newEvent(new FollowMarkerEvent(true));
 
                     // Make it impossible for the driver to exit "Follow Marker Mode"
                     showStopRoute(false);
-                } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
+
+                    // Disable gestures.
+                    googleMap.getUiSettings().setAllGesturesEnabled(false);
+                } else if(driverDistractionLevel.getLevel() < 2 && lastDistractionLevel >= 2) /* Low distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
+                    System.out.println("distractionLevel low");
 
                     //Make it possible for the driver to exit "Follow Marker Mode"
                     showStopRoute(true);
