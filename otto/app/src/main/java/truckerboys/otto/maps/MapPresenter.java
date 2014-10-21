@@ -117,12 +117,12 @@ public class MapPresenter implements IEventListener, IView {
                 RouteLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
 
                 // Display the adress of the first checkpoint to the driver.
-                mapView.setNextCheckpointText(firstCheckpoint.getAddress());
-                //TODO mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
+                mapView.setNextCheckpointText(firstCheckpoint.getName());
+                mapView.setNextCheckpointDistText(firstCheckpoint.getDistance() + "");
                 mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardMinutes() + "");
             } else {
                 // If we didn't have any checkpoints in the new route, we display the next checkpoint as the final destination.
-                mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getAddress());
+                mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getName());
                 mapView.setNextCheckpointETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
                 mapView.setNextCheckpointDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
             }

@@ -432,6 +432,15 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     }
 
+    public void showStopRoute(final boolean visibility){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopRoute.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
+    }
+
     @Override
     public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
         getActivity().runOnUiThread(new Runnable() {
@@ -439,10 +448,17 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             public void run() {
                 if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+
+                    // Fire event to make sure that the camera follows the marker.
                     EventTruck.getInstance().newEvent(new FollowMarkerEvent(true));
+
+                    // Make it impossible for the driver to exit "Follow Marker Mode"
+                    showStopRoute(false);
                 } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
-                    //TODO Show X to stop following marker.
+
+                    //Make it possible for the driver to exit "Follow Marker Mode"
+                    showStopRoute(true);
                 }
             }
         });
