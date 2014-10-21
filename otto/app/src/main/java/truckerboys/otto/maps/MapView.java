@@ -453,15 +453,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
                     // Simulate that we click the follow route button.
                     showStartRouteDialog(false);
-                    showActiveRouteDialog(true);
+                    showActiveRouteDialog(false);
                     setAllGestures(false);
-
-                    // Make it impossible for the driver to exit "Follow Marker Mode"
-                    showStopRoute(false);
                 } else if(driverDistractionLevel.getLevel() < 2 && lastDistractionLevel >= 2) /* Low distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
 
                     //Make it possible for the driver to exit "Follow Marker Mode"
+                    showActiveRouteDialog(true);
                     showStopRoute(true);
                 }
             }
