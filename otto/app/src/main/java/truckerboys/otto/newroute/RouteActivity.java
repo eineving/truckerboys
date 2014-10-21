@@ -92,43 +92,42 @@ public class RouteActivity extends Activity implements IEventListener {
 
     }
 
-    public void startSpinner(View view) {
-
-        spinnerDialog = new ProgressDialog(this);
-        spinnerDialog.setMessage("Loading your route");
-        spinnerDialog.setTitle("Loading");
-        spinnerDialog.setCancelable(true);
-        spinnerDialog.show();
-
-
-        handleNavigate();
-
-    }
-
-    public void handleNavigate() {
+    public void startSpinner() {
 
         if (finalDestination != null && coder != null && routePresenter != null) {
             if (finalDestination.getText() != null
                     && !finalDestination.getText().equals("")) {
 
-                routePresenter.sendLocation("" + finalDestination.getText().toString(),
-                        routeModel.getCheckpoints(), coder);
+                spinnerDialog = new ProgressDialog(this);
+                spinnerDialog.setMessage("Loading your route");
+                spinnerDialog.setTitle("Loading");
+                spinnerDialog.setCancelable(true);
+                spinnerDialog.show();
 
-                if (history != null) {
-                    routePresenter.saveHistory(history, ""
-                            + finalDestination.getText().toString());
-                }
+                handleNavigate();
 
             } else {
-                // If no destination is set
-                // TODO UNCOMMENT THIS
-                // dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
 
-                // TODO REMVOE THIS
-                        routePresenter.sendLocation("" + history1Text.getText(),
-                                new ArrayList<String>(), coder);
+                // if no final destination is set
+                dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
             }
+
         }
+
+
+    }
+
+    public void handleNavigate() {
+
+
+        routePresenter.sendLocation("" + finalDestination.getText().toString(),
+                routeModel.getCheckpoints(), coder);
+
+        if (history != null) {
+            routePresenter.saveHistory(history, ""
+                    + finalDestination.getText().toString());
+        }
+
 
 
 
@@ -167,6 +166,7 @@ public class RouteActivity extends Activity implements IEventListener {
 
         // Sets listeners to UI components
 
+        // Removes checkpoint
         checkpointList.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -181,6 +181,8 @@ public class RouteActivity extends Activity implements IEventListener {
                 }
             }
         });
+
+
 
         // Handles when user selects an item from the drop-down menu
         search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -220,58 +222,34 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
-        /*navigate.setOnTouchListener(new View.OnTouchListener() {
+        removeDestinationButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-
-
-                if(!finalDestination.getText().equals("")){
-                   //ProgressDialog.show(RouteActivity.this, "Loading", "Loading your route");
-                }
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-
-                    navigate.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    navigate.setBackgroundColor(Color.TRANSPARENT);
-
-
-                }
+                clickFX(removeDestinationButton, motionEvent);
 
                 return false;
             }
         });
+
+        navigate.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                clickFX(navigate, motionEvent);
+
+                return false;
+            }
+        });
+
 
         // Navigate button
         navigate.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-
-                // If destination is set
-                if (finalDestination != null && coder != null && routePresenter != null) {
-                    if (finalDestination.getText() != null
-                            && !finalDestination.getText().equals("")) {
-
-                        routePresenter.sendLocation("" + finalDestination.getText().toString(),
-                                routeModel.getCheckpoints(), coder);
-
-                        if (history != null) {
-                            routePresenter.saveHistory(history, ""
-                                    + finalDestination.getText().toString());
-                        }
-
-
-
-
-                    } else {
-                        // If no destination is set
-                        dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
-                    }
-                }
+                startSpinner();
             }
-        });*/
+        });
 
         // Handles when user clicks "done" button on keyboard
         search.setOnKeyListener(new View.OnKeyListener() {
@@ -345,13 +323,7 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    history1.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    history1.setBackgroundColor(Color.TRANSPARENT);
-
-                }
+                clickFX(history1, motionEvent);
 
                 return false;
             }
@@ -372,13 +344,7 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    history2.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    history2.setBackgroundColor(Color.TRANSPARENT);
-
-                }
+                clickFX(history2, motionEvent);
 
                 return false;
             }
@@ -395,17 +361,14 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+
+
+
         history3.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    history3.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    history3.setBackgroundColor(Color.TRANSPARENT);
-
-                }
+                clickFX(history3, motionEvent);
 
                 return false;
             }
@@ -428,6 +391,15 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+
+        addButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                clickFX(addButton1, motionEvent);
+
+                return false;
+            }
+        });
 
         // When the user clicks the checkpoint selected
         addButton2.setOnClickListener(new View.OnClickListener() {
@@ -452,7 +424,32 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+        addButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                clickFX(addButton2, motionEvent);
 
+                return false;
+            }
+        });
+
+
+    }
+
+    /**
+     * Click effect for when a clickable is touched.
+     * @param view the controller clicked
+     * @param motionEvent up/down
+     */
+    public void clickFX(View view, MotionEvent motionEvent) {
+
+        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+            view.setBackgroundColor(Color.LTGRAY);
+
+        } else {
+            view.setBackgroundColor(Color.TRANSPARENT);
+
+        }
     }
 
     /**
