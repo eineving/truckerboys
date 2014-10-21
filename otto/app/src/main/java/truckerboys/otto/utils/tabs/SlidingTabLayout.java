@@ -28,6 +28,7 @@ import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -96,7 +97,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
     private Handler changeThemeHandler = new Handler(Looper.getMainLooper());
 
-    private boolean nonDistractionModeOn = false;
+    private boolean distractionMode = false;
     private ArrayList<TextView> tabTitles = new ArrayList<TextView>();
     private int tabTitleColor;
 
@@ -179,7 +180,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
      */
     public void setViewPager(ViewPager viewPager) {
         mTabStrip.removeAllViews();
-
+        Log.w("PAGER", "PAGER CHANGE!");
         mViewPager = viewPager;
         if (viewPager != null) {
             viewPager.setOnPageChangeListener(new InternalViewPagerListener());
@@ -218,6 +219,8 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
     private void populateTabStrip() {
+
+        Log.w("PAGER", "POPULATE TABS!");
         final PagerAdapter adapter = mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
 
@@ -278,7 +281,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if(nonDistractionModeOn){
+        if(distractionMode){
             if(ev.getX()>=mTabStrip.getChildAt(2).getX()-5){
                 return true;
             }
@@ -354,61 +357,48 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
      * @param driverDistractionLevel The distraction level
      */
     public void distractionLevelChanged(DriverDistractionLevel driverDistractionLevel){
+        Log.w("PAGER", "LEVEL CHANGED");
+
+        Runnable setAdapter = new Runnable() {
+            @Override
+            public void run() {
+                int item = mViewPager.getCurrentItem();
+                //mViewPager.setAdapter(mViewPager.getAdapter());
+
+                mViewPager.setAdapter(mViewPager.getAdapter());
+
+                if(item==1){
+                    mViewPager.setCurrentItem(1);
+                }else{
+                    mViewPager.setCurrentItem(0);
+                }
+                mViewPager.getAdapter().notifyDataSetChanged();
+            }
+        };
+
+        final int colour;
+
         if(driverDistractionLevel.getLevel()>1) {
-            nonDistractionModeOn = true;
-            Runnable setAdapter = new Runnable() {
-                @Override
-                public void run() {
-                    int item = mViewPager.getCurrentItem();
-                    mViewPager.setAdapter(mViewPager.getAdapter());
-                    if(item==1){
-                       mViewPager.setCurrentItem(1);
-                    }else{
-                       mViewPager.setCurrentItem(0);
-                    }
-                    mViewPager.getAdapter().notifyDataSetChanged();
-                }
-            };
-            getRootView().post(setAdapter);
-
-            Runnable r = new Runnable(){
-                @Override
-                public void run() {
-                    mTabStrip.setSelectedIndicatorColors(0xFFE51C23);
-                    for(int i = 2; i < tabTitles.size(); i++){
-                        tabTitles.get(i).setTextColor(0xFF9e9e9e);
-                    }
-                }
-            };
-            changeThemeHandler.post(r);
-
-        } else {
-            nonDistractionModeOn = false;
-            Runnable setAdapter = new Runnable() {
-                @Override
-                public void run() {
-                    int item = mViewPager.getCurrentItem();
-                    mViewPager.setAdapter(mViewPager.getAdapter());
-                    if(item==1){
-                        mViewPager.setCurrentItem(1);
-                    }else{
-                        mViewPager.setCurrentItem(0);
-                    }
-                    mViewPager.getAdapter().notifyDataSetChanged();
-                }
-            };
-            Runnable r = new Runnable(){
-                @Override
-                public void run() {
-                    mTabStrip.setSelectedIndicatorColors(0xFF33B5E5);
-                    for(int i = 2; i < tabTitles.size(); i++){
-                        tabTitles.get(i).setTextColor(tabTitleColor);
-                    }
-                }
-            };
-            changeThemeHandler.post(r);
-            getRootView().post(setAdapter);
+            distractionMode = true;
+            colour = 0xFFE51C23;
+        }else{
+            distractionMode = false;
+            colour = 0xFF33B5E5;
         }
+
+        Runnable r = new Runnable(){
+            @Override
+            public void run() {
+                mTabStrip.setSelectedIndicatorColors(colour);
+                for(int i = 2; i < tabTitles.size(); i++){
+                    tabTitles.get(i).setTextColor((distractionMode ? 0xFF9e9e9e :tabTitleColor));
+                }
+            }
+        };
+
+        changeThemeHandler.post(r);
+        getRootView().post(setAdapter);
+
     }
 
 }
