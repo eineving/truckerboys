@@ -26,13 +26,13 @@ public class MapLocation extends Location{
 
 
     /**
-     * Checks if the locations have the same coordinates.
-     * @param rhs Map location to compare with.
-     * @return true if the locations have the same coordinates.
+     * Compares two coordinates and checks if they are within 5 meters of eachother.
+     *
+     * @param rhs The location to compare with.
+     * @return True if distanceTo rhs is less than 5 meters.
      */
     public boolean equalCoordinates(MapLocation rhs) {
-        return (rhs.getLatitude() == getLatitude() && rhs.getLongitude() == getLongitude());
-
+        return distanceTo(rhs) < 10;
     }
     
     public LatLng getLatLng(){
