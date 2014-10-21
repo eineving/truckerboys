@@ -300,8 +300,14 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 float rot1 = bearings.get(0);
                 float rot2 = bearings.get(2);
 
-                float deltaRot = rot2 - rot1;
-                float step = (float)Math.min(deltaRot, 2*Math.PI - deltaRot) / INTERPOLATION_FREQ;
+                float deltaRot1 = rot2 - rot1;
+                float deltaRot2 = rot1 - rot2;
+                float step;
+                if(Math.abs(deltaRot1) < Math.abs(deltaRot2)){
+                    step = deltaRot1 / INTERPOLATION_FREQ;
+                } else {
+                    step = deltaRot2 / INTERPOLATION_FREQ;
+                }
 
                 float smoothBearing = rot1 + step * index;
 
