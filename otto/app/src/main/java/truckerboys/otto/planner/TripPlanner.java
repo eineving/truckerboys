@@ -172,14 +172,12 @@ public class
         Route directRoute = directionsProvider.getRoute(currentLocation, finalDestination, checkpoints);
 
         //If the truck does not have enough fuel to get to the first checkpoint
-        if (fuelTank.getMileage() * 1000 < directRoute.getCheckpoints().get(0).getDistance()) {
-
-        }
+        boolean gasStationNeeded = fuelTank.getMileage() * 1000 < directRoute.getCheckpoints().get(0).getDistance();
 
         //TODO Implement check if gas is enough for this session
         if (chosenStop != null) {
             //Setting the recommended as it will be in alternative stops
-            Route calculationRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5),false);
+            Route calculationRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5), gasStationNeeded);
             if (calculationRoute.getCheckpoints().size() > 0) {
                 alternativeLocations.add(calculationRoute.getCheckpoints().get(0));
             }
@@ -193,7 +191,7 @@ public class
 
             optimalRoute = directionsProvider.getRoute(currentLocation, finalDestination, tempCheckpoints);
 
-            alternativeLocations.addAll(calculateAlternativeStops(directRoute,
+            alternativeLocations.addAll(calculateAlternativeStops(directRoute, gasStationNeeded,
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
                     directRoute.getCheckpoints().get(0).getEta().dividedBy(3)));
         } else {
@@ -201,7 +199,7 @@ public class
             //Returns the direct route if ETA is shorter than the time you have left to drive
             if (directRoute.getCheckpoints().get(0).getEta().isShorterThan(sessionTimeLeft)) {
                 optimalRoute = directRoute;
-                alternativeLocations = (calculateAlternativeStops(directRoute,
+                alternativeLocations = (calculateAlternativeStops(directRoute, gasStationNeeded,
                         directRoute.getCheckpoints().get(0).getEta().dividedBy(2),
                         directRoute.getCheckpoints().get(0).getEta().dividedBy(3),
                         directRoute.getCheckpoints().get(0).getEta().dividedBy(4)));
@@ -209,8 +207,8 @@ public class
 
             //If there is no time left on this session
             else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
-                optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5),false);
-                alternativeLocations = calculateAlternativeStops(directRoute, Duration.standardMinutes(10),
+                optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5), gasStationNeeded);
+                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded ,Duration.standardMinutes(10),
                         Duration.standardMinutes(15), Duration.standardMinutes(20));
             }
 
@@ -220,18 +218,21 @@ public class
 
                 //If the ETA/2 is longer than time left on session
                 if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
-                    optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft(),false);
-                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
+                    optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft(), gasStationNeeded);
+                    alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded,
+                            sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
                 } else {
-                    optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2),false);
-                    alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3));
+                    optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2), gasStationNeeded);
+                    alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded, sessionTimeLeft,
+                            sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3));
                 }
             }
 
             //If the location is not within reach this day (drive maximum distance)
             else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL),false);
-                alternativeLocations = calculateAlternativeStops(directRoute, sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
+                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL), gasStationNeeded);
+                alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded,
+                        sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
             } else {
                 throw new InvalidRequestException("Something is not right here");
             }
@@ -264,7 +265,24 @@ public class
      * @param stopsETA    times that stops are wanted in.
      * @return list if stop locations
      */
-    private ArrayList<RouteLocation> calculateAlternativeStops(Route directRoute, Duration... stopsETA)
+    private ArrayList<RouteLocation> calculateAlternativeStops(Route directRoute, boolean gasStationNeeded, Duration... stopsETA)
+            throws InvalidRequestException, NoConnectionException {
+        if (gasStationNeeded) {
+            return calculateAlterantiveGasStations(directRoute, stopsETA[0], (fuelTank.getMileage() * 1000) / 2,
+                    (fuelTank.getMileage() * 1000) / 3, (fuelTank.getMileage() * 1000) / 4);
+        } else {
+            return calculateAlternativeRestLocations(directRoute, stopsETA);
+        }
+    }
+
+    /**
+     * Get a list of one stop location close to each wanted ETA.
+     *
+     * @param directRoute fastest route without rest locations added.
+     * @param stopsETA    times that stops are wanted in.
+     * @return list if stop locations
+     */
+    private ArrayList<RouteLocation> calculateAlternativeRestLocations(Route directRoute, Duration... stopsETA)
             throws InvalidRequestException, NoConnectionException {
         ArrayList<RouteLocation> incompleteInfo = new ArrayList<RouteLocation>();
         ArrayList<RouteLocation> completeInfo = new ArrayList<RouteLocation>();
@@ -362,7 +380,7 @@ public class
                     closeLocations = placesProvider.getNearbyGasStations(optimalLatLong);
                 }
             } else {
-                Route tempRoute = directionsProvider.getRoute(currentLocation, new MapLocation(optimalLatLong), null, null);
+                Route tempRoute = directionsProvider.getRoute(currentLocation, new MapLocation(optimalLatLong));
                 RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(),
                         Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance());
                 forcedLocation.setName("No name location");
@@ -434,22 +452,5 @@ public class
         }
         Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
         return coordinates.get(currentIndex);
-    }
-
-    /**
-     * Checks if a MapLocation already exists in an ArrayList
-     *
-     * @param location Location that you want to see if the list contains
-     * @param list     List that might contain given location
-     * @return True if list contains a location with the same coordinates as the location
-     */
-    private boolean locationExistsInList(MapLocation location, ArrayList<? extends
-            MapLocation> list) {
-        for (MapLocation temp : list) {
-            if (temp.getLatitude() == location.getLatitude() && temp.getLongitude() == location.getLongitude()) {
-                return true;
-            }
-        }
-        return false;
     }
 }
