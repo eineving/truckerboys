@@ -1,9 +1,8 @@
 package truckerboys.otto.clock;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 
+import truckerboys.otto.IView;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
@@ -11,7 +10,6 @@ import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 
 /**
@@ -52,11 +50,7 @@ public class ClockPresenter  implements IView, IEventListener {
         }
 
         if(event.isType(SetChosenStopEvent.class)){
-            if(model.setChosenStop(((SetChosenStopEvent)event).getStop())){
-                //No exceptions, the chosen stop was set
-            }else{
-                view.displayToast("No connection available");
-            }
+            model.setChosenStop(((SetChosenStopEvent) event).getStop());
         }
     }
 }
