@@ -1,4 +1,6 @@
-# OTTO: Onroad Time Tracking Optimizer
+# OTTO: Onroad Time Tracking Optimizer <img src=https://github.com/eineving/truckerboys/blob/develop/documentation/images/OTTOLogo.jpg alt="Logo" height="100px"/>
+
+
 
 #### Trucker Boys Project for DAT255 @ Chalmers University of Technology Fall 2014
 ### Relevant links
