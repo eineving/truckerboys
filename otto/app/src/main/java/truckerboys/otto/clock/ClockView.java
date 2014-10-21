@@ -53,7 +53,6 @@ public class ClockView extends Fragment {
 
     Boolean variablesSet = false;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
-    Instant timeNow;
 
     public ClockView() {}
 
@@ -151,8 +150,7 @@ public class ClockView extends Fragment {
      *
      * @param timeLeft The remaining time
      */
-    public void setTimeLeft(TimeLeft timeLeft, Instant timeNow) {
-        this.timeNow = timeNow;
+    public void setTimeLeft(TimeLeft timeLeft) {
         if (variablesSet) {
             timeL = getTimeAsFormattedString(timeLeft.getTimeLeft());
             if (timeLeft.getExtendedTimeLeft().getMillis() > 0) {
@@ -282,7 +280,7 @@ public class ClockView extends Fragment {
             return;
         }
         v.setVisibility(ViewGroup.VISIBLE);
-        Duration time = new Duration(timeNow, stop.getTimeOfArrival());
+        Duration time = new Duration(new Instant(), stop.getTimeOfArrival());
         if(time.getMillis()<0){
             time = Duration.ZERO;
         }

@@ -25,12 +25,9 @@ import truckerboys.otto.utils.positions.RouteLocation;
  */
 public class ClockModel {
 
-    private Instant lastTimeUpdate, timeNow;
-
     private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
     private RouteLocation recStop, nextDestination;
-    private long timeDifference;
 
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
@@ -45,56 +42,31 @@ public class ClockModel {
         this.regulationHandler = regulationHandler;
         this.user = user;
 
-        lastTimeUpdate = new Instant();
-        timeLeftDuration = new Duration(Duration.ZERO);
-        timeLeftExtendedDuration = new Duration(Duration.ZERO);
-        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
+        timeLeft = new TimeLeft(Duration.ZERO, Duration.ZERO);
 
         altStops = new ArrayList<RouteLocation>();
     }
 
     /**
-     * Updates the ETAs of the stops and the time left until violation
-     */
-    public void update() {
-        timeNow = new Instant();
-        timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
-        timeLeftDuration = timeLeftDuration.minus(timeDifference);
-        if(timeLeftDuration.getMillis()<0)
-            timeLeftDuration = Duration.ZERO;
-        timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
-        if(timeLeftExtendedDuration.getMillis()<0)
-            timeLeftExtendedDuration = Duration.ZERO;
-
-        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
-
-        lastTimeUpdate = timeNow;
-    }
-
-    /**
      * Sets the time left until violation and the stops.
-     * Called when the route is changed.
+     * Called when the route is changed or updated.
      */
     public void processChangedRoute() {
 
         try {
             route = tripPlanner.getRoute();
+            recStop = route.getRecommendedStop();
+            altStops = route.getAlternativeStops();
+
+            if(route.getCheckpoints() == null || route.getCheckpoints().size() == 0){
+                nextDestination = route.getFinalDestination();
+            }else{
+                nextDestination = route.getCheckpoints().get(0);
+            }
         }catch (NoActiveRouteException e){
             route = null;
         }
         timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
-        timeLeftDuration = timeLeft.getTimeLeft();
-        timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
-
-        //TODO Simon: What if exception
-        recStop = route.getRecommendedStop();
-        altStops = route.getAlternativeStops();
-
-        if(route.getCheckpoints() == null || route.getCheckpoints().size() == 0){
-            nextDestination = route.getFinalDestination();
-        }else{
-            nextDestination = route.getCheckpoints().get(0);
-        }
     }
 
     /**
@@ -134,10 +106,6 @@ public class ClockModel {
      */
     public TimeLeft getTimeLeft() {
         return timeLeft;
-    }
-
-    public Instant getTimeNow(){
-        return timeNow;
     }
 
     public Route getRoute(){
