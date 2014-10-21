@@ -20,6 +20,7 @@ package truckerboys.otto.utils.tabs;
  */
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
