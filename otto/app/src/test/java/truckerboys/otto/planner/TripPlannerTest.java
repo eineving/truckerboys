@@ -8,11 +8,14 @@ import org.joda.time.Duration;
 
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.directionsAPI.Route;
+import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
+import org.joda.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +35,6 @@ public class TripPlannerTest extends TestCase {
     private final MapLocation kiruna = new MapLocation(new LatLng(67.853702, 20.2564299));
     private final MapLocation stockholm = new MapLocation(new LatLng(59.3261419, 17.9875456));
 
-    //TODO how to create a user properly?
     private User user = new User(Robolectric.application);
     private TripPlanner tripPlanner;
 
@@ -45,6 +47,10 @@ public class TripPlannerTest extends TestCase {
         super.setUp();
         tripPlanner = new TripPlanner(euRegulationHandler, new GoogleDirections(), new GooglePlaces(), user);
 
+        Session session = new Session(SessionType.WORKING, Instant.now());
+        session.end();
+
+        user.getHistory().addSession(session);
     }
 
     @Test
@@ -71,7 +77,7 @@ public class TripPlannerTest extends TestCase {
         activeRoute = tripPlanner.getRoute();
 
         //First checkpoint should not have an ETA over 4,5 hours
-        assertFalse(activeRoute.getCheckpoints().get(1).getEta().isLongerThan(Duration.standardMinutes(270)));
+        assertFalse(activeRoute.getCheckpoints().get(0).getEta().isLongerThan(Duration.standardMinutes(270)));
 
         //These are out of reach within one session
         assertFalse(activeRoute.getRecommendedStop().equalCoordinates(kiruna));

@@ -47,7 +47,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     private Runnable statsUpdater = new Runnable() {
         public void run() {
 
-            restorePreferences();
+            restorePreferences(view.getActivity().getSharedPreferences(STATS, 0));
             loadUserHistory();
             updateHandler.postDelayed(statsUpdater, 600000); // Updates each 10min
         }
@@ -70,28 +70,39 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         EventTruck.getInstance().subscribe(view);
     }
 
+    public StatsView getView() {
+        return view;
+    }
+
+    public void setView(StatsView view) {
+        this.view = view;
+    }
+
+    public StatsModel getModel() {
+        return model;
+    }
+
     /**
      * Method for restoring the saved preferences from
      * the user statistics
      */
-    public void restorePreferences() {
-        SharedPreferences stats = view.getActivity().getSharedPreferences(STATS, 0);
+    public void restorePreferences(SharedPreferences stats) {
 
         // Gets the time driven today and time driven total
         double[] time = loadTime();
 
         // Gets today stats
-        double distanceByFuel = stats.getFloat("distanceByFuel", 0);
+        float distanceByFuel = stats.getFloat("distanceByFuel", 0);
 
         // Gets total stats
-        double distanceTotal = stats.getFloat("distanceTotal", 0);
-        double fuelTotal = stats.getFloat("fuelTotal", 0);
+        float distanceTotal = stats.getFloat("distanceTotal", 0);
+        float fuelTotal = stats.getFloat("fuelTotal", 0);
 
         // Gets total stats
         int violation = stats.getInt("violation", 0);
 
-        double[] statsToday = {time[0], 0, 0, distanceByFuel};
-        double[] statsTotal = {time[1], distanceTotal, fuelTotal, 0};
+        double[] statsToday = {time[0], 0, 0, (double)distanceByFuel};
+        double[] statsTotal = {time[1], (double)distanceTotal, (double)fuelTotal, 0};
 
         setStats(statsToday, statsTotal, violation);
 
@@ -163,6 +174,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
         view.clearSessionAdapter();
 
+
         // Update statsview with the new session string
         for(Session session : userHistory.getSessions()) {
 
@@ -177,13 +189,30 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
 
                 // Update statsview with the new session string
+                //TODO Fix this nullpointer
                 view.updateSessionHistory(sessionString);
 
             }
 
+
+            model.updateSessionHistory(sessionString);
         }
 
-        model.updateSessionHistory(sessionString);
+    }
+
+    /**
+     * Method for saving the current stats
+     * if the StatsView has stopped.
+     */
+    public void saveCurrentStats(SharedPreferences sharedPreferences) {
+        //SharedPreferences.Editor editor = view.getActivity().getSharedPreferences(STATS, 0).edit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putFloat("distanceTotal", (float)model.getDistanceTotal());
+        editor.putFloat("fuelTotal", (float)model.getFuelTotal());
+        editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
+
+        editor.commit();
     }
 
     @Override
@@ -191,14 +220,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
         // If the view has stopped grab stats data from model and store them in a shared pref. file
         if(event.isType(StatsViewStoppedEvent.class)) {
-
-            SharedPreferences.Editor editor = view.getActivity().getSharedPreferences(STATS, 0).edit();
-
-            editor.putFloat("distanceTotal", (float)model.getDistanceTotal());
-            editor.putFloat("fuelTotal", (float)model.getFuelToday());
-            editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
-
-            editor.commit();
+            saveCurrentStats(view.getActivity().getSharedPreferences(STATS,0));
         }
 
         // Starts the update loop (10min interval)
@@ -217,6 +239,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         }
 
     }
+
+
 
     /**
      * Listens to signals from the truck and sends
