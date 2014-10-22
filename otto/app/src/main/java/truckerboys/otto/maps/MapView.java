@@ -31,9 +31,11 @@ import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
+import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.FollowMarkerEvent;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.math.Double2;
 import truckerboys.otto.utils.positions.MapLocation;
@@ -47,7 +49,6 @@ import truckerboys.otto.vehicle.VehicleInterface;
 public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener, IDistractionListener {
 
     private View rootView;
-    private MapPresenter presenter;
 
     // Objects that identify everything that is visible on the map.
     private GoogleMap googleMap;
@@ -73,31 +74,19 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private int lastDistractionLevel;
 
     //region Camera Settings
-    public float CAMERA_TILT = 45f;
+    public float CAMERA_TILT = 60f;
     public float CAMERA_ZOOM = 16f; //Default to 16f zoom.
+    private boolean followMarker;
     //endregion
 
     //region Interpolation variables.
     // The frequency of the interpolation.
-    public static final int INTERPOLATION_FREQ = 25;
+    public static final int INTERPOLATION_FREQ = 50;
     // The step of the interpolation.
     private int index;
     private LinkedList<Double2> positions = new LinkedList<Double2>();
     private LinkedList<Float> bearings = new LinkedList<Float>();
     //endregion
-
-    @Override
-    public void onDestroyView() {
-
-        FragmentManager fm = getFragmentManager();
-
-        Fragment xmlFragment = fm.findFragmentById(R.id.map);
-        if (xmlFragment != null) {
-            fm.beginTransaction().remove(xmlFragment).commit();
-        }
-
-        super.onDestroyView();
-    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -105,6 +94,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
         EventTruck.getInstance().subscribe(this);
+
         // Subscribe to DistractionLevelChanged, since we want to change marker when having a high distraction level.
         VehicleInterface.subscribeToDistractionChange(this);
 
@@ -142,23 +132,24 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         nextCheckpointETAText = (TextView) rootView.findViewById(R.id.nextStopETA_text);
         nextCheckpointDistText = (TextView) rootView.findViewById(R.id.nextStopDistance_text);
 
-
+        //region StartRoute - OnClickListener
         startRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.startFollowRoute();
+                setFollowMarker(true);
                 showStartRouteDialog(false);
                 showActiveRouteDialog(true);
                 setAllGestures(false);
             }
         });
+        //endregion
 
         // Make the follow route button responsive.
         //region StartRoute - OnTouchListener
         startRoute.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     startRoute.setBackgroundColor(getResources().getColor(R.color.textLightest));
                 } else {
                     startRoute.setBackgroundColor(Color.TRANSPARENT);
@@ -169,11 +160,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         });
         //endregion
 
+        //region StopRoute - OnClickListener
         stopRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showActiveRouteDialog(false);
-                presenter.stopFollowRoute();
+                //presenter.stopFollowRoute();
+                setFollowMarker(false);
                 setAllGestures(true);
 
                 //If there currently is a route drawn on the map.
@@ -183,6 +176,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 }
             }
         });
+        //endregion
 
         return rootView;
     }
@@ -213,32 +207,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     /**
      * Helper method to move the camera across the map.
      *
-     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
-     * @param location The location to set the camera to.
-     * @param bearing  The bearing to set the camera to.
-     */
-    public void moveCamera(final boolean animate, final LatLng location, final float zoom, final float bearing, final int durationMs) {
-        if (googleMap != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (animate) {
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)), durationMs, null);
-                    } else {
-                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, zoom, CAMERA_TILT, bearing)));
-                    }
-                }
-            });
-
-        }
-    }
-
-    /**
-     * Helper method to move the camera across the map.
-     *
-     * @param animate  True if you want the camera to be animated across the map. False if it should just move instantly.
-     * @param location The location to set the camera to.
-     * @param bearing  The bearing to set the camera to.
+     * @param cameraUpdate The camera update object to base the camera movement on.
+     * @param cancelableCallback The callback that is to be called onCancel and onFinish.
      */
     public void moveCamera(CameraUpdate cameraUpdate, GoogleMap.CancelableCallback cancelableCallback) {
         if (googleMap != null) {
@@ -331,7 +301,14 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 float rot1 = bearings.get(0);
                 float rot2 = bearings.get(2);
 
-                float step = (rot2 - rot1) / INTERPOLATION_FREQ;
+                float deltaRot1 = rot2 - rot1;
+                float deltaRot2 = rot1 - rot2;
+                float step;
+                if(Math.abs(deltaRot1) < Math.abs(deltaRot2)){
+                    step = deltaRot1 / INTERPOLATION_FREQ;
+                } else {
+                    step = deltaRot2 / INTERPOLATION_FREQ;
+                }
 
                 float smoothBearing = rot1 + step * index;
 
@@ -358,9 +335,27 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void performEvent(Event event) {
+        /**
+         * When the LocationHandler registers that the location has changed, we fire an GPSUpdateEvent.
+         * We need to catch this here in order to move the camera, interpolate the markers etc.
+         */
         //region GPSUpdateEvent
         if (event.isType(GPSUpdateEvent.class)) {
             final MapLocation newLocation = ((GPSUpdateEvent) event).getNewPosition();
+
+            //region Adjust zoom to speed
+            if(isFollowingMarker()) {
+                if (newLocation.getSpeed() <= 8.33 /* ca 30km/h */) {
+                    CAMERA_ZOOM = 17f;
+                } else if (newLocation.getSpeed() > 8.3 && newLocation.getSpeed() <= 13.88 /* ca 50km/h */) {
+                    CAMERA_ZOOM = 16.5f;
+                } else if (newLocation.getSpeed() > 13.88 && newLocation.getSpeed() <= 19.44/* 70km/h */) {
+                    CAMERA_ZOOM = 14.5f;
+                } else if (newLocation.getSpeed() > 19.44) {
+                    CAMERA_ZOOM = 14f;
+                }
+            }
+            //endregion
 
             // If we just initiated the map, we should move to first received GPS position.
             // For better user experience. (THIS ONLY HAPPENS ONCE)
@@ -389,6 +384,18 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         CAMERA_ZOOM = cameraPosition.zoom;
     }
 
+    @Override
+    public void onDestroyView() {
+        FragmentManager fm = getFragmentManager();
+
+        Fragment xmlFragment = fm.findFragmentById(R.id.map);
+        if (xmlFragment != null) {
+            fm.beginTransaction().remove(xmlFragment).commit();
+        }
+
+        super.onDestroyView();
+    }
+
     /**
      * Set the new route to draw.
      *
@@ -398,15 +405,45 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //Add all new steps.
-                routePolyline.setPoints(route.getDetailedPolyline());
+            //Add all new steps.
+            routePolyline.setPoints(route.getDetailedPolyline());
             }
         });
-
     }
 
-    public void setPresenter(MapPresenter presenter) {
-        this.presenter = presenter;
+    public boolean isFollowingMarker(){
+        return followMarker;
+    }
+
+    /**
+     * Specifies that the camera should follow the marker, if it should follow the marker it zooms in
+     * on the marker and then starts following it.
+     *
+     * @param follow True if camera should follow the marker.
+     */
+    private void setFollowMarker(final boolean follow){
+        if(follow) {
+            moveCamera(
+                    CameraUpdateFactory.newCameraPosition(new CameraPosition(
+                            LocationHandler.getCurrentLocationAsLatLng(),
+                            17f,
+                            CAMERA_TILT,
+                            LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
+                    new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            //Make the camera follow the marker when we finished zooming in to marker.
+                            followMarker = true;
+                        }
+
+                        @Override
+                        public void onCancel() {
+                        }
+                    }
+            );
+        } else {
+            followMarker = false;
+        }
     }
 
     private void setAllGestures(final boolean value){
@@ -444,20 +481,40 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     }
 
+    public void showStopRoute(final boolean visibility){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopRoute.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
+    }
+
     @Override
     public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(driverDistractionLevel.getLevel() >= 1 && lastDistractionLevel < 1) /* High distraction level */{
+                if(driverDistractionLevel.getLevel() >= 2 && lastDistractionLevel < 2) /* High distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
-                    System.out.println("changed Distraction Level: " + driverDistractionLevel.getLevel());
-                } else if(driverDistractionLevel.getLevel() < 1 && lastDistractionLevel >= 1) /* Low distraction level */ {
+
+                    setFollowMarker(true);
+
+                    // Simulate that we click the follow route button.
+                    showStartRouteDialog(false);
+                    showActiveRouteDialog(false);
+                    setAllGestures(false);
+                } else if(driverDistractionLevel.getLevel() < 2 && lastDistractionLevel >= 2) /* Low distraction level */ {
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
-                    System.out.println("changed Distraction Level: " + driverDistractionLevel.getLevel() + " woop");
+
+                    //Make it possible for the driver to exit "Follow Marker Mode"
+                    showActiveRouteDialog(true);
+                    showStopRoute(true);
                 }
             }
         });
+
+        lastDistractionLevel = driverDistractionLevel.getLevel();
     }
 
     public void setFinalDestinationText(final String text) {
