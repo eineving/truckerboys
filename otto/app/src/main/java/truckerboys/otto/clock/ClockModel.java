@@ -1,11 +1,8 @@
 package truckerboys.otto.clock;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
@@ -16,7 +13,6 @@ import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -25,7 +21,6 @@ import truckerboys.otto.utils.positions.RouteLocation;
  */
 public class ClockModel {
 
-    private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
     private RouteLocation recStop, nextDestination;
 
@@ -89,14 +84,32 @@ public class ClockModel {
         return nextDestination;
     }
 
-    public boolean setChosenStop(RouteLocation stop){
+    public void setChosenStop(final RouteLocation stop){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tripPlanner.setChoosenStop(stop);
+                }catch (InvalidRequestException e){
+                    //Will never be thrown
+                }catch (NoConnectionException e){
+                    //Will never be thrown because if the app has no connection
+                    // the view will have changed and the button to
+                    // choose a stop won't be displayed
+                }
+            }
+        }).start();
+    }
+
+    private void tryChosenStop(RouteLocation stop){
         try {
             tripPlanner.setChoosenStop(stop);
-            return true;
         }catch (InvalidRequestException e){
-            return false;
+            //Will never be thrown
         }catch (NoConnectionException e){
-            return false;
+            //Will never be thrown because if the app has no connection
+            // the view will have changed and the button to
+            // choose a stop won't be displayed
         }
     }
 

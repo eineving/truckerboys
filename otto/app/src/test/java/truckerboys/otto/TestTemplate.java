@@ -7,7 +7,7 @@ import org.robolectric.annotation.Config;
 /**
  * Created by Simon Petersson on 2014-09-24.
  * This test is just a template for other tests to use. The important parts are the
- * @Config(emulateSdk = 18) before the class definiton, this is NEEDED in order for gradle
+ * @Config(emulateSdk = 18) before the class definition, this is NEEDED in order for gradle
  * to be able to compile the test.
  *
  * You also need to define: @RunWith(RobolectricTestRunner.class) in order for gradle to know
