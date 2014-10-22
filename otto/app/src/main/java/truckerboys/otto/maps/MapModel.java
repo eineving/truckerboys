@@ -3,6 +3,7 @@ package truckerboys.otto.maps;
 import android.location.Address;
 import android.location.Location;
 import android.os.Handler;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -74,31 +75,37 @@ public class MapModel implements IEventListener {
         //region GPSUpdateEvent
         if (event.isType(GPSUpdateEvent.class)) {
             GPSUpdateEvent gpsUpdateEvent = (GPSUpdateEvent) event;
+            //Save the position received from the GPS.
+            MapLocation newPosition = gpsUpdateEvent.getNewPosition();
 
-            /**
-             * Check if we've passed the upcoming checkpoint on the route.
-             */
-            // If we have route and checkpoints in route.
-            if(getRoute() != null && getRoute().getCheckpoints().size() > 0) {
-                // If we got in range of the checkpoint since last update.
-                if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) < DISTANCE_FROM_CHECKPOINT && !closeToCheckpoint) {
-                    closeToCheckpoint = true;
-                } else if (closeToCheckpoint) /* We're currently in range. */ {
-                    try {
+
+            //region Check if we've passed the upcoming checkpoint on the route.
+            try {
+                // If we have route and checkpoints in route.
+                if (getRoute().getCheckpoints().size() > 0) {
+
+                    //Next checkpoint on the route.
+                    RouteLocation nextCheckpoint = getRoute().getCheckpoints().get(0);
+
+                    // If we got in range of the checkpoint since last GPS update.
+                    if (newPosition.distanceTo(nextCheckpoint) < DISTANCE_FROM_CHECKPOINT &&!closeToCheckpoint) {
+                        closeToCheckpoint = true;
+                    } else if (closeToCheckpoint) /* We're currently in range. */ {
                         // We left checkpoint range again, calculate new route to final destination.
-                        if (gpsUpdateEvent.getNewPosition().distanceTo(getRoute().getCheckpoints().get(0)) > DISTANCE_FROM_CHECKPOINT) {
+                        if (newPosition.distanceTo(nextCheckpoint) > DISTANCE_FROM_CHECKPOINT) {
                             tripPlanner.updateRoute(LocationHandler.getCurrentLocationAsMapLocation());
                             closeToCheckpoint = false;
                         }
-                    } catch (InvalidRequestException e) {
-                        //TODO Create proper catch
-                        e.printStackTrace();
-                    } catch (NoConnectionException e) {
-                        //TODO Create proper catch
-                        e.printStackTrace();
                     }
                 }
+            } catch (NoConnectionException e) {
+                //TODO Show a "Bad connection" symbol in view?
+            } catch (NoActiveRouteException e) {
+                // Driver has not defined a route, no need to calculate if we've passed checkpoints.
+            } catch (InvalidRequestException e) {
+                
             }
+            //endregion
         }
         //endregion
 
@@ -107,14 +114,14 @@ public class MapModel implements IEventListener {
          * the user presses 'Navigate'). We need to pass all this information to the TripPlanner making it calculate
          * a new route with the information we provide.
          */
-        //region NewRouteEvent (This event is fired when the user requests a new route from RouteActivity.)
+        //region NewRouteEvent
         if (event.isType(RouteRequestEvent.class)) {
             try {
                 // We get the checkpoints as adresses in RouteRequestEvent.
                 // Convert them to MapLocations making it possible to send them into the TripPlanner.
                 ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
                 for (Address address : ((RouteRequestEvent) event).getCheckpoints()) {
-                   checkpoints.add(new MapLocation(new LatLng(address.getLatitude(), address.getLongitude())));
+                    checkpoints.add(new MapLocation(new LatLng(address.getLatitude(), address.getLongitude())));
                 }
 
                 // Tell the TripPlanner to calculate a new route with the information we provide.
@@ -134,13 +141,7 @@ public class MapModel implements IEventListener {
         //endregion
     }
 
-    public Route getRoute() {
-        try {
-            return tripPlanner.getRoute();
-        } catch (NoActiveRouteException e) {
-            //TODO catch this properly!!!
-            e.printStackTrace();
-            return null;
-        }
+    public Route getRoute() throws NoActiveRouteException {
+        return tripPlanner.getRoute();
     }
 }

@@ -19,6 +19,7 @@ import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.FollowMarkerEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -92,8 +93,12 @@ public class MapPresenter implements IEventListener, IView {
          */
         //region ChangedRouteEvent
         if (event.isType(ChangedRouteEvent.class)) {
-            mapView.setRoute(mapModel.getRoute());
-            mapView.setMarkers(mapModel.getRoute().getCheckpoints());
+            try {
+                mapView.setRoute(mapModel.getRoute());
+                mapView.setMarkers(mapModel.getRoute().getCheckpoints());
+            } catch (NoActiveRouteException e) {
+                //TODO Make proper catch.
+            }
         }
         //endregion
 
@@ -106,33 +111,42 @@ public class MapPresenter implements IEventListener, IView {
         if(event.isType(RouteRequestEvent.class)){
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
-            mapView.setFinalDestinationText(mapModel.getRoute().getFinalDestination().getAddress());
-            mapView.setFinalDestinationDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
-            mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
-            mapView.showStartRouteDialog(true);
+            try {
+                mapView.setFinalDestinationText(mapModel.getRoute().getFinalDestination().getAddress());
+                mapView.setFinalDestinationDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
+                mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
+                mapView.showStartRouteDialog(true);
 
-            // If we have any checkpoints in the new route, display the first one as the truck starts to move.
-            if(!mapModel.getRoute().getCheckpoints().isEmpty()) {
-                // Get first checkpoint
-                RouteLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
+                // If we have any checkpoints in the new route, display the first one as the truck starts to move.
+                if(!mapModel.getRoute().getCheckpoints().isEmpty()) {
+                    // Get first checkpoint
+                    RouteLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
 
-                // Display the adress of the first checkpoint to the driver.
-                mapView.setNextCheckpointText(firstCheckpoint.getName());
-                mapView.setNextCheckpointDistText(firstCheckpoint.getDistance() + "");
-                mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardMinutes() + "");
-            } else {
-                // If we didn't have any checkpoints in the new route, we display the next checkpoint as the final destination.
-                mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getName());
-                mapView.setNextCheckpointETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
-                mapView.setNextCheckpointDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
+                    // Display the adress of the first checkpoint to the driver.
+                    mapView.setNextCheckpointText(firstCheckpoint.getName());
+                    mapView.setNextCheckpointDistText(firstCheckpoint.getDistance() + "");
+                    mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardMinutes() + "");
+                } else {
+                    // If we didn't have any checkpoints in the new route, we display the next checkpoint as the final destination.
+                    mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getName());
+                    mapView.setNextCheckpointETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
+                    mapView.setNextCheckpointDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
+                }
+
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(LocationHandler.getCurrentLocationAsLatLng());
+                builder.include(new LatLng(routeRequestEvent.getFinalDestion().getLatitude(), routeRequestEvent.getFinalDestion().getLongitude()));
+                LatLngBounds bounds = builder.build();
+
+                mapView.moveCamera(true, bounds);
+
+            } catch (NoActiveRouteException e) {
+                // It's stupid to fire a RouteRequestEvent without an active route. But if it happens,
+                // Make sure all dialogs are hidden, making sure the user doesn't see any incorrect information.
+                mapView.showStartRouteDialog(false);
+                mapView.showActiveRouteDialog(false);
+                mapView.showStopRoute(false);
             }
-
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            builder.include(LocationHandler.getCurrentLocationAsLatLng());
-            builder.include(new LatLng(routeRequestEvent.getFinalDestion().getLatitude(), routeRequestEvent.getFinalDestion().getLongitude()));
-            LatLngBounds bounds = builder.build();
-
-            mapView.moveCamera(true, bounds);
         }
         //endregion
 
