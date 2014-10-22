@@ -74,7 +74,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private int lastDistractionLevel;
 
     //region Camera Settings
-    public float CAMERA_TILT = 45f;
+    public float CAMERA_TILT = 60f;
     public float CAMERA_ZOOM = 16f; //Default to 16f zoom.
     private boolean followMarker;
     //endregion
@@ -382,7 +382,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         CAMERA_ZOOM = cameraPosition.zoom;
-        System.out.println("Camera Bearing: " + cameraPosition.bearing);
     }
 
     @Override
@@ -406,8 +405,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //Add all new steps.
-                routePolyline.setPoints(route.getDetailedPolyline());
+            //Add all new steps.
+            routePolyline.setPoints(route.getDetailedPolyline());
             }
         });
     }
@@ -427,7 +426,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             moveCamera(
                     CameraUpdateFactory.newCameraPosition(new CameraPosition(
                             LocationHandler.getCurrentLocationAsLatLng(),
-                            18f,
+                            17f,
                             CAMERA_TILT,
                             LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
                     new GoogleMap.CancelableCallback() {
