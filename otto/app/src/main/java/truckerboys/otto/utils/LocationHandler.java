@@ -1,7 +1,6 @@
 package truckerboys.otto.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -12,8 +11,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 
-import truckerboys.otto.NoConnectionActivity;
-import truckerboys.otto.newroute.RouteActivity;
 import truckerboys.otto.utils.eventhandler.EventTruck;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.positions.MapLocation;
