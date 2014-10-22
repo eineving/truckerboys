@@ -48,7 +48,7 @@ public class
 
     private MapLocation currentLocation;
 
-    private FuelTankInfo fuelTank = new FuelTankInfo(200);
+    private FuelTankInfo fuelTank = new FuelTankInfo(1000);
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
@@ -208,7 +208,7 @@ public class
             //If there is no time left on this session
             else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
                 optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5), gasStationNeeded);
-                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded ,Duration.standardMinutes(10),
+                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded, Duration.standardMinutes(10),
                         Duration.standardMinutes(15), Duration.standardMinutes(20));
             }
 
@@ -219,19 +219,19 @@ public class
                 //If the ETA/2 is longer than time left on session
                 if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
                     optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft(), gasStationNeeded);
-                    alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded,
+                    alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded,
                             sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
                 } else {
                     optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2), gasStationNeeded);
-                    alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded, sessionTimeLeft,
+                    alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded, sessionTimeLeft,
                             sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3));
                 }
             }
 
             //If the location is not within reach this day (drive maximum distance)
             else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL), gasStationNeeded);
-                alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded,
+                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft(), gasStationNeeded);
+                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded,
                         sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
             } else {
                 throw new InvalidRequestException("Something is not right here");
@@ -243,6 +243,7 @@ public class
                 displayedRecommended = optimalRoute.getFinalDestination();
             }
         }
+
         //TODO delete these
         int index = 0;
         Log.w("NbrOfAlternative", alternativeLocations.size() + "");
@@ -422,7 +423,7 @@ public class
      * @param withinDistance Distance that the LatLng has to be within in meters.
      * @return The coordinate that matches time left the best.
      */
-    private LatLng findLatLngWithinReach(Route directRoute, Duration timeLeft, int withinDistance) throws InvalidRequestException, NoConnectionException {
+    private LatLng findLatLngWithinReachOld(Route directRoute, Duration timeLeft, int withinDistance) throws InvalidRequestException, NoConnectionException {
         ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
@@ -452,5 +453,60 @@ public class
         }
         Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
         return coordinates.get(currentIndex);
+    }
+
+    /**
+     * Find the coordinate on the polyline that have the smallest delta value from the time and distance left.
+     *
+     * @param directRoute    Route from Google Directions without any rest or gas stops.
+     * @param timeLeft       ETA that the coordinate should be close to.
+     * @param withinDistance Distance that the LatLng has to be within in meters.
+     * @return The coordinate that matches time left the best.
+     */
+    private LatLng findLatLngWithinReach(Route directRoute, Duration timeLeft, int withinDistance)
+            throws InvalidRequestException, NoConnectionException {
+
+        double[] divider = {0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.750, 0.875, 1};
+        ArrayList<LatLng> coordinates = directRoute.getDetailedPolyline();
+        int[] index = new int[9];
+        int topIndex = coordinates.size() - 1;
+        int bottomIndex = 0;
+        Route routeToLatLng;
+
+        // Type of binary search with eight instead of two parts to minimize google requests
+        do {
+            LatLng[] baseLatLng = new LatLng[9];
+
+            for (int i = 0; i < 9; i++) {
+                index[i] = (int) ((topIndex - bottomIndex) * divider[i] + bottomIndex);
+                baseLatLng[i] = coordinates.get(index[i]);
+            }
+
+            ArrayList<MapLocation> tempLocations = new ArrayList<MapLocation>();
+            for (int i = 1; i < 8; i++) {
+                tempLocations.add(new MapLocation(baseLatLng[i]));
+            }
+            routeToLatLng = directionsProvider.getRoute(new MapLocation(baseLatLng[0]), new MapLocation(baseLatLng[8]), tempLocations);
+
+            for (int i = 0; i < 8; i++) {
+                //Checks if the LatLng matches end conditions
+                if ((routeToLatLng.getCheckpoints().get(i).getEta().isLongerThan(timeLeft.minus(Duration.standardMinutes(10))) &&
+                        routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft)) ||
+                        routeToLatLng.getCheckpoints().get(i).getDistance() > withinDistance + 10000 &&
+                                routeToLatLng.getCheckpoints().get(i).getDistance() < withinDistance) {
+                    return routeToLatLng.getCheckpoints().get(i).getLatLng();
+                }
+
+                if (routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft.minus(Duration.standardMinutes(10))) &&
+                        routeToLatLng.getCheckpoints().get(i).getDistance() < withinDistance) {
+                    bottomIndex = index[i];
+                } else {
+                    topIndex = index[i];
+                    break;
+                }
+            }
+        } while (topIndex - bottomIndex > 1);
+
+        return directRoute.getDetailedPolyline().get(bottomIndex);
     }
 }
