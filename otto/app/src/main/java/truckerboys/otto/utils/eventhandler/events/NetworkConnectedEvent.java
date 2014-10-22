@@ -1,5 +1,7 @@
 package truckerboys.otto.utils.eventhandler.events;
 
+import truckerboys.otto.utils.eventhandler.EventType;
+
 /**
  * Created by Simon Petersson on 2014-10-21.
  *
@@ -10,7 +12,7 @@ public class NetworkConnectedEvent extends Event {
     private boolean connected;
 
     public NetworkConnectedEvent(boolean connected) {
-        super();
+        super(EventType.CONNECTION);
         this.connected = connected;
     }
 

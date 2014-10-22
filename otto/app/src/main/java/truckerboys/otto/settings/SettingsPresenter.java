@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
@@ -17,7 +17,7 @@ import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
  * Created by Mikael Malmqvist on 2014-09-18.
  * Presenter handling logic between settingsView and settingsModel
  */
-public class SettingsPresenter implements IEventListener{
+public class SettingsPresenter {
     private SettingsModel model;
 
     private SharedPreferences settings;
@@ -25,10 +25,6 @@ public class SettingsPresenter implements IEventListener{
     public SettingsPresenter(SharedPreferences settings){
         this.model = new SettingsModel();
         this.settings = settings;
-
-
-
-        EventTruck.getInstance().subscribe(this);
     }
 
     public void setListeners(Switch sound, Switch display, final EditText tankSize) {
@@ -74,8 +70,7 @@ public class SettingsPresenter implements IEventListener{
         // Commit the changes
         settingsEditor.commit();
 
-        EventTruck.getInstance().newEvent(new SettingsChangedEvent());
-
+        EventBuss.getInstance().newEvent(new SettingsChangedEvent());
     }
 
 
@@ -86,7 +81,7 @@ public class SettingsPresenter implements IEventListener{
     public void soundChanged(boolean sound) {
 
         // Fire an event with new sound mode on/off
-        EventTruck.getInstance().newEvent(new SoundChangedEvent(sound));
+        EventBuss.getInstance().newEvent(new SoundChangedEvent(sound));
 
     }
 
@@ -116,13 +111,5 @@ public class SettingsPresenter implements IEventListener{
 
     public SettingsModel getModel() {
         return model;
-    }
-
-    @Override
-    public void performEvent(Event event) {
-        if(event.isType(SoundChangedEvent.class)) {
-
-        }
-
     }
 }

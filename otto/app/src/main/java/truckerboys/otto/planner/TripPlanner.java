@@ -15,7 +15,7 @@ import truckerboys.otto.directionsAPI.IDirections;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.IPlaces;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.exceptions.CheckpointNotFoundException;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
@@ -67,7 +67,7 @@ public class
     public void updateRoute(MapLocation currentLocation) throws InvalidRequestException, NoConnectionException {
         this.currentLocation = currentLocation;
         activeRoute = getCalculatedRoute();
-        EventTruck.getInstance().newEvent(new ChangedRouteEvent());
+        EventBuss.getInstance().newEvent(new ChangedRouteEvent());
     }
 
     /**
@@ -94,7 +94,7 @@ public class
     public void setChoosenStop(RouteLocation chosenStop) throws InvalidRequestException, NoConnectionException {
         this.chosenStop = chosenStop;
         activeRoute = getCalculatedRoute();
-        EventTruck.getInstance().newEvent(new ChangedRouteEvent());
+        EventBuss.getInstance().newEvent(new ChangedRouteEvent());
     }
 
     /**

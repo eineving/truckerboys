@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import truckerboys.otto.R;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.events.NewRouteClickedEvent;
 
 /**
@@ -59,7 +59,7 @@ public class HomeView extends Fragment {
 
             public void onClick(View v) {
 
-                EventTruck.getInstance().newEvent(new NewRouteClickedEvent());
+                EventBuss.getInstance().newEvent(new NewRouteClickedEvent());
 
             }
         });

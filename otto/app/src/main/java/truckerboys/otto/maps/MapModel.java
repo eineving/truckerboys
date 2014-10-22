@@ -1,20 +1,17 @@
 package truckerboys.otto.maps;
 
 import android.location.Address;
-import android.location.Location;
 import android.os.Handler;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
@@ -59,7 +56,7 @@ public class MapModel implements IEventListener {
 
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.GPS_UPDATE, EventType.ROUTE);
         //TODO Uncomment
         //updateRouteHandler.post(updateRoute);
     }

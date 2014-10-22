@@ -1,5 +1,7 @@
 package truckerboys.otto.utils.eventhandler.events;
 
+import truckerboys.otto.utils.eventhandler.EventType;
+
 /**
  * Created by Simon Petersson on 2014-10-21.
  *
@@ -7,18 +9,7 @@ package truckerboys.otto.utils.eventhandler.events;
  */
 public class GPSConnectedEvent extends Event {
 
-    private boolean connected;
-
-    public GPSConnectedEvent(boolean connected) {
-        super();
-        this.connected = connected;
-    }
-
-    /**
-     * Returns whether or not the device is currently connected to the GPS.
-     * @return True if the device has GPS/Network connectvitiy.
-     */
-    public boolean isConnected(){
-        return connected;
+    public GPSConnectedEvent() {
+        super(EventType.CONNECTION);
     }
 }

@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 import truckerboys.otto.utils.positions.RouteLocation;
 
@@ -109,17 +109,17 @@ public class ClockView extends Fragment {
                 if (tag.equalsIgnoreCase("firstAltStop")) {
                     viewSwitcher.showPrevious();
                     startSpinner();
-                    EventTruck.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
+                    EventBuss.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
                 }
                 if (tag.equalsIgnoreCase("secAltStop")) {
                     viewSwitcher.showPrevious();
                     startSpinner();
-                    EventTruck.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
+                    EventBuss.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
                 }
                 if(tag.equalsIgnoreCase("thirdAltStop")){
                     viewSwitcher.showPrevious();
                     startSpinner();
-                    EventTruck.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
+                    EventBuss.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
                 }
             }
         };

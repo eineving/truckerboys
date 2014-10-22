@@ -1,22 +1,19 @@
 package truckerboys.otto.home;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import truckerboys.otto.IView;
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
-import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.newroute.RouteActivity;
-import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.NewRouteClickedEvent;
@@ -40,9 +37,7 @@ public class HomePresenter implements IView, IEventListener {
         this.user = user;
         this.handler = handler;
 
-
-
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.BUTTON_CLICKED);
     }
 
 

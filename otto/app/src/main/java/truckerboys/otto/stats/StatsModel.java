@@ -1,16 +1,6 @@
 package truckerboys.otto.stats;
 
-import android.widget.LinearLayout;
-
 import java.util.ArrayList;
-
-import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventTruck;
-import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
-import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
-import truckerboys.otto.utils.eventhandler.events.UpdateSessionHistoryEvent;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.

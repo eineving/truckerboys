@@ -18,7 +18,8 @@ import truckerboys.otto.IView;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -66,8 +67,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER,VehicleSignalID.TOTAL_VEHICLE_DISTANCE);
 
 
-        EventTruck.getInstance().subscribe(this);
-        EventTruck.getInstance().subscribe(view);
+        EventBuss.getInstance().subscribe(this, EventType.STATISTICS);
+        EventBuss.getInstance().subscribe(view, EventType.STATISTICS);
     }
 
     public StatsView getView() {
@@ -261,7 +262,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 // Gets the total distance by fuel and updates the listeners
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
 
-                EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
+                EventBuss.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
                 statsEditor.putFloat("distanceByFuel", kmPerLiter);
 
                 statsEditor.commit();
@@ -274,7 +275,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 // Gets the total distance and updates the listeners
                 long distance = ((SCSLong) signal.getData()).getLongValue();
 
-                EventTruck.getInstance().newEvent(new TotalDistanceEvent(distance));
+                EventBuss.getInstance().newEvent(new TotalDistanceEvent(distance));
 
                 statsEditor.putFloat("distanceTotal", distance);
                 statsEditor.commit();

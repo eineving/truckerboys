@@ -18,7 +18,7 @@ import org.joda.time.Instant;
 
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -80,7 +80,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         // Restores preferences for settings in presenter
-        EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
+        EventBuss.getInstance().newEvent(new RestorePreferencesEvent());
 
         return rootView;
     }
@@ -134,7 +134,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
-        EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
+        EventBuss.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
     }
 
     /**
@@ -146,7 +146,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
         super.onStop();
 
         // Notifies the presenter that the view has stopped
-        EventTruck.getInstance().newEvent(new StatsViewStoppedEvent());
+        EventBuss.getInstance().newEvent(new StatsViewStoppedEvent());
 
     }
 
