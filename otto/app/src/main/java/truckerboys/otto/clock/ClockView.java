@@ -44,7 +44,8 @@ public class ClockView extends Fragment {
     ProgressDialog spinnerDialog;
 
     TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, thirdAltStopETA,
-            recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle;
+            recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle, timeTitle,
+            altStopsTitle;
     ImageView recStopImage, firstAltStopImage, secAltStopImage, thirdAltStopImage;
     RelativeLayout firstAltStopClick, secAltStopClick, thirdAltStopClick;
     LinearLayout alternativeStopsButton, backButton;
@@ -53,7 +54,7 @@ public class ClockView extends Fragment {
 
     ArrayList<RouteLocation> altStops = new ArrayList<RouteLocation>();
 
-    Boolean variablesSet = false;
+    Boolean variablesSet = false, nextDestinationIsFinal;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
     public ClockView() {}
@@ -78,7 +79,9 @@ public class ClockView extends Fragment {
         timeLeft = (TextView) rootView.findViewById(R.id.clockETA);
         timeLeftExtended = (TextView) rootView.findViewById(R.id.clockETAExtended);
 
+        timeTitle = (TextView) rootView.findViewById(R.id.timeTitle);
         recStopTitle = (TextView) rootView.findViewById(R.id.recStopTitle);
+        altStopsTitle = (TextView) rootView.findViewById(R.id.altStopsTitle);
 
         recStopETA = (TextView) rootView.findViewById(R.id.recStopETA);
         firstAltStopETA = (TextView) rootView.findViewById(R.id.firstAltStopETA);
@@ -226,8 +229,20 @@ public class ClockView extends Fragment {
      * Sets the next destination of the route
      * @param nextDestination The next destination
      */
-    public void setNextDestination(RouteLocation nextDestination){
+    public void setNextDestination(RouteLocation nextDestination, boolean nextDestinationIsFinal){
         this.nextDestination = nextDestination;
+        this.nextDestinationIsFinal = nextDestinationIsFinal;
+        System.out.println("Nextisfinal setNext: " + nextDestinationIsFinal);
+    }
+
+    public void setOnBreak(boolean isOnBreak){
+        if(variablesSet) {
+            if (isOnBreak) {
+                timeTitle.setText("Break time left");
+            } else {
+                timeTitle.setText("Time to break");
+            }
+        }
     }
 
     /**
@@ -267,10 +282,24 @@ public class ClockView extends Fragment {
             recStopETA.setText(getTimeAsFormattedString(nextDestination.getEta()));
             recStopName.setText(nextDestination.getAddress());
             recStopImage.setVisibility(TextView.GONE);
+            System.out.println("Next final setlabels " + nextDestinationIsFinal);
+            if(nextDestinationIsFinal) {
+                recStopTitle.setText("Destination");
+            }else{
+                recStopTitle.setText("Next");
+            }
             v.setVisibility(ViewGroup.VISIBLE);
             alternativeStopsButton.setVisibility(View.VISIBLE);
+            altStopsTitle.setText("Add stop");
 
         }else{
+            if(nextDestination.getAddress()==recStop.getAddress()){
+                recStopTitle.setText("Destination");
+                altStopsTitle.setText("Add stop");
+            }else{
+                recStopTitle.setText("Next");
+                altStopsTitle.setText("Alternatives");
+            }
             setStopUI(recStop, recStopETA, recStopName, recStopImage);
         }
 
