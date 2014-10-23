@@ -232,15 +232,18 @@ public class ClockView extends Fragment {
     public void setNextDestination(RouteLocation nextDestination, boolean nextDestinationIsFinal){
         this.nextDestination = nextDestination;
         this.nextDestinationIsFinal = nextDestinationIsFinal;
-        System.out.println("Nextisfinal setNext: " + nextDestinationIsFinal);
     }
 
+    /**
+     * Sets if the driver is on break
+     * @param isOnBreak Boolean, true if the driver is on break
+     */
     public void setOnBreak(boolean isOnBreak){
         if(variablesSet) {
             if (isOnBreak) {
-                timeTitle.setText("Break time left");
+                timeTitle.setText(R.string.break_title);
             } else {
-                timeTitle.setText("Time to break");
+                timeTitle.setText(R.string.driving_title);
             }
         }
     }
@@ -282,23 +285,23 @@ public class ClockView extends Fragment {
             recStopETA.setText(getTimeAsFormattedString(nextDestination.getEta()));
             recStopName.setText(nextDestination.getAddress());
             recStopImage.setVisibility(TextView.GONE);
-            System.out.println("Next final setlabels " + nextDestinationIsFinal);
             if(nextDestinationIsFinal) {
-                recStopTitle.setText("Destination");
+                recStopTitle.setText(R.string.recStop_title_final);
             }else{
-                recStopTitle.setText("Next");
+                recStopTitle.setText(R.string.recStop_title_break);
             }
             v.setVisibility(ViewGroup.VISIBLE);
             alternativeStopsButton.setVisibility(View.VISIBLE);
-            altStopsTitle.setText("Add stop");
+            altStopsTitle.setText(R.string.alt_title_final);
 
         }else{
+            //If the recommended stop is the final destination, change the UI to make that clear
             if(nextDestination.getAddress()==recStop.getAddress()){
-                recStopTitle.setText("Destination");
-                altStopsTitle.setText("Add stop");
+                recStopTitle.setText(R.string.recStop_title_final);
+                altStopsTitle.setText(R.string.alt_title_final);
             }else{
-                recStopTitle.setText("Next");
-                altStopsTitle.setText("Alternatives");
+                recStopTitle.setText(R.string.recStop_title_break);
+                altStopsTitle.setText(R.string.alt_title_break);
             }
             setStopUI(recStop, recStopETA, recStopName, recStopImage);
         }
@@ -347,6 +350,9 @@ public class ClockView extends Fragment {
         }
     }
 
+    /**
+     * Displays a loading dialog.
+     */
     private void startSpinner() {
 
         spinnerDialog = new ProgressDialog(getActivity());

@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:focusableInTouchMode="false"
-            android:text="Time to break"
+            android:text="@string/driving_title"
             android:layout_marginTop="10dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/textLight"
@@ -128,7 +128,7 @@
             android:layout_marginLeft="10dp"
             android:paddingBottom="10dp"
             android:layout_weight="1"
-            android:text="Alternatives"
+            android:text="@string/alt_title_break"
             android:textColor="@color/textLight"
             android:textSize="45sp" />
 

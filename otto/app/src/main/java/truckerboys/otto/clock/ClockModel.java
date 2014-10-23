@@ -94,10 +94,18 @@ public class ClockModel {
         return altStops;
     }
 
+    /**
+     * Returns the next destination. Could be a checkpoint or the final destination.
+     * @return The next destination.
+     */
     public RouteLocation getNextDestination(){
         return nextDestination;
     }
 
+    /**
+     * Sets the chosen stop.
+     * @param stop The stop to be chosen.
+     */
     public void setChosenStop(final RouteLocation stop){
         new Thread(new Runnable() {
             @Override
@@ -115,26 +123,34 @@ public class ClockModel {
         }).start();
     }
 
+    /**
+     * Updates the time left. If there is no driving time left and the driver is on break, it displays the time left on break.
+     */
     public void updateTL(){
-        System.out.println("UpdateTL!");
         timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
         if(timeLeft.getTimeLeft().getMillis()<=0){
             try {
-                System.out.println("Timeleft on break");
                 timeLeft = regulationHandler.getTimeLeftOnBreak(user.getHistory());
                 isOnBreak = false;
             }catch (CurrentlyNotOnRestException e){
-                System.out.println("Not on break");
                 timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
                 isOnBreak = true;
             }
         }
     }
 
+    /**
+     * Returns if the driver is on break.
+     * @return Boolean, true if driver is on break.
+     */
     public boolean isOnBreak(){
         return isOnBreak;
     }
 
+    /**
+     * Returns if the next destination is the final destination.
+     * @return Boolean, true if the next destinaton is final.
+     */
     public boolean isNextDestinationFinal(){
         System.out.println("Next dest final? " + nextDestinationIsFinal);
         return nextDestinationIsFinal;
@@ -148,6 +164,10 @@ public class ClockModel {
         return timeLeft;
     }
 
+    /**
+     * Returns the current route.
+     * @return The current route
+     */
     public Route getRoute(){
         return route;
     }
