@@ -43,12 +43,9 @@ public class
     private RouteLocation chosenStop;
     private RouteLocation recommendedStop;
 
-    //TODO remove variable
-    private int nbrOfDirCalls = 0;
-
     private MapLocation currentLocation;
 
-    private FuelTankInfo fuelTank = new FuelTankInfo(200);
+    private FuelTankInfo fuelTank = new FuelTankInfo(1000);
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;
@@ -208,7 +205,7 @@ public class
             //If there is no time left on this session
             else if (sessionTimeLeft.isEqual(Duration.ZERO)) {
                 optimalRoute = getOptimizedRoute(directRoute, Duration.standardMinutes(5), gasStationNeeded);
-                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded ,Duration.standardMinutes(10),
+                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded, Duration.standardMinutes(10),
                         Duration.standardMinutes(15), Duration.standardMinutes(20));
             }
 
@@ -219,19 +216,19 @@ public class
                 //If the ETA/2 is longer than time left on session
                 if (directRoute.getCheckpoints().get(0).getEta().dividedBy(2).isLongerThan(sessionTimeLeft)) {
                     optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft(), gasStationNeeded);
-                    alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded,
+                    alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded,
                             sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
                 } else {
                     optimalRoute = getOptimizedRoute(directRoute, directRoute.getCheckpoints().get(0).getEta().dividedBy(2), gasStationNeeded);
-                    alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded, sessionTimeLeft,
+                    alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded, sessionTimeLeft,
                             sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3));
                 }
             }
 
             //If the location is not within reach this day (drive maximum distance)
             else if (!directRoute.getCheckpoints().get(0).getEta().isShorterThan(regulationHandler.getThisDayTL(user.getHistory()).getTimeLeft())) {
-                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft().minus(MARGINAL), gasStationNeeded);
-                alternativeLocations = calculateAlternativeStops(directRoute,gasStationNeeded,
+                optimalRoute = getOptimizedRoute(directRoute, regulationHandler.getThisSessionTL(user.getHistory()).getTimeLeft(), gasStationNeeded);
+                alternativeLocations = calculateAlternativeStops(directRoute, gasStationNeeded,
                         sessionTimeLeft.dividedBy(2), sessionTimeLeft.dividedBy(3), sessionTimeLeft.dividedBy(4));
             } else {
                 throw new InvalidRequestException("Something is not right here");
@@ -243,6 +240,7 @@ public class
                 displayedRecommended = optimalRoute.getFinalDestination();
             }
         }
+
         //TODO delete these
         int index = 0;
         Log.w("NbrOfAlternative", alternativeLocations.size() + "");
@@ -254,6 +252,7 @@ public class
             } catch (Exception e) {
                 Log.w("AlternativeETA " + index, e.toString());
             }
+            index++;
         }
         return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
@@ -268,7 +267,7 @@ public class
     private ArrayList<RouteLocation> calculateAlternativeStops(Route directRoute, boolean gasStationNeeded, Duration... stopsETA)
             throws InvalidRequestException, NoConnectionException {
         if (gasStationNeeded) {
-            return calculateAlterantiveGasStations(directRoute, stopsETA[0], (fuelTank.getMileage() * 1000) / 2,
+            return calculateAlternativeGasStations(directRoute, stopsETA[0], (fuelTank.getMileage() * 1000) / 2,
                     (fuelTank.getMileage() * 1000) / 3, (fuelTank.getMileage() * 1000) / 4);
         } else {
             return calculateAlternativeRestLocations(directRoute, stopsETA);
@@ -304,9 +303,7 @@ public class
         //Creates new RouteLocations with all variables set
         for (RouteLocation incompleteLocation : incompleteInfo) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
-            completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
-                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(),
-                    Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance()));
+            completeInfo.add(tempRoute.getFinalDestination());
         }
         return completeInfo;
     }
@@ -321,7 +318,7 @@ public class
      * @throws InvalidRequestException
      * @throws NoConnectionException
      */
-    private ArrayList<RouteLocation> calculateAlterantiveGasStations(Route directRoute, Duration stopETA, int... distances)
+    private ArrayList<RouteLocation> calculateAlternativeGasStations(Route directRoute, Duration stopETA, int... distances)
             throws InvalidRequestException, NoConnectionException {
         ArrayList<RouteLocation> incompleteInfo = new ArrayList<RouteLocation>();
         ArrayList<RouteLocation> completeInfo = new ArrayList<RouteLocation>();
@@ -422,35 +419,49 @@ public class
      * @param withinDistance Distance that the LatLng has to be within in meters.
      * @return The coordinate that matches time left the best.
      */
-    private LatLng findLatLngWithinReach(Route directRoute, Duration timeLeft, int withinDistance) throws InvalidRequestException, NoConnectionException {
-        ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
+    private LatLng findLatLngWithinReach(Route directRoute, Duration timeLeft, int withinDistance)
+            throws InvalidRequestException, NoConnectionException {
+
+        double[] divider = {0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.750, 0.875, 1};
+        ArrayList<LatLng> coordinates = directRoute.getDetailedPolyline();
+        int[] index = new int[9];
         int topIndex = coordinates.size() - 1;
         int bottomIndex = 0;
-        int currentIndex = (topIndex + bottomIndex) / 2;
+        Route routeToLatLng;
 
-        Route routeToLatLng = directionsProvider.getRoute(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                new MapLocation(coordinates.get(currentIndex)));
-        nbrOfDirCalls++;
+        // Type of binary search with eight instead of two parts to minimize google requests
+        do {
+            LatLng[] baseLatLng = new LatLng[9];
 
-
-        while ((routeToLatLng.getFinalDestination().getEta().isShorterThan(timeLeft.minus(Duration.standardMinutes(5))) ||
-                routeToLatLng.getFinalDestination().getEta().isLongerThan(timeLeft)) && routeToLatLng.getDistance() < withinDistance - 5000) {
-            if (routeToLatLng.getFinalDestination().getEta().isLongerThan(timeLeft) || routeToLatLng.getDistance() > withinDistance - 5000) {
-                topIndex = currentIndex;
-            } else {
-                bottomIndex = currentIndex;
+            for (int i = 0; i < 9; i++) {
+                index[i] = (int) ((topIndex - bottomIndex) * divider[i] + bottomIndex);
+                baseLatLng[i] = coordinates.get(index[i]);
             }
 
-            currentIndex = (topIndex + bottomIndex) / 2;
-            //Just to be safe
-            if (topIndex - bottomIndex < 2) {
-                break;
+            ArrayList<MapLocation> tempLocations = new ArrayList<MapLocation>();
+            for (int i = 1; i < 8; i++) {
+                tempLocations.add(new MapLocation(baseLatLng[i]));
             }
-            routeToLatLng = directionsProvider.getRoute(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                    new MapLocation(coordinates.get(currentIndex)));
-            nbrOfDirCalls++;
-        }
-        Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
-        return coordinates.get(currentIndex);
+            routeToLatLng = directionsProvider.getRoute(new MapLocation(baseLatLng[0]), new MapLocation(baseLatLng[8]), tempLocations);
+            for (int i = 0; i < 8; i++) {
+                //Checks if the LatLng matches end conditions
+                if ((routeToLatLng.getCheckpoints().get(i).getEta().isLongerThan(timeLeft.minus(Duration.standardMinutes(5))) &&
+                        routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft)) ||
+                        routeToLatLng.getCheckpoints().get(i).getDistance() > withinDistance + 10000 &&
+                                routeToLatLng.getCheckpoints().get(i).getDistance() < withinDistance) {
+                    return routeToLatLng.getCheckpoints().get(i).getLatLng();
+                }
+
+                if (routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft.minus(Duration.standardMinutes(5))) &&
+                        routeToLatLng.getCheckpoints().get(i).getDistance() < withinDistance) {
+                    bottomIndex = index[i];
+                } else {
+                    topIndex = index[i];
+                    break;
+                }
+            }
+        } while (topIndex - bottomIndex > 1);
+
+        return directRoute.getDetailedPolyline().get(bottomIndex);
     }
 }

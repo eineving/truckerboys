@@ -81,6 +81,7 @@ public class MainActivity extends Activity implements IEventListener{
      * Simple method for launching the NoConnectionActivity.
      */
     private void launchNoNetworkConnectionActivity(){
+        System.out.println("No Network");
         Intent noNetworkConnectionIntent = new Intent(this, NoNetworkConnectionActivity.class);
         startActivity(noNetworkConnectionIntent);
     }
