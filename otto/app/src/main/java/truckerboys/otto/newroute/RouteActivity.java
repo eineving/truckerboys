@@ -1,15 +1,12 @@
 package truckerboys.otto.newroute;
 
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Geocoder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,19 +17,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import javax.xml.transform.Result;
-
-import truckerboys.otto.OTTOActivity;
 import truckerboys.otto.R;
-import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.placeSuggestion.PlacesAutoCompleteAdapter;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
@@ -137,7 +130,7 @@ public class RouteActivity extends Activity implements IEventListener {
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.fragment_new_route);
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.STATISTICS);
         coder = new Geocoder(this);
         history = getSharedPreferences(HISTORY, 0);
         routePresenter = new RoutePresenter();

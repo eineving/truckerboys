@@ -6,7 +6,8 @@ import truckerboys.otto.IView;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -24,7 +25,7 @@ public class ClockPresenter  implements IView, IEventListener {
         model = new ClockModel(tripPlanner, regulationHandler, user);
         view = new ClockView();
 
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
 
     }
 

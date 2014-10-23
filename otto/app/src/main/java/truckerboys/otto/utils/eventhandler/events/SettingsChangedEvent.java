@@ -1,22 +1,13 @@
 package truckerboys.otto.utils.eventhandler.events;
 
+import truckerboys.otto.utils.eventhandler.EventType;
+
 /**
  * Created by root on 2014-10-02.
  */
 public class SettingsChangedEvent extends Event {
-    private static String system = "metric";
 
     public SettingsChangedEvent() {
-
+        super(EventType.SETTINGS);
     }
-
-    public SettingsChangedEvent(String system) {
-        this.system = system;
-    }
-
-    public String getSystem() {
-        return system;
-    }
-
-
 }

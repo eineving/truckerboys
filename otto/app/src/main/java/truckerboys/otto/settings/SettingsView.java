@@ -13,7 +13,8 @@ import android.widget.EditText;
 import android.widget.Switch;
 
 import truckerboys.otto.R;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
@@ -46,7 +47,7 @@ public class SettingsView extends Fragment implements IView, IEventListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.SETTINGS);
 
         presenter = new SettingsPresenter(getActivity().getSharedPreferences(SETTINGS, 0));
 
