@@ -18,7 +18,8 @@ import truckerboys.otto.IView;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -47,7 +48,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
     private Runnable statsUpdater = new Runnable() {
         public void run() {
 
-            restorePreferences();
+            restorePreferences(view.getActivity().getSharedPreferences(STATS, 0));
             loadUserHistory();
             updateHandler.postDelayed(statsUpdater, 600000); // Updates each 10min
         }
@@ -66,32 +67,43 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER,VehicleSignalID.TOTAL_VEHICLE_DISTANCE);
 
 
-        EventTruck.getInstance().subscribe(this);
-        EventTruck.getInstance().subscribe(view);
+        EventBuss.getInstance().subscribe(this, EventType.STATISTICS);
+        EventBuss.getInstance().subscribe(view, EventType.STATISTICS);
+    }
+
+    public StatsView getView() {
+        return view;
+    }
+
+    public void setView(StatsView view) {
+        this.view = view;
+    }
+
+    public StatsModel getModel() {
+        return model;
     }
 
     /**
      * Method for restoring the saved preferences from
      * the user statistics
      */
-    public void restorePreferences() {
-        SharedPreferences stats = view.getActivity().getSharedPreferences(STATS, 0);
+    public void restorePreferences(SharedPreferences stats) {
 
         // Gets the time driven today and time driven total
         double[] time = loadTime();
 
         // Gets today stats
-        double distanceByFuel = stats.getFloat("distanceByFuel", 0);
+        float distanceByFuel = stats.getFloat("distanceByFuel", 0);
 
         // Gets total stats
-        double distanceTotal = stats.getFloat("distanceTotal", 0);
-        double fuelTotal = stats.getFloat("fuelTotal", 0);
+        float distanceTotal = stats.getFloat("distanceTotal", 0);
+        float fuelTotal = stats.getFloat("fuelTotal", 0);
 
         // Gets total stats
         int violation = stats.getInt("violation", 0);
 
-        double[] statsToday = {time[0], 0, 0, distanceByFuel};
-        double[] statsTotal = {time[1], distanceTotal, fuelTotal, 0};
+        double[] statsToday = {time[0], 0, 0, (double)distanceByFuel};
+        double[] statsTotal = {time[1], (double)distanceTotal, (double)fuelTotal, 0};
 
         setStats(statsToday, statsTotal, violation);
 
@@ -163,6 +175,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
         view.clearSessionAdapter();
 
+
         // Update statsview with the new session string
         for(Session session : userHistory.getSessions()) {
 
@@ -173,17 +186,34 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                         + "-" + new DateTime(session.getStartTime()).getDayOfMonth()
                         + ": " + session.getSessionType().toString()
                         + " for " + session.getDuration().getStandardHours()
-                        + "h " + session.getDuration().getStandardMinutes() + "min";
+                        + "h " + session.getDuration().minus(session.getDuration().getStandardHours() * 3600000).getStandardMinutes() + "min";
 
 
                 // Update statsview with the new session string
+                //TODO Fix this nullpointer
                 view.updateSessionHistory(sessionString);
 
             }
 
+
+            model.updateSessionHistory(sessionString);
         }
 
-        model.updateSessionHistory(sessionString);
+    }
+
+    /**
+     * Method for saving the current stats
+     * if the StatsView has stopped.
+     */
+    public void saveCurrentStats(SharedPreferences sharedPreferences) {
+        //SharedPreferences.Editor editor = view.getActivity().getSharedPreferences(STATS, 0).edit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putFloat("distanceTotal", (float)model.getDistanceTotal());
+        editor.putFloat("fuelTotal", (float)model.getFuelTotal());
+        editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
+
+        editor.commit();
     }
 
     @Override
@@ -191,14 +221,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
 
         // If the view has stopped grab stats data from model and store them in a shared pref. file
         if(event.isType(StatsViewStoppedEvent.class)) {
-
-            SharedPreferences.Editor editor = view.getActivity().getSharedPreferences(STATS, 0).edit();
-
-            editor.putFloat("distanceTotal", (float)model.getDistanceTotal());
-            editor.putFloat("fuelTotal", (float)model.getFuelToday());
-            editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
-
-            editor.commit();
+            saveCurrentStats(view.getActivity().getSharedPreferences(STATS,0));
         }
 
         // Starts the update loop (10min interval)
@@ -217,6 +240,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         }
 
     }
+
+
 
     /**
      * Listens to signals from the truck and sends
@@ -237,7 +262,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 // Gets the total distance by fuel and updates the listeners
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
 
-                EventTruck.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
+                EventBuss.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
                 statsEditor.putFloat("distanceByFuel", kmPerLiter);
 
                 statsEditor.commit();
@@ -250,7 +275,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 // Gets the total distance and updates the listeners
                 long distance = ((SCSLong) signal.getData()).getLongValue();
 
-                EventTruck.getInstance().newEvent(new TotalDistanceEvent(distance));
+                EventBuss.getInstance().newEvent(new TotalDistanceEvent(distance));
 
                 statsEditor.putFloat("distanceTotal", distance);
                 statsEditor.commit();

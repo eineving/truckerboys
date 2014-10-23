@@ -1,13 +1,12 @@
 package truckerboys.otto.clock;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 import truckerboys.otto.directionsAPI.Route;
+import truckerboys.otto.driver.CurrentlyNotOnRestException;
+import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.PlannedRoute;
@@ -16,7 +15,6 @@ import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
-import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -25,17 +23,14 @@ import truckerboys.otto.utils.positions.RouteLocation;
  */
 public class ClockModel {
 
-    private Instant lastTimeUpdate, timeNow;
-
-    private Duration timeLeftDuration, timeLeftExtendedDuration;
     private TimeLeft timeLeft;
     private RouteLocation recStop, nextDestination;
-    private long timeDifference;
 
     private TripPlanner tripPlanner;
     private IRegulationHandler regulationHandler;
     private User user;
     private PlannedRoute route;
+    private boolean isOnBreak, nextDestinationIsFinal;
 
     private ArrayList<RouteLocation> altStops;
 
@@ -45,69 +40,42 @@ public class ClockModel {
         this.regulationHandler = regulationHandler;
         this.user = user;
 
-        lastTimeUpdate = new Instant();
-        timeLeftDuration = new Duration(Duration.ZERO);
-        timeLeftExtendedDuration = new Duration(Duration.ZERO);
-        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
+        timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
+        if(timeLeft.getTimeLeft().getMillis()<=0){
+            try {
+                timeLeft = regulationHandler.getTimeLeftOnBreak(user.getHistory());
+                isOnBreak = false;
+            }catch (CurrentlyNotOnRestException e){
+                timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
+                isOnBreak = true;
+            }
+        }
 
         altStops = new ArrayList<RouteLocation>();
     }
 
     /**
-     * Updates the ETAs of the stops and the time left until violation
-     */
-    public void update() {
-        timeNow = new Instant();
-        timeDifference = timeNow.getMillis() - lastTimeUpdate.getMillis();
-        timeLeftDuration = timeLeftDuration.minus(timeDifference);
-        if(timeLeftDuration.getMillis()<0)
-            timeLeftDuration = Duration.ZERO;
-        timeLeftExtendedDuration = timeLeftExtendedDuration.minus(timeDifference);
-        if(timeLeftExtendedDuration.getMillis()<0)
-            timeLeftExtendedDuration = Duration.ZERO;
-        if(recStop!=null)
-        recStop.decreaseETA(new Duration(timeDifference));
-        if(recStop.getEta().getMillis()<0)
-            recStop.decreaseETA(recStop.getEta());
-        if(altStops!=null) {
-            for (RouteLocation stop : altStops) {
-                if (stop != null) {
-                    stop.decreaseETA(new Duration(timeDifference));
-                    if(stop.getEta().getMillis()<0)
-                        stop.decreaseETA(stop.getEta());
-                }
-            }
-        }
-
-        timeLeft = new TimeLeft(timeLeftDuration, timeLeftExtendedDuration);
-
-        lastTimeUpdate = timeNow;
-    }
-
-    /**
      * Sets the time left until violation and the stops.
-     * Called when the route is changed.
+     * Called when the route is changed or updated.
      */
     public void processChangedRoute() {
 
         try {
             route = tripPlanner.getRoute();
+            recStop = route.getRecommendedStop();
+            altStops = route.getAlternativeStops();
+
+            if(route.getCheckpoints() == null || route.getCheckpoints().size() <= 2){
+                nextDestination = route.getFinalDestination();
+                nextDestinationIsFinal = true;
+            }else{
+                nextDestination = route.getCheckpoints().get(0);
+                nextDestinationIsFinal = false;
+            }
         }catch (NoActiveRouteException e){
             route = null;
         }
         timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
-        timeLeftDuration = timeLeft.getTimeLeft();
-        timeLeftExtendedDuration = timeLeft.getExtendedTimeLeft();
-
-        //TODO Simon: What if exception
-        recStop = route.getRecommendedStop();
-        altStops = route.getAlternativeStops();
-
-        if(route.getCheckpoints() == null || route.getCheckpoints().size() == 0){
-            nextDestination = route.getFinalDestination();
-        }else{
-            nextDestination = route.getCheckpoints().get(0);
-        }
     }
 
     /**
@@ -126,19 +94,66 @@ public class ClockModel {
         return altStops;
     }
 
+    /**
+     * Returns the next destination. Could be a checkpoint or the final destination.
+     * @return The next destination.
+     */
     public RouteLocation getNextDestination(){
         return nextDestination;
     }
 
-    public boolean setChosenStop(RouteLocation stop){
-        try {
-            tripPlanner.setChoosenStop(stop);
-            return true;
-        }catch (InvalidRequestException e){
-            return false;
-        }catch (NoConnectionException e){
-            return false;
+    /**
+     * Sets the chosen stop.
+     * @param stop The stop to be chosen.
+     */
+    public void setChosenStop(final RouteLocation stop){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tripPlanner.setChoosenStop(stop);
+                }catch (InvalidRequestException e){
+                    //Will never be thrown
+                }catch (NoConnectionException e){
+                    //Will never be thrown because if the app has no connection
+                    // the view will have changed and the button to
+                    // choose a stop won't be displayed
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * Updates the time left. If there is no driving time left and the driver is on break, it displays the time left on break.
+     */
+    public void updateTL(){
+        timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
+        if(timeLeft.getTimeLeft().getMillis()<=0){
+            try {
+                timeLeft = regulationHandler.getTimeLeftOnBreak(user.getHistory());
+                isOnBreak = false;
+            }catch (CurrentlyNotOnRestException e){
+                timeLeft = regulationHandler.getThisSessionTL(user.getHistory());
+                isOnBreak = true;
+            }
         }
+    }
+
+    /**
+     * Returns if the driver is on break.
+     * @return Boolean, true if driver is on break.
+     */
+    public boolean isOnBreak(){
+        return isOnBreak;
+    }
+
+    /**
+     * Returns if the next destination is the final destination.
+     * @return Boolean, true if the next destinaton is final.
+     */
+    public boolean isNextDestinationFinal(){
+        System.out.println("Next dest final? " + nextDestinationIsFinal);
+        return nextDestinationIsFinal;
     }
 
     /**
@@ -149,6 +164,10 @@ public class ClockModel {
         return timeLeft;
     }
 
+    /**
+     * Returns the current route.
+     * @return The current route
+     */
     public Route getRoute(){
         return route;
     }

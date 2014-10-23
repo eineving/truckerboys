@@ -15,7 +15,6 @@ import truckerboys.otto.driver.TachographHandler;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.home.ActiveSessionDialogFragment;
 import truckerboys.otto.home.HomePresenter;
-import truckerboys.otto.home.HomeView;
 import truckerboys.otto.maps.MapPresenter;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
@@ -23,12 +22,13 @@ import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.stats.StatsPresenter;
-import truckerboys.otto.stats.StatsView;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
@@ -42,10 +42,12 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     private IRegulationHandler regulationHandler;
 
     private User user;
+
+    //These may seem unused but they need to be created somewhere
     private TachographHandler tachographHandler;
     private LocationHandler locationHandler;
 
-    private List<IView> views = new ArrayList<IView>();
+    private List<IView> presenters = new ArrayList<IView>();
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
 
@@ -67,7 +69,9 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
         //Create standard view with a ViewPager and corresponding tabs.
         viewPager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), getViews());
+
+        pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), getPresenters());
+
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(2);
 
@@ -77,8 +81,9 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
          */
         viewPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
 
-        //Use Googles 'SlidingTabLayout' to display tabs for all views.
+        //Use Googles 'SlidingTabLayout' to display tabs for all presenters.
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.tab_slider);
+        slidingTabLayout.setAdapter(pagerAdapter, getPresenters());
         slidingTabLayout.setViewPager(viewPager);
 
         // Turns display properties (alive on/off) based on saved settings file
@@ -88,7 +93,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
     }
 
     @Override
@@ -113,25 +118,25 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
      * Creates all relevant presenters that we need to have tabs for.
      */
     private void createPresenters() {
-        views.add(new MapPresenter(tripPlanner));
+        presenters.add(new MapPresenter(tripPlanner));
 
-        views.add(new ClockPresenter(tripPlanner, regulationHandler, user));
+        presenters.add(new ClockPresenter(tripPlanner, regulationHandler, user));
 
-        views.add(new HomePresenter(regulationHandler, user));
+        presenters.add(new HomePresenter(regulationHandler, user));
 
-        views.add(new StatsPresenter(user));
+        presenters.add(new StatsPresenter(user));
 
-        views.add(new SettingsView());
+        presenters.add(new SettingsView());
     }
 
-    public List<IView> getViews() {
-        return views;
+    public List<IView> getPresenters() {
+        return presenters;
     }
 
     @Override
     public void performEvent(Event event) {
         // Sets the current page to Map if a new destination is set
-        if (event.isType(RouteRequestEvent.class)) {
+        if (event.isType(RouteRequestEvent.class) || event.isType(SetChosenStopEvent.class)) {
             viewPager.setCurrentItem(0);
         }
     }
@@ -143,7 +148,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
      */
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        EventTruck.getInstance().newEvent(new YesClickedEvent());
+        EventBuss.getInstance().newEvent(new YesClickedEvent());
     }
 
     @Override

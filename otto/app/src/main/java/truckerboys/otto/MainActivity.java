@@ -1,15 +1,15 @@
 package truckerboys.otto;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 
-import truckerboys.otto.home.ActiveSessionDialogFragment;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.GPSConnectedEvent;
+import truckerboys.otto.utils.eventhandler.events.NetworkConnectedEvent;
 
 /**
  * Created by Simon Petersson on 14/10/2014.
@@ -18,70 +18,87 @@ import truckerboys.otto.home.ActiveSessionDialogFragment;
  * the application, since it will not run without the GPS enabled. (There is no need for the
  * application without GPS enabled, since it relies heavily on that.)
  */
-public class MainActivity extends Activity implements LocationListener{
+public class MainActivity extends Activity implements IEventListener{
 
-    private LocationManager locationManager;
+    private ConnectionListener connectionListener;
+    private Class currentActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, this);
+        EventBuss.getInstance().subscribe(this, EventType.CONNECTION);
 
-        if(isConnectedToGPS()){
+        connectionListener = new ConnectionListener(this);
+        if(connectionListener.isConnectedToGPS() && connectionListener.isConnectedToNetwork()){
             launchOTTOActivity();
-        } else {
-            launchNoConnectionActivity();
+        } else if (!connectionListener.isConnectedToGPS()) {
+            launchNoGPSConnectionActivity();
+        } else if (!connectionListener.isConnectedToNetwork()) {
+            launchNoNetworkConnectionActivity();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(isConnectedToGPS()){
+        if(connectionListener.isConnectedToGPS() && connectionListener.isConnectedToNetwork()){
             launchOTTOActivity();
-        } else {
-            launchNoConnectionActivity();
+        } else if (!connectionListener.isConnectedToGPS()) {
+            launchNoGPSConnectionActivity();
+        } else if (!connectionListener.isConnectedToNetwork()) {
+            launchNoNetworkConnectionActivity();
         }
     }
 
-    private boolean isConnectedToGPS(){
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {}
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {}
-
-    @Override
-    public void onProviderEnabled(String s) {
-        //If Connection has been established, close NoConnetionActivity.
-        NoConnectionActivity.getNoConnectionActivity().finish();
-        //Then launch OTTOActivity
-        launchOTTOActivity();
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-        //If provider isn't availible, launch NoConnecitonActivity.
-        launchNoConnectionActivity();
+    /**
+     * Checks what activity should be started 
+     */
+    private void launchNextActivity(){
+        if(connectionListener.isConnectedToNetwork() && connectionListener.isConnectedToGPS() && currentActivity.getClass().equals(OTTOActivity.class)){
+            if(NoGPSConnectionActivity.getNoGPSConnectionActivity() != null) {
+                NoGPSConnectionActivity.getNoGPSConnectionActivity().finish();
+            }
+            if(NoNetworkConnectionActivity.getNoNetworkConnectionActivity() != null){
+                NoNetworkConnectionActivity.getNoNetworkConnectionActivity().finish();
+            }
+            launchOTTOActivity();
+        } else if (!connectionListener.isConnectedToGPS() && currentActivity.getClass().equals(NoGPSConnectionActivity.class)) {
+            launchNoGPSConnectionActivity();
+        } else if (!connectionListener.isConnectedToNetwork() && currentActivity.getClass().equals(NoNetworkConnectionActivity.class)) {
+            launchNoNetworkConnectionActivity();
+        }
     }
 
     /**
      * Simple method for launching the NoConnectionActivity.
      */
-    private void launchNoConnectionActivity(){
-        Intent noConnectionIntent = new Intent(this, NoConnectionActivity.class);
-        startActivity(noConnectionIntent);
+    private void launchNoGPSConnectionActivity(){
+        Intent noGPSConnectionIntent = new Intent(this, NoGPSConnectionActivity.class);
+        startActivity(noGPSConnectionIntent);
+    }
+
+    /**
+     * Simple method for launching the NoConnectionActivity.
+     */
+    private void launchNoNetworkConnectionActivity(){
+        System.out.println("No Network");
+        Intent noNetworkConnectionIntent = new Intent(this, NoNetworkConnectionActivity.class);
+        startActivity(noNetworkConnectionIntent);
     }
 
     /**
      * SImple method for launching the OTTOActivity.
      */
     private void launchOTTOActivity(){
+        currentActivity = OTTOActivity.class;
         Intent OTTOActivity = new Intent(this, OTTOActivity.class);
         startActivity(OTTOActivity);
+    }
+
+    @Override
+    public void performEvent(Event event) {
+        if(event.isType(NetworkConnectedEvent.class) || event.isType(GPSConnectedEvent.class)){
+            launchNextActivity();
+        }
     }
 }

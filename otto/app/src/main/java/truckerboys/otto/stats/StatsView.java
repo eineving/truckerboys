@@ -18,7 +18,7 @@ import org.joda.time.Instant;
 
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -72,17 +72,26 @@ public class StatsView extends Fragment implements IView, IEventListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView  = inflater.inflate(R.layout.fragment_stats, container, false);
 
+        initzialiseUI();
+
+        sessionAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_plain_text);
+
+        historyList.setAdapter(sessionAdapter);
+
+
+        // Restores preferences for settings in presenter
+        EventBuss.getInstance().newEvent(new RestorePreferencesEvent());
+
+        return rootView;
+    }
+
+    public void initzialiseUI() {
         // Creates TextViews from the fragment for daily stats
         timeToday = (TextView) rootView.findViewById(R.id.timeTodayTime);
         distanceByFuel = (TextView) rootView.findViewById(R.id.KmByFuel);
 
         // Session history
         historyList = (ListView) rootView.findViewById(R.id.sessionListView);
-
-        sessionAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_plain_text);
-
-        historyList.setAdapter(sessionAdapter);
-
 
         // Creates TextViews from the fragment for daily stats
         timeTotal = (TextView) rootView.findViewById(R.id.timeTotalTime);
@@ -91,13 +100,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
         // Creates TextViews from the fragment for violation stats
         this.violations = (TextView) rootView.findViewById(R.id.numberOfViolations);
-
-        // Restores preferences for settings in presenter
-        EventTruck.getInstance().newEvent(new RestorePreferencesEvent());
-
-        return rootView;
     }
-
 
     @Override
     public void onResume() {
@@ -131,7 +134,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
-        EventTruck.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
+        EventBuss.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
     }
 
     /**
@@ -143,7 +146,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
         super.onStop();
 
         // Notifies the presenter that the view has stopped
-        EventTruck.getInstance().newEvent(new StatsViewStoppedEvent());
+        EventBuss.getInstance().newEvent(new StatsViewStoppedEvent());
 
     }
 
@@ -153,12 +156,18 @@ public class StatsView extends Fragment implements IView, IEventListener{
      * @param sessionString data from previous sessions.
      */
     public void updateSessionHistory(String sessionString) {
-        sessionAdapter.add(sessionString);
 
-        sessionAdapter.notifyDataSetChanged();
+        if(sessionAdapter != null) {
+            sessionAdapter.add(sessionString);
+            sessionAdapter.notifyDataSetChanged();
+        }
 
-        historyList.setLayoutParams(new LinearLayout.LayoutParams(
-                1000, historyList.getAdapter().getCount()*125));
+
+
+        if(historyList != null) {
+            historyList.setLayoutParams(new LinearLayout.LayoutParams(
+                    1000, historyList.getAdapter().getCount()*125));
+        }
 
     }
 
@@ -167,8 +176,12 @@ public class StatsView extends Fragment implements IView, IEventListener{
      * history list.
      */
     public void clearSessionAdapter() {
-        sessionAdapter.clear();
-        sessionAdapter.notifyDataSetChanged();
+        try{
+            sessionAdapter.clear();
+            sessionAdapter.notifyDataSetChanged();
+        } catch (NullPointerException e) {
+            System.out.println("An adapter might not have been set");
+        }
     }
 
     /**

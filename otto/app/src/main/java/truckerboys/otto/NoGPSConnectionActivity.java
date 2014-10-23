@@ -1,10 +1,7 @@
 package truckerboys.otto;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -16,19 +13,19 @@ import android.widget.Button;
  * This Activity is shown when the app has no connection to the GPS or loses to connection when
  * the app is running.
  */
-public class NoConnectionActivity extends Activity{
+public class NoGPSConnectionActivity extends Activity{
 
     private Button turnOnGPS;
 
-    private static NoConnectionActivity noConnectionActivity;
+    private static NoGPSConnectionActivity noGPSConnectionActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_no_conection);
+        setContentView(R.layout.activity_no_gps_conection);
 
         //Make singleton of this activity, making it possible to close it from another activity.
-        noConnectionActivity = this;
+        noGPSConnectionActivity = this;
 
         turnOnGPS = (Button) findViewById(R.id.activateGPSButton);
 
@@ -52,12 +49,17 @@ public class NoConnectionActivity extends Activity{
     }
 
     @Override
-    public void finish() {
-        super.finish();
-        noConnectionActivity = null;
+    public void onBackPressed() {
+
     }
 
-    public static NoConnectionActivity getNoConnectionActivity() {
-        return noConnectionActivity;
+    @Override
+    public void finish() {
+        super.finish();
+        noGPSConnectionActivity = null;
+    }
+
+    public static NoGPSConnectionActivity getNoGPSConnectionActivity() {
+        return noGPSConnectionActivity;
     }
 }

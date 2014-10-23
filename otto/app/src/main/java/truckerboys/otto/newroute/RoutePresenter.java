@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 
@@ -25,29 +25,41 @@ public class RoutePresenter {
      */
     public void sendLocation(String nameOfLocation, List<String> checkpoints, Geocoder coder){
 
-        int maxResults = 1;
+        final Geocoder geocoder = coder;
+        final String str = nameOfLocation;
+        final List<String> checks = checkpoints;
 
-        try {
-            // Creates an array of addresses (of length 1) based on the string selected
-            // and gets the first result
-            List<Address> locations = coder.getFromLocationName(nameOfLocation, maxResults);
 
-            ArrayList<Address> checkpointsArray = new ArrayList<Address>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int maxResults = 1;
 
-            for(String checkpoint : checkpoints) {
+                try {
+                    // Creates an array of addresses (of length 1) based on the string selected
+                    // and gets the first result
+                    List<Address> locations = geocoder.getFromLocationName(str, maxResults);
 
-                checkpointsArray.add((coder.getFromLocationName(checkpoint, maxResults)).get(0));
+                    ArrayList<Address> checkpointsArray = new ArrayList<Address>();
+
+                    for(String checkpoint : checks) {
+
+                        checkpointsArray.add((geocoder.getFromLocationName(checkpoint, maxResults)).get(0));
+                    }
+
+                    if(locations.size() > 0) {
+                        Address location = locations.get(0);
+                        //Address checkPoint = checkPoints.get(0);
+                        EventBuss.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
+                    }
+
+                } catch (IOException e) {
+                    System.out.println("Something went horribly wrong regarding you request!");
+                }
             }
+        }).start();
 
-            if(locations.size() > 0) {
-                Address location = locations.get(0);
-                //Address checkPoint = checkPoints.get(0);
-                EventTruck.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
-            }
 
-        } catch (IOException e) {
-            System.out.println("Something went horribly wrong regarding you request!");
-        }
 
     }
 
@@ -60,7 +72,7 @@ public class RoutePresenter {
         String place3 = history.getString("place3", "");
 
 
-        EventTruck.getInstance().newEvent(new RefreshHistoryEvent(place1, place2, place3));
+        EventBuss.getInstance().newEvent(new RefreshHistoryEvent(place1, place2, place3));
     }
 
     /**

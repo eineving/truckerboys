@@ -4,9 +4,12 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
     android:id="@+id/alternative_stops_view">
 
     <LinearLayout
+        android:id="@+id/backButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -20,23 +23,15 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="1dp"
-            android:src="@drawable/arrowleft"
-            android:id="@+id/backButton"/>
-
-        <View
-            android:layout_width="1.5dp"
-            android:layout_height="match_parent"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@color/textLightest" />
+            android:src="@drawable/arrowleft"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:singleLine="true"
-            android:text="Alternatives"
+            android:text="Clock"
             android:textColor="@color/textLight"
             android:textSize="45sp" />
 

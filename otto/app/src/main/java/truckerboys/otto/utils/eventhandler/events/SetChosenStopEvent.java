@@ -1,5 +1,6 @@
 package truckerboys.otto.utils.eventhandler.events;
 
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -10,6 +11,7 @@ public class SetChosenStopEvent extends Event {
     private RouteLocation stop;
 
     public SetChosenStopEvent(RouteLocation stop){
+        super(EventType.CLOCK);
         this.stop = stop;
     }
 

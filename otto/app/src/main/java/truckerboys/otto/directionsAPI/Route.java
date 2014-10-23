@@ -40,6 +40,33 @@ public class Route {
     }
 
     /**
+     * Copy constructor.
+     *
+     * @param other Route to copy.
+     */
+    public Route(Route other) {
+        this.finalDestination = new RouteLocation(other.finalDestination);
+        this.eta = new Duration(other.eta);
+        this.distance = other.distance;
+
+        this.overviewPolyline = new ArrayList<LatLng>();
+        for (LatLng point : other.overviewPolyline) {
+            this.overviewPolyline.add(new LatLng(point.latitude, point.longitude));
+        }
+
+        this.detailedPolyline = new ArrayList<LatLng>();
+        for (LatLng point : other.detailedPolyline) {
+            this.detailedPolyline.add(new LatLng(point.latitude, point.longitude));
+        }
+
+        this.checkpoints = new ArrayList<RouteLocation>();
+        for (RouteLocation temp : other.checkpoints) {
+            this.checkpoints.add(new RouteLocation(temp));
+        }
+    }
+
+
+    /**
      * Get target destination
      *
      * @return target destination
@@ -92,4 +119,6 @@ public class Route {
     public ArrayList<RouteLocation> getCheckpoints() {
         return checkpoints;
     }
+
+
 }

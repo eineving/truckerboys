@@ -1,5 +1,6 @@
 package truckerboys.otto.utils.eventhandler.events;
 
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.positions.MapLocation;
 
 /**
@@ -9,26 +10,13 @@ import truckerboys.otto.utils.positions.MapLocation;
  */
 public class GPSUpdateEvent extends Event {
     private MapLocation newPosition;
-    private MapLocation oldPosition;
 
-    public GPSUpdateEvent(MapLocation newPosition, MapLocation oldPosition){
+    public GPSUpdateEvent(MapLocation newPosition){
+        super(EventType.GPS_UPDATE);
         this.newPosition = newPosition;
-        this.oldPosition = oldPosition;
     }
 
     public MapLocation getNewPosition() {
         return newPosition;
-    }
-
-    public void setNewPosition(MapLocation newPosition) {
-        this.newPosition = newPosition;
-    }
-
-    public MapLocation getOldPosition() {
-        return oldPosition;
-    }
-
-    public void setOldPosition(MapLocation oldPosition) {
-        this.oldPosition = oldPosition;
     }
 }

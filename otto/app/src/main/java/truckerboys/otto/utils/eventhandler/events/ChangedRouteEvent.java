@@ -1,5 +1,7 @@
 package truckerboys.otto.utils.eventhandler.events;
 
+import truckerboys.otto.utils.eventhandler.EventType;
+
 /**
  * Created by Simon Petersson on 2014-10-02.
  *
@@ -8,6 +10,6 @@ package truckerboys.otto.utils.eventhandler.events;
  */
 public class ChangedRouteEvent extends Event {
     public ChangedRouteEvent(){
-
+        super(EventType.ROUTE);
     }
 }

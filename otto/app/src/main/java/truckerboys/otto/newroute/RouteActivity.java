@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,17 +17,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.OTTOActivity;
 import truckerboys.otto.R;
-import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.placeSuggestion.PlacesAutoCompleteAdapter;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
@@ -75,7 +72,10 @@ public class RouteActivity extends Activity implements IEventListener {
 
     // Dialogs
     private NoDestinationDialog dialog = new NoDestinationDialog();
+    private ProgressDialog spinnerDialog;
 
+
+    private Handler locationHandler = new Handler();
     InputMethodManager keyboard;
 
 
@@ -85,11 +85,52 @@ public class RouteActivity extends Activity implements IEventListener {
 
     }
 
+    public void startSpinner() {
+
+        if (finalDestination != null && coder != null && routePresenter != null) {
+            if (finalDestination.getText() != null
+                    && !finalDestination.getText().equals("")) {
+
+                spinnerDialog = new ProgressDialog(this);
+                spinnerDialog.setMessage("Loading your route");
+                spinnerDialog.setTitle("Loading");
+                spinnerDialog.setCancelable(true);
+                spinnerDialog.show();
+
+                handleNavigate();
+
+            } else {
+
+                // if no final destination is set
+                dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
+            }
+
+        }
+
+
+    }
+
+    public void handleNavigate() {
+
+
+        routePresenter.sendLocation("" + finalDestination.getText().toString(),
+                routeModel.getCheckpoints(), coder);
+
+        if (history != null) {
+            routePresenter.saveHistory(history, ""
+                    + finalDestination.getText().toString());
+        }
+
+
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.fragment_new_route);
-        EventTruck.getInstance().subscribe(this);
+        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.STATISTICS);
         coder = new Geocoder(this);
         history = getSharedPreferences(HISTORY, 0);
         routePresenter = new RoutePresenter();
@@ -118,6 +159,7 @@ public class RouteActivity extends Activity implements IEventListener {
 
         // Sets listeners to UI components
 
+        // Removes checkpoint
         checkpointList.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -132,6 +174,8 @@ public class RouteActivity extends Activity implements IEventListener {
                 }
             }
         });
+
+
 
         // Handles when user selects an item from the drop-down menu
         search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -171,55 +215,32 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
-        navigate.setOnTouchListener(new View.OnTouchListener() {
+        removeDestinationButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-
-
-                if(!finalDestination.getText().equals("")){
-                }
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-
-                    navigate.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    navigate.setBackgroundColor(Color.TRANSPARENT);
-
-
-                }
+                clickFX(removeDestinationButton, motionEvent);
 
                 return false;
             }
         });
+
+        navigate.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                clickFX(navigate, motionEvent);
+
+                return false;
+            }
+        });
+
 
         // Navigate button
         navigate.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-
-                // If destination is set
-                if (finalDestination != null && coder != null && routePresenter != null) {
-                    if (finalDestination.getText() != null
-                            && !finalDestination.getText().equals("")) {
-
-                        routePresenter.sendLocation("" + finalDestination.getText().toString(),
-                                routeModel.getCheckpoints(), coder);
-
-                        if (history != null) {
-                            routePresenter.saveHistory(history, ""
-                                    + finalDestination.getText().toString());
-                        }
-
-
-
-
-                    } else {
-                        // If no destination is set
-                        dialog.show(RouteActivity.this.getFragmentManager(), "No Destination");
-                    }
-                }
+                startSpinner();
             }
         });
 
@@ -286,8 +307,14 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history1Text.getText(),
-                        new ArrayList<String>(), coder);
+                if (finalDestination != null && history1Text.getText() != null
+                        && !history1Text.getText().equals("")) {
+
+                    finalDestination.setText(history1Text.getText());
+                    tempLocation = history1Text.getText().toString();
+
+                    removeDestinationButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -295,13 +322,7 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    history1.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    history1.setBackgroundColor(Color.TRANSPARENT);
-
-                }
+                clickFX(history1, motionEvent);
 
                 return false;
             }
@@ -312,8 +333,14 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history2Text.getText(),
-                        new ArrayList<String>(), coder);
+                if (finalDestination != null && history2Text.getText() != null
+                        && !history2Text.getText().equals("")) {
+
+                    finalDestination.setText(history2Text.getText());
+                    tempLocation = history2Text.getText().toString();
+
+                    removeDestinationButton.setVisibility(View.VISIBLE);
+                }
 
             }
         });
@@ -322,13 +349,7 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    history2.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    history2.setBackgroundColor(Color.TRANSPARENT);
-
-                }
+                clickFX(history2, motionEvent);
 
                 return false;
             }
@@ -339,23 +360,26 @@ public class RouteActivity extends Activity implements IEventListener {
             @Override
             public void onClick(View view) {
 
-                routePresenter.sendLocation("" + history3Text.getText(),
-                        new ArrayList<String>(), coder);
+                if (finalDestination != null && history3Text.getText() != null
+                        && !history3Text.getText().equals("")) {
+
+                    finalDestination.setText(history3Text.getText());
+                    tempLocation = history3Text.getText().toString();
+
+                    removeDestinationButton.setVisibility(View.VISIBLE);
+                }
 
             }
         });
+
+
+
 
         history3.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    history3.setBackgroundColor(Color.LTGRAY);
-
-                }else {
-                    history3.setBackgroundColor(Color.TRANSPARENT);
-
-                }
+                clickFX(history3, motionEvent);
 
                 return false;
             }
@@ -378,6 +402,15 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+
+        addButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                clickFX(addButton1, motionEvent);
+
+                return false;
+            }
+        });
 
         // When the user clicks the checkpoint selected
         addButton2.setOnClickListener(new View.OnClickListener() {
@@ -402,7 +435,32 @@ public class RouteActivity extends Activity implements IEventListener {
             }
         });
 
+        addButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                clickFX(addButton2, motionEvent);
 
+                return false;
+            }
+        });
+
+
+    }
+
+    /**
+     * Click effect for when a clickable is touched.
+     * @param view the controller clicked
+     * @param motionEvent up/down
+     */
+    public void clickFX(View view, MotionEvent motionEvent) {
+
+        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+            view.setBackgroundColor(Color.LTGRAY);
+
+        } else {
+            view.setBackgroundColor(Color.TRANSPARENT);
+
+        }
     }
 
     /**
@@ -440,6 +498,7 @@ public class RouteActivity extends Activity implements IEventListener {
 
         // When a new destination is selected this activity is to be finished
         if (event.isType(RouteRequestEvent.class)) {
+            spinnerDialog.dismiss();
             // Sends user back to MainActivity after have chosen the destination
             finish();
         }

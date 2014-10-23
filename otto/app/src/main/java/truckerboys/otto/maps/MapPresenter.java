@@ -7,15 +7,17 @@ import android.support.v4.app.Fragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventTruck;
+import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
-import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**
@@ -31,76 +33,84 @@ public class MapPresenter implements IEventListener, IView {
     private Handler updateHandler = new Handler(Looper.getMainLooper());
     private Runnable updatePos = new Runnable() {
         public void run() {
-            if(mapModel.isActiveRoute()) {
+            if(mapView.isFollowingMarker()) {
                 mapView.updatePositionMarker(true);
             } else {
                 mapView.updatePositionMarker(false);
             }
-            updateHandler.postDelayed(updatePos, LocationHandler.LOCATION_REQUEST_INTERVAL_MS / MapView.INTERPOLATION_FREQ);
+            updateHandler.postDelayed(updatePos, (LocationHandler.LOCATION_REQUEST_INTERVAL_MS  * 2)/ MapView.INTERPOLATION_FREQ);
         }
     };
     //endregion
 
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
-        mapView.setPresenter(this);
-
         this.mapModel = new MapModel(tripPlanner);
-        EventTruck.getInstance().subscribe(this);
-    }
-
-    public void startFollowRoute(){
-        mapView.moveCamera(true, LocationHandler.getCurrentLocationAsLatLng(), 18f, LocationHandler.getCurrentLocationAsMapLocation().getBearing(), 1000);
-        mapModel.setActiveRoute(true);
-
-        //Make sure the handler doesnt run updatePos to many times.
-        updateHandler.removeCallbacks(updatePos);
-        //Wait 1000ms before running the updatePos runnable. Making the above animation finish before starting the next one.
-        updateHandler.postDelayed(updatePos, 2000);
-    }
-
-    public void stopFollowRoute(){
-        mapModel.setActiveRoute(false);
+        EventBuss.getInstance().subscribe(this, EventType.ROUTE);
+        updatePos.run();
     }
 
     @Override
     public void performEvent(Event event) {
+        /*
+         * If the route has been changed (more specifically this should be called when the TripPlanner
+         * changes the route somehow) we need to listen to this and modify the MapView accordingly.
+         */
+        //region ChangedRouteEvent
         if (event.isType(ChangedRouteEvent.class)) {
-            mapView.setRoute(mapModel.getRoute());
-            mapView.setMarkers(mapModel.getRoute().getCheckpoints());
+            try {
+                mapView.setRoute(mapModel.getRoute());
+                mapView.setMarkers(mapModel.getRoute().getCheckpoints());
+            } catch (NoActiveRouteException e) {
+                //TODO Make proper catch.
+            }
         }
+        //endregion
 
-        // If a new route is set in RouteActivity, zoom out to see all of the route.
+        /*
+         * When a Route is requested by the user (More specifically this is done from RouteActivity when
+         * the user presses 'Navigate'). We need to adjust the MapView accordingly by setting
+          * all UI Text-elements to the information that we need to provide.
+         */
+        //region RouteRequestEvent
         if(event.isType(RouteRequestEvent.class)){
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
-            mapView.setFinalDestinationText(mapModel.getRoute().getFinalDestination().getAddress());
-            mapView.setFinalDestinationDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
-            mapView.setFinalDestinationETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
-            mapView.showStartRouteDialog(true);
-
-            if(!mapModel.getRoute().getCheckpoints().isEmpty()) {
-                // Get first checkpoint
-                RouteLocation firstCheckpoint = mapModel.getRoute().getCheckpoints().get(0);
-
-                // Set first checkpoints in strings.
-                mapView.setNextCheckpointText(firstCheckpoint.getAddress());
-                //mapView.setNextCheckpointDistText(firstCheckpoint.getDistance());
-                mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardMinutes() + "");
-            } else {
-                mapView.setNextCheckpointText(mapModel.getRoute().getFinalDestination().getAddress());
-                mapView.setNextCheckpointETAText(mapModel.getRoute().getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
-                mapView.setNextCheckpointDistText(((mapModel.getRoute().getDistance() + 50) / 100) / 10.0 + "km | ");
-            }
+            //Hide old layout if we had a previous route before this one.
             mapView.showActiveRouteDialog(false);
+            mapView.setFollowMarker(false);
 
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            builder.include(LocationHandler.getCurrentLocationAsLatLng());
-            builder.include(new LatLng(routeRequestEvent.getFinalDestion().getLatitude(), routeRequestEvent.getFinalDestion().getLongitude()));
-            LatLngBounds bounds = builder.build();
+            try {
+                Route route = mapModel.getRoute();
 
-            mapView.moveCamera(true, bounds);
+                mapView.setFinalDestinationText(route.getFinalDestination().getAddress());
+                mapView.setFinalDestinationDistText(((route.getDistance() + 50) / 100) / 10.0 + "km | ");
+                mapView.setFinalDestinationETAText(route.getEta().getStandardHours()  + "h " + mapModel.getRoute().getEta().getStandardMinutes() % 60 + "min");
+                mapView.showStartRouteDialog(true);
+
+                // Get first checkpoint
+                RouteLocation firstCheckpoint = route.getCheckpoints().get(0);
+
+                // Display the adress of the first checkpoint to the driver.
+                mapView.setNextCheckpointText(firstCheckpoint.getAddress());
+                mapView.setNextCheckpointDistText(((firstCheckpoint.getDistance() + 50) / 100) / 10.0 + "km | ");
+                mapView.setNextCheckpointETAText(firstCheckpoint.getEta().getStandardHours()  + "h " + firstCheckpoint.getEta().getStandardMinutes() % 60 + "min");
+
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(LocationHandler.getCurrentLocationAsLatLng());
+                builder.include(new LatLng(routeRequestEvent.getFinalDestion().getLatitude(), routeRequestEvent.getFinalDestion().getLongitude()));
+                LatLngBounds bounds = builder.build();
+
+                mapView.moveCamera(true, bounds);
+
+            } catch (NoActiveRouteException e) {
+                // It's stupid to fire a RouteRequestEvent without an active route. But if it happens,
+                // Make sure all dialogs are hidden, making sure the user doesn't see any incorrect information.
+                mapView.showStartRouteDialog(false);
+                mapView.showStopRoute(false);
+            }
         }
+        //endregion
     }
 
     @Override

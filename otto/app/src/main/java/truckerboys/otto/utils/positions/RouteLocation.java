@@ -3,9 +3,11 @@ package truckerboys.otto.utils.positions;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Class representing a rest location
@@ -14,6 +16,7 @@ public class RouteLocation extends MapLocation {
     private List<String> type;
     private String name;
     private Duration eta;
+    private Instant timeOfArrival;
     private String address;
     private int distance;
 
@@ -25,13 +28,42 @@ public class RouteLocation extends MapLocation {
      * @param eta      estimated time til arrival
      * @param distance distance to location in meters
      */
-    public RouteLocation(LatLng latLng, String address, Duration eta, int distance) {
+    public RouteLocation(LatLng latLng, String address, Duration eta, Instant timeOfArival , int distance) {
         super(latLng);
         this.address = address;
         this.eta = eta;
         this.distance = distance;
+        this.timeOfArrival = timeOfArival;
         this.type = new ArrayList<String>();
+
+
+        this.name = "";
+        StringTokenizer token = new StringTokenizer(address);
+        while(token.hasMoreTokens()){
+            String x = token.nextToken();
+            if(x.matches("[a-zA-z]]")){
+                name += (x + " ");
+            }
+        }
     }
+
+    /**
+     * Copy constructor
+     *
+     * @param other RouteLocation to copy
+     */
+    public RouteLocation(RouteLocation other) {
+        super(other);
+        this.type = other.type;
+        this.name = other.name;
+        this.eta = new Duration(other.eta);
+        this.timeOfArrival = new Instant(other.timeOfArrival);
+        this.address = other.address;
+        this.distance = other.distance;
+
+
+    }
+
 
     /**
      * What type of rest location this is
@@ -87,27 +119,7 @@ public class RouteLocation extends MapLocation {
         this.type = type;
     }
 
-    /**
-     * Set name of the RouteLocation
-     *
-     * @param name name of the RouteLocation
-     */
-    public void setName(String name) {
-        this.name = name;
+    public Instant getTimeOfArrival() {
+        return timeOfArrival;
     }
-
-    /**
-     * Subtract time from ETA
-     *
-     * @param time time to subtract from ETA
-     */
-    public void decreaseETA(Duration time) {
-        try {
-            this.eta = this.eta.minus(time);
-        } catch (NullPointerException e) {
-            //TODO We should not do this
-            eta = Duration.ZERO;
-        }
-    }
-
 }

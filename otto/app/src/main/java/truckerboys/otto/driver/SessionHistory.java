@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
+/**Class which handles all the history. If you need the ask for breaks, driving time etc. this is where you do it.
  * Created by Martin on 24/09/2014.
  */
 public class SessionHistory {
@@ -36,7 +36,7 @@ public class SessionHistory {
     /**
      * Creates a new SessionHistory.
      *
-     * @param sessions
+     * @param sessions the history
      */
     public SessionHistory(List<Session> sessions) {
         for(Session s : sessions){
@@ -92,44 +92,6 @@ public class SessionHistory {
      */
     public boolean isResting() {
         return sessions.get(0) == null || sessions.get(0).getSessionType() == SessionType.RESTING;
-    }
-
-    /**
-     * Checks if there exists a rest-session longer or equal to a specified time in
-     * an interval [now, backLimit]
-     *
-     * @param restTime  The length of the time to check for
-     * @param backLimit The instant of which to check back to.
-     * @return True if break exists
-     */
-    public boolean existRestLonger(Duration restTime, Instant backLimit) {
-
-        //Loop through all sessions
-        for (Session session : sessions) {
-            //If session is of type RESTING
-            if (session.getSessionType() == SessionType.RESTING) {
-                //If break is longer than specified and after the backlimit
-                if (!session.getDuration().isShorterThan(restTime) && session.getEndTime().isAfter(backLimit)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-    /**
-     * Get the duration since current break was started.
-     *
-     * @return Duration since break was started.
-     * @throws CurrentlyNotOnRestException if driver currently isn't on a break.
-     */
-    public Duration getTimeSinceRestStart() throws CurrentlyNotOnRestException {
-
-        if (sessions.get(0) != null && sessions.get(0).getSessionType() == SessionType.RESTING) {
-            return sessions.get(0).getDuration();
-        }
-
-        throw new CurrentlyNotOnRestException();
     }
 
     /**
@@ -416,8 +378,6 @@ public class SessionHistory {
      */
     public Instant getLatestWeeklyRestEndTime(List<Session> sessions) throws NoValidBreakFound {
 
-        //TODO: Regulation 9.6
-
         Duration weeklyRest1;
         Duration weeklyRest2;
 
@@ -461,7 +421,6 @@ public class SessionHistory {
             }
         }
 
-        // TODO If there has never been any weekly breaks, this isn't valid. Since code will break in getNumberOfExtendedDaysThisWeek()
         //      More specifically it will throw and exception and therefor getNumberOfExtendedDaysThisWeek() will have no week to check
         //      if days are in. It will therefor never return numberOfExtendedDays if driver has never taken a weekly break.
         throw new NoValidBreakFound("No valid weekly break was found.");
