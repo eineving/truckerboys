@@ -296,7 +296,7 @@ public class ClockView extends Fragment {
 
         }else{
             //If the recommended stop is the final destination, change the UI to make that clear
-            if(nextDestination.getAddress()==recStop.getAddress()){
+            if(nextDestination.getAddress()==recStop.getAddress() && nextDestinationIsFinal){
                 recStopTitle.setText(R.string.recStop_title_final);
                 altStopsTitle.setText(R.string.alt_title_final);
             }else{
