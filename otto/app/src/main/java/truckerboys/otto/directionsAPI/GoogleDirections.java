@@ -14,7 +14,7 @@ import truckerboys.otto.utils.positions.MapLocation;
 
 
 public class GoogleDirections implements IDirections {
-    private GoogleRequesterHandler requesterHandler;
+    private int nbrOfCalls = 0;
 
     private static final String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/";
     private static final String GOOGLE_KEY = "AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk";
@@ -33,6 +33,8 @@ public class GoogleDirections implements IDirections {
             e.printStackTrace();
             throw new NoConnectionException("ExecutionException");
         }
+        nbrOfCalls++;
+        Log.w("nbrOfDirCalls", nbrOfCalls + "");
         return GoogleDirectionsJSONDecoder.stringToRoute(response);
     }
 
@@ -64,6 +66,8 @@ public class GoogleDirections implements IDirections {
             e.printStackTrace();
             throw new NoConnectionException("ExecutionException");
         }
+        nbrOfCalls++;
+        Log.w("nbrOfDirCalls", nbrOfCalls + "");
         return GoogleDirectionsJSONDecoder.etaToDestination(response);
     }
 

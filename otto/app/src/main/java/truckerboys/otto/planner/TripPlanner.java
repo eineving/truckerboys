@@ -43,9 +43,6 @@ public class
     private RouteLocation chosenStop;
     private RouteLocation recommendedStop;
 
-    //TODO remove variable
-    private int nbrOfDirCalls = 0;
-
     private MapLocation currentLocation;
 
     private FuelTankInfo fuelTank = new FuelTankInfo(1000);
@@ -255,6 +252,7 @@ public class
             } catch (Exception e) {
                 Log.w("AlternativeETA " + index, e.toString());
             }
+            index++;
         }
         return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
@@ -305,9 +303,7 @@ public class
         //Creates new RouteLocations with all variables set
         for (RouteLocation incompleteLocation : incompleteInfo) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
-            completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(), incompleteLocation.getLongitude()),
-                    tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(),
-                    Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance()));
+            completeInfo.add(tempRoute.getFinalDestination());
         }
         return completeInfo;
     }
@@ -423,46 +419,6 @@ public class
      * @param withinDistance Distance that the LatLng has to be within in meters.
      * @return The coordinate that matches time left the best.
      */
-    private LatLng findLatLngWithinReachOld(Route directRoute, Duration timeLeft, int withinDistance) throws InvalidRequestException, NoConnectionException {
-        ArrayList<LatLng> coordinates = directRoute.getOverviewPolyline();
-        int topIndex = coordinates.size() - 1;
-        int bottomIndex = 0;
-        int currentIndex = (topIndex + bottomIndex) / 2;
-
-        Route routeToLatLng = directionsProvider.getRoute(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                new MapLocation(coordinates.get(currentIndex)));
-        nbrOfDirCalls++;
-
-
-        while ((routeToLatLng.getFinalDestination().getEta().isShorterThan(timeLeft.minus(Duration.standardMinutes(5))) ||
-                routeToLatLng.getFinalDestination().getEta().isLongerThan(timeLeft)) && routeToLatLng.getDistance() < withinDistance - 5000) {
-            if (routeToLatLng.getFinalDestination().getEta().isLongerThan(timeLeft) || routeToLatLng.getDistance() > withinDistance - 5000) {
-                topIndex = currentIndex;
-            } else {
-                bottomIndex = currentIndex;
-            }
-
-            currentIndex = (topIndex + bottomIndex) / 2;
-            //Just to be safe
-            if (topIndex - bottomIndex < 2) {
-                break;
-            }
-            routeToLatLng = directionsProvider.getRoute(new MapLocation(directRoute.getOverviewPolyline().get(0)),
-                    new MapLocation(coordinates.get(currentIndex)));
-            nbrOfDirCalls++;
-        }
-        Log.w("nbrOfDirCalls", nbrOfDirCalls + "");
-        return coordinates.get(currentIndex);
-    }
-
-    /**
-     * Find the coordinate on the polyline that have the smallest delta value from the time and distance left.
-     *
-     * @param directRoute    Route from Google Directions without any rest or gas stops.
-     * @param timeLeft       ETA that the coordinate should be close to.
-     * @param withinDistance Distance that the LatLng has to be within in meters.
-     * @return The coordinate that matches time left the best.
-     */
     private LatLng findLatLngWithinReach(Route directRoute, Duration timeLeft, int withinDistance)
             throws InvalidRequestException, NoConnectionException {
 
@@ -487,17 +443,16 @@ public class
                 tempLocations.add(new MapLocation(baseLatLng[i]));
             }
             routeToLatLng = directionsProvider.getRoute(new MapLocation(baseLatLng[0]), new MapLocation(baseLatLng[8]), tempLocations);
-
             for (int i = 0; i < 8; i++) {
                 //Checks if the LatLng matches end conditions
-                if ((routeToLatLng.getCheckpoints().get(i).getEta().isLongerThan(timeLeft.minus(Duration.standardMinutes(10))) &&
+                if ((routeToLatLng.getCheckpoints().get(i).getEta().isLongerThan(timeLeft.minus(Duration.standardMinutes(5))) &&
                         routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft)) ||
                         routeToLatLng.getCheckpoints().get(i).getDistance() > withinDistance + 10000 &&
                                 routeToLatLng.getCheckpoints().get(i).getDistance() < withinDistance) {
                     return routeToLatLng.getCheckpoints().get(i).getLatLng();
                 }
 
-                if (routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft.minus(Duration.standardMinutes(10))) &&
+                if (routeToLatLng.getCheckpoints().get(i).getEta().isShorterThan(timeLeft.minus(Duration.standardMinutes(5))) &&
                         routeToLatLng.getCheckpoints().get(i).getDistance() < withinDistance) {
                     bottomIndex = index[i];
                 } else {

@@ -17,7 +17,7 @@ public class GooglePlaces implements IPlaces {
     public ArrayList<RouteLocation> getNearbyGasStations(LatLng position) throws NoConnectionException {
         String response;
 
-        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&&radius=3000types=gas_station" + "&key=" + GOOGLE_KEY;
+        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&&radius=5000types=gas_station" + "&key=" + GOOGLE_KEY;
 
         try {
             response = new GoogleRequesterHandler().execute(request).get();
@@ -38,7 +38,7 @@ public class GooglePlaces implements IPlaces {
         String response;
 
         //TODO What types to search for?  https://developers.google.com/places/documentation/search
-        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&radius=3000&types=gas_station" + "&key=" + GOOGLE_KEY;
+        String request = PLACES_URL + "nearbysearch/json?location=" + position.latitude + "," + position.longitude + "&radius=5000&types=gas_station" + "&key=" + GOOGLE_KEY;
 
         try {
             response = new GoogleRequesterHandler().execute(request).get();
