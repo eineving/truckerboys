@@ -7,6 +7,7 @@ import org.joda.time.Instant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Class representing a rest location
@@ -34,6 +35,16 @@ public class RouteLocation extends MapLocation {
         this.distance = distance;
         this.timeOfArrival = timeOfArival;
         this.type = new ArrayList<String>();
+
+
+        this.name = "";
+        StringTokenizer token = new StringTokenizer(address);
+        while(token.hasMoreTokens()){
+            String x = token.nextToken();
+            if(x.matches("[a-zA-z]]")){
+                name += (x + " ");
+            }
+        }
     }
 
     /**
@@ -49,6 +60,8 @@ public class RouteLocation extends MapLocation {
         this.timeOfArrival = new Instant(other.timeOfArrival);
         this.address = other.address;
         this.distance = other.distance;
+
+
     }
 
 
@@ -104,15 +117,6 @@ public class RouteLocation extends MapLocation {
      */
     public void setType(List<String> type) {
         this.type = type;
-    }
-
-    /**
-     * Set name of the RouteLocation
-     *
-     * @param name name of the RouteLocation
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Instant getTimeOfArrival() {

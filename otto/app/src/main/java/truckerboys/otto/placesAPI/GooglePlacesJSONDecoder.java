@@ -61,7 +61,6 @@ public class GooglePlacesJSONDecoder {
             LatLng position = new LatLng(coordinate.get("lat"), coordinate.get("lng"));
             ArrayList<String> types = (ArrayList<String>) location.get("types");
             RouteLocation temp = new RouteLocation(position, "", null, null, -1);
-            temp.setName((String) location.get("name"));
             temp.setType(types);
             decoded.add(temp);
         }

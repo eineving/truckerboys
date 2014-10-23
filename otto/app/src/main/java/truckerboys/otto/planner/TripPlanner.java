@@ -383,7 +383,7 @@ public class
                 Route tempRoute = directionsProvider.getRoute(currentLocation, new MapLocation(optimalLatLong));
                 RouteLocation forcedLocation = new RouteLocation(optimalLatLong, "", tempRoute.getEta(),
                         Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance());
-                forcedLocation.setName("No name location");
+
                 closeLocations.add(forcedLocation);
             }
         }
