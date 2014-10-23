@@ -45,7 +45,8 @@ public class
 
     private MapLocation currentLocation;
 
-    private FuelTankInfo fuelTank = new FuelTankInfo(1000);
+    // Default value for FuelTtnk-size is 330 liters. That is a tanksize specified by Volvo.
+    private FuelTankInfo fuelTank = new FuelTankInfo(330);
 
     public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
         this.regulationHandler = regulationHandler;

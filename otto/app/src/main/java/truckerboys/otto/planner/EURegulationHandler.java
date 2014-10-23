@@ -227,16 +227,17 @@ public class EURegulationHandler implements IRegulationHandler {
 
                 tempHistory.addSession(s);
                 if (!getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
-
+                    tempHistory.removeLastSession();
+                    i -= 10;
                     //And then loop backwards reducing by one minute.
                     while (true) {
                         s = new Session(SessionType.RESTING, new Instant(), new Instant().plus(Duration.standardMinutes(i)));
                         tempHistory.addSession(s);
-                        if (getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
-                            return new TimeLeft(s.getDuration().plus(Duration.standardMinutes(1)), Duration.ZERO);
+                        if (!getThisSessionTL(tempHistory).getTimeLeft().equals(Duration.ZERO)) {
+                            return new TimeLeft(s.getDuration(), Duration.ZERO);
                         }
                         tempHistory.removeLastSession();
-                        i--;
+                        i++;
                     }
                 }
                 tempHistory.removeLastSession();
