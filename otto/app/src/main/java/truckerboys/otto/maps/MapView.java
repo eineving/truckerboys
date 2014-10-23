@@ -279,11 +279,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         if (positionMarker != null) { //Make sure we initiated posMaker in onCreateView
             //We actually just need 2 bearings since we use linear interpolations but we require 3 so
             //that the bearings and positions are synced.
-            if (positions.size() >= 3) {
+            final int size = positions.size();
+            if (size >= 3) {
 
-                Double2 a = positions.get(0);
-                Double2 b = positions.get(1);
-                Double2 c = positions.get(2);
+
+                Double2 a = positions.get(size -3);
+                Double2 b = positions.get(size -2);
+                Double2 c = positions.get(size -1);
 
                 Double2 vecA = b.sub(a).div(INTERPOLATION_FREQ);
                 Double2 vecB = c.sub(b).div(INTERPOLATION_FREQ);
