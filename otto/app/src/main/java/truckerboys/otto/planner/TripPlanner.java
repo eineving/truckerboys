@@ -33,7 +33,6 @@ public class
     private IDirections directionsProvider;
     private IPlaces placesProvider;
 
-
     //Route preferences
     private PlannedRoute activeRoute;
     private MapLocation startLocation;
@@ -343,9 +342,7 @@ public class
         //Creates new RouteLocations with all variables set
         for (RouteLocation incompleteLocation : incompleteInfo) {
             Route tempRoute = directionsProvider.getRoute(currentLocation, incompleteLocation);
-            completeInfo.add(new RouteLocation(new LatLng(incompleteLocation.getLatitude(),
-                    incompleteLocation.getLongitude()), tempRoute.getFinalDestination().getAddress(), tempRoute.getEta(),
-                    Instant.now().plus(tempRoute.getEta()), tempRoute.getDistance()));
+            completeInfo.add(tempRoute.getFinalDestination());
         }
         return completeInfo;
     }
