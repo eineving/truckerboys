@@ -186,7 +186,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                         + "-" + new DateTime(session.getStartTime()).getDayOfMonth()
                         + ": " + session.getSessionType().toString()
                         + " for " + session.getDuration().getStandardHours()
-                        + "h " + session.getDuration().getStandardMinutes() + "min";
+                        + "h " + session.getDuration().minus(session.getDuration().getStandardHours() * 3600000).getStandardMinutes() + "min";
 
 
                 // Update statsview with the new session string

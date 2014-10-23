@@ -30,6 +30,16 @@ public class User {
                 history.addSession(s);
             }
         }
+        if(history.getSessions().size() == 0){
+            Instant i = new Instant();
+            history.addSession(new Session(SessionType.RESTING, i.minus(Duration.standardMinutes(45)),new Instant()));
+            history.addSession(new Session(SessionType.DRIVING, i.minus(Duration.standardMinutes(225)),i.minus(Duration.standardMinutes(45))));
+            history.addSession(new Session(SessionType.WORKING, i.minus(Duration.standardMinutes(285)),i.minus(Duration.standardMinutes(225))));
+            history.addSession(new Session(SessionType.RESTING, i.minus(Duration.standardMinutes(1000)),i.minus(Duration.standardMinutes(285))));
+            history.addSession(new Session(SessionType.DRIVING, i.minus(Duration.standardMinutes(1187)),i.minus(Duration.standardMinutes(1000))));
+            Log.w("HISTORY", "ADDED DUMMY HISTORY");
+        }
+
         if(history.getSessions().size() > 0 && history.getSessions().get(0).isActive()){
             currentSession = history.getSessions().get(0);
         }
