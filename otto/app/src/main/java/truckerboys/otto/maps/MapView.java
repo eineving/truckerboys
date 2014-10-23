@@ -421,7 +421,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
      *
      * @param follow True if camera should follow the marker.
      */
-    private void setFollowMarker(final boolean follow){
+    public void setFollowMarker(final boolean follow){
         if(follow) {
             moveCamera(
                     CameraUpdateFactory.newCameraPosition(new CameraPosition(

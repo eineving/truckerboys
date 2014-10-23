@@ -76,6 +76,10 @@ public class MapPresenter implements IEventListener, IView {
         if(event.isType(RouteRequestEvent.class)){
             RouteRequestEvent routeRequestEvent = (RouteRequestEvent)event;
 
+            //Hide old layout if we had a previous route before this one.
+            mapView.showActiveRouteDialog(false);
+            mapView.setFollowMarker(false);
+
             try {
                 Route route = mapModel.getRoute();
 
@@ -103,7 +107,6 @@ public class MapPresenter implements IEventListener, IView {
                 // It's stupid to fire a RouteRequestEvent without an active route. But if it happens,
                 // Make sure all dialogs are hidden, making sure the user doesn't see any incorrect information.
                 mapView.showStartRouteDialog(false);
-                mapView.showActiveRouteDialog(false);
                 mapView.showStopRoute(false);
             }
         }
