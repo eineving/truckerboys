@@ -71,7 +71,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private TextView nextCheckpointDistText;
 
     // Last known distraction level. Used for optimizing (Not having to set new icon every time distractionlevel is changed.)
-    private int lastDistractionLevel;
+    private int lastDistractionLevel = 0;
 
     //region Camera Settings
     public float CAMERA_TILT = 60f;
@@ -492,11 +492,14 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
+        System.out.println("Level changed in MapView");
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("Runnable is ran: " + driverDistractionLevel.getLevel());
                 if(driverDistractionLevel.getLevel() >= 2 && lastDistractionLevel < 2) /* High distraction level */ {
-                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
+                    System.out.println("Distractionlevel is now high");
+                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
 
                     setFollowMarker(true);
 
@@ -505,16 +508,16 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     showActiveRouteDialog(false);
                     setAllGestures(false);
                 } else if(driverDistractionLevel.getLevel() < 2 && lastDistractionLevel >= 2) /* Low distraction level */ {
-                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
+                    System.out.println("Distractionlevel is now low");
+                    positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
 
                     //Make it possible for the driver to exit "Follow Marker Mode"
                     showActiveRouteDialog(true);
                     showStopRoute(true);
                 }
+                lastDistractionLevel = driverDistractionLevel.getLevel();
             }
         });
-
-        lastDistractionLevel = driverDistractionLevel.getLevel();
     }
 
     public void setFinalDestinationText(final String text) {

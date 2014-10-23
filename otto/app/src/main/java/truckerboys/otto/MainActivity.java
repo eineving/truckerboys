@@ -21,6 +21,7 @@ import truckerboys.otto.utils.eventhandler.events.NetworkConnectedEvent;
 public class MainActivity extends Activity implements IEventListener{
 
     private ConnectionListener connectionListener;
+    private Class currentActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +54,17 @@ public class MainActivity extends Activity implements IEventListener{
      * Checks what activity should be started 
      */
     private void launchNextActivity(){
-        if(connectionListener.isConnectedToNetwork() && connectionListener.isConnectedToGPS()){
+        if(connectionListener.isConnectedToNetwork() && connectionListener.isConnectedToGPS() && currentActivity.getClass().equals(OTTOActivity.class)){
             if(NoGPSConnectionActivity.getNoGPSConnectionActivity() != null) {
                 NoGPSConnectionActivity.getNoGPSConnectionActivity().finish();
             }
+            if(NoNetworkConnectionActivity.getNoNetworkConnectionActivity() != null){
+                NoNetworkConnectionActivity.getNoNetworkConnectionActivity().finish();
+            }
             launchOTTOActivity();
-        } else if (!connectionListener.isConnectedToGPS()) {
+        } else if (!connectionListener.isConnectedToGPS() && currentActivity.getClass().equals(NoGPSConnectionActivity.class)) {
             launchNoGPSConnectionActivity();
-        } else if (!connectionListener.isConnectedToNetwork()) {
+        } else if (!connectionListener.isConnectedToNetwork() && currentActivity.getClass().equals(NoNetworkConnectionActivity.class)) {
             launchNoNetworkConnectionActivity();
         }
     }
@@ -85,6 +89,7 @@ public class MainActivity extends Activity implements IEventListener{
      * SImple method for launching the OTTOActivity.
      */
     private void launchOTTOActivity(){
+        currentActivity = OTTOActivity.class;
         Intent OTTOActivity = new Intent(this, OTTOActivity.class);
         startActivity(OTTOActivity);
     }
