@@ -28,6 +28,7 @@ import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
@@ -92,7 +93,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
-        EventBuss.getInstance().subscribe(this, EventType.ROUTE);
+        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
     }
 
     @Override
@@ -135,7 +136,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     @Override
     public void performEvent(Event event) {
         // Sets the current page to Map if a new destination is set
-        if (event.isType(RouteRequestEvent.class)) {
+        if (event.isType(RouteRequestEvent.class) || event.isType(SetChosenStopEvent.class)) {
             viewPager.setCurrentItem(0);
         }
     }
