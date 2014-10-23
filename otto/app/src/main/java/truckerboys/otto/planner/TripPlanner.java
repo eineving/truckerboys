@@ -106,17 +106,17 @@ public class
     public void passedCheckpoint(MapLocation passedCheckpoint) throws CheckpointNotFoundException {
         boolean checkpointFound = false;
 
-        if (passedCheckpoint.equalCoordinates(chosenStop)) {
+        if (chosenStop != null && passedCheckpoint.equalCoordinates(chosenStop)) {
             chosenStop = null;
             checkpointFound = true;
         }
 
-        if (passedCheckpoint.equalCoordinates(recommendedStop)) {
+        if (recommendedStop!= null && passedCheckpoint.equalCoordinates(recommendedStop)) {
             recommendedStop = null;
             checkpointFound = true;
         }
 
-        if (passedCheckpoint.equalCoordinates(finalDestination)) {
+        if (finalDestination != null && passedCheckpoint.equalCoordinates(finalDestination)) {
             activeRoute = null;
             checkpointFound = true;
         }

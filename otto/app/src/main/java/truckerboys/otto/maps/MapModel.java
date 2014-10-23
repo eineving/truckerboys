@@ -16,6 +16,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
+import truckerboys.otto.utils.exceptions.CheckpointNotFoundException;
 import truckerboys.otto.utils.exceptions.InvalidRequestException;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.exceptions.NoConnectionException;
@@ -90,6 +91,7 @@ public class MapModel implements IEventListener {
                     } else if (closeToCheckpoint) /* We're currently in range. */ {
                         // We left checkpoint range again, calculate new route to final destination.
                         if (newPosition.distanceTo(nextCheckpoint) > DISTANCE_FROM_CHECKPOINT) {
+                            tripPlanner.passedCheckpoint(nextCheckpoint);
                             tripPlanner.updateRoute(LocationHandler.getCurrentLocationAsMapLocation());
                             closeToCheckpoint = false;
                         }
@@ -101,6 +103,8 @@ public class MapModel implements IEventListener {
                 // Driver has not defined a route, no need to calculate if we've passed checkpoints.
             } catch (InvalidRequestException e) {
                 
+            } catch (CheckpointNotFoundException e) {
+                closeToCheckpoint = false;
             }
             //endregion
         }
