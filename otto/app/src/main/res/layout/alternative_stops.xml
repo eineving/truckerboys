@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:singleLine="true"
-            android:text="Alternatives"
+            android:text="Clock"
             android:textColor="@color/textLight"
             android:textSize="45sp" />
 

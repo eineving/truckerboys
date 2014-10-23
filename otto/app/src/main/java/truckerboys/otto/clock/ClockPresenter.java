@@ -1,5 +1,7 @@
 package truckerboys.otto.clock;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 
 import truckerboys.otto.IView;
@@ -21,12 +23,36 @@ public class ClockPresenter  implements IView, IEventListener {
     private ClockModel model;
     private ClockView view;
 
+    private Handler updateHandler;
+    private Runnable update;
+
     public ClockPresenter(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user){
         model = new ClockModel(tripPlanner, regulationHandler, user);
         view = new ClockView();
+        view.setOnBreak(model.isOnBreak());
 
         EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
 
+        updateHandler = new Handler(Looper.getMainLooper());
+        update = new Runnable(){
+            public void run(){
+                updateTL();
+            }
+        };
+        updateHandler.postDelayed(update, 1000);
+
+    }
+    /**
+     * Updates the model and view with time left.
+     */
+    public void updateTL() {
+        if(model.getRoute()==null) {
+            model.updateTL();
+            view.setTimeLeft(model.getTimeLeft());
+            view.updateUI();
+            view.setOnBreak(model.isOnBreak());
+        }
+        updateHandler.postDelayed(update, 5000);
     }
 
     @Override
@@ -43,9 +69,12 @@ public class ClockPresenter  implements IView, IEventListener {
     public void performEvent(Event event) {
         if(event.isType(ChangedRouteEvent.class)){
             model.processChangedRoute();
+            if(model.getRoute()!=null){
+                updateHandler.removeCallbacks(update);
+            }
             view.setRecommendedStop(model.getRecommendedStop());
             view.setAltStops(model.getAltStops());
-            view.setNextDestination(model.getNextDestination());
+            view.setNextDestination(model.getNextDestination(), model.isNextDestinationFinal());
             view.setTimeLeft(model.getTimeLeft());
             view.updateUI();
         }

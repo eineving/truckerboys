@@ -44,7 +44,8 @@ public class ClockView extends Fragment {
     ProgressDialog spinnerDialog;
 
     TextView timeLeft, timeLeftExtended, recStopETA, firstAltStopETA, secAltStopETA, thirdAltStopETA,
-            recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle;
+            recStopName, firstAltStopName, secAltStopName, thirdAltStopName, recStopTitle, timeTitle,
+            altStopsTitle;
     ImageView recStopImage, firstAltStopImage, secAltStopImage, thirdAltStopImage;
     RelativeLayout firstAltStopClick, secAltStopClick, thirdAltStopClick;
     LinearLayout alternativeStopsButton, backButton;
@@ -53,7 +54,7 @@ public class ClockView extends Fragment {
 
     ArrayList<RouteLocation> altStops = new ArrayList<RouteLocation>();
 
-    Boolean variablesSet = false;
+    Boolean variablesSet = false, nextDestinationIsFinal;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
 
     public ClockView() {}
@@ -78,7 +79,9 @@ public class ClockView extends Fragment {
         timeLeft = (TextView) rootView.findViewById(R.id.clockETA);
         timeLeftExtended = (TextView) rootView.findViewById(R.id.clockETAExtended);
 
+        timeTitle = (TextView) rootView.findViewById(R.id.timeTitle);
         recStopTitle = (TextView) rootView.findViewById(R.id.recStopTitle);
+        altStopsTitle = (TextView) rootView.findViewById(R.id.altStopsTitle);
 
         recStopETA = (TextView) rootView.findViewById(R.id.recStopETA);
         firstAltStopETA = (TextView) rootView.findViewById(R.id.firstAltStopETA);
@@ -226,8 +229,23 @@ public class ClockView extends Fragment {
      * Sets the next destination of the route
      * @param nextDestination The next destination
      */
-    public void setNextDestination(RouteLocation nextDestination){
+    public void setNextDestination(RouteLocation nextDestination, boolean nextDestinationIsFinal){
         this.nextDestination = nextDestination;
+        this.nextDestinationIsFinal = nextDestinationIsFinal;
+    }
+
+    /**
+     * Sets if the driver is on break
+     * @param isOnBreak Boolean, true if the driver is on break
+     */
+    public void setOnBreak(boolean isOnBreak){
+        if(variablesSet) {
+            if (isOnBreak) {
+                timeTitle.setText(R.string.break_title);
+            } else {
+                timeTitle.setText(R.string.driving_title);
+            }
+        }
     }
 
     /**
@@ -267,10 +285,24 @@ public class ClockView extends Fragment {
             recStopETA.setText(getTimeAsFormattedString(nextDestination.getEta()));
             recStopName.setText(nextDestination.getAddress());
             recStopImage.setVisibility(TextView.GONE);
+            if(nextDestinationIsFinal) {
+                recStopTitle.setText(R.string.recStop_title_final);
+            }else{
+                recStopTitle.setText(R.string.recStop_title_break);
+            }
             v.setVisibility(ViewGroup.VISIBLE);
             alternativeStopsButton.setVisibility(View.VISIBLE);
+            altStopsTitle.setText(R.string.alt_title_final);
 
         }else{
+            //If the recommended stop is the final destination, change the UI to make that clear
+            if(nextDestination.getAddress()==recStop.getAddress()){
+                recStopTitle.setText(R.string.recStop_title_final);
+                altStopsTitle.setText(R.string.alt_title_final);
+            }else{
+                recStopTitle.setText(R.string.recStop_title_break);
+                altStopsTitle.setText(R.string.alt_title_break);
+            }
             setStopUI(recStop, recStopETA, recStopName, recStopImage);
         }
 
@@ -318,6 +350,9 @@ public class ClockView extends Fragment {
         }
     }
 
+    /**
+     * Displays a loading dialog.
+     */
     private void startSpinner() {
 
         spinnerDialog = new ProgressDialog(getActivity());
