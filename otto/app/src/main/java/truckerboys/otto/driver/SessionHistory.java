@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**Class which handles all the history. If you need the ask for breaks, driving time etc. this is where you do it.
+/**
+ * Class which handles all the history. If you need the ask for breaks, driving time etc. this is where you do it.
  * Created by Martin on 24/09/2014.
  */
 public class SessionHistory {
@@ -30,16 +31,17 @@ public class SessionHistory {
     private List<Session> sessions = new ArrayList<Session>();
 
 
-    public SessionHistory(){
+    public SessionHistory() {
 
     }
+
     /**
      * Creates a new SessionHistory.
      *
      * @param sessions the history
      */
     public SessionHistory(List<Session> sessions) {
-        for(Session s : sessions){
+        for (Session s : sessions) {
             addSession(s);
         }
     }
@@ -50,9 +52,9 @@ public class SessionHistory {
      * @param session the past sessions
      */
     public void addSession(Session session) {
-        if(sessions.size() == 0){
+        if (sessions.size() == 0) {
             sessions.add(session);
-        }else{
+        } else {
             boolean added = false;
             for (Session s : sessions) {
                 if (session.getStartTime().isAfter(s.getStartTime())) {
@@ -61,7 +63,7 @@ public class SessionHistory {
                     break;
                 }
             }
-            if(!added){
+            if (!added) {
                 sessions.add(session);
             }
         }
@@ -76,8 +78,8 @@ public class SessionHistory {
         return sessions;
     }
 
-    public void removeLastSession(){
-        if(sessions.size() > 0 ){
+    public void removeLastSession() {
+        if (sessions.size() > 0) {
             sessions.remove(0);
         }
     }
@@ -110,7 +112,7 @@ public class SessionHistory {
             //Session is driving and has start-time after 'start'
             if (session.getSessionType() == SessionType.DRIVING) {
 
-                if (session.getStartTime().isAfter(start)) {
+                if (!session.getStartTime().isBefore(start)) {
                     //Add whole session to time
                     time = time.plus(session.getDuration());
                 } else if (session.getStartTime().isBefore(start) && session.getEndTime().isAfter(start)) {
@@ -134,7 +136,7 @@ public class SessionHistory {
 
         for (Session session : sessions) {
             if (session.getSessionType() == SessionType.RESTING) {
-                if (session.getDuration().isLongerThan(duration)) {
+                if (!session.getDuration().isShorterThan(duration)) {
                     return time;
                 }
             } else {
@@ -453,7 +455,7 @@ public class SessionHistory {
      * @return the driving time since the last daily break.
      */
     public Duration getActiveTimeSinceLastDailyBreak() {
-        //Get latest weekly break, if no break was found. We are in first week ever. Search all sessions.
+        //Get latest Daily break, if no break was found. We are in first week ever. Search all sessions.
         Instant latestDailyBreak;
         try {
             latestDailyBreak = getLatestDailyRestEndTime();
@@ -497,6 +499,7 @@ public class SessionHistory {
 
     /**
      * Returns the Date of a given Sessions.
+     *
      * @param sessionIndex The index of the session
      * @return The DateTime of Session at index i.
      */
