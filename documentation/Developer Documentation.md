@@ -42,6 +42,8 @@ take actions in other parts of the application whenever we want to. For example
 we can update the application in real-time when we change something in our settings
 tab. Which makes for a better user experience.
 
+##User Inteface
+
 ##External Dependencies
 Since we're developing for Android, we've choosen Google as our main provider for
 external APIs. This is mainly because users of Android are already very
