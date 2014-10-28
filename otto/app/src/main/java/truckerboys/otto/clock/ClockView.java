@@ -252,15 +252,16 @@ public class ClockView extends Fragment {
      * Updates the UI
      */
     public void updateUI() {
-
         if (variablesSet) {
             Runnable updateUI = new Runnable() {
                 public void run() {
                     setLabels();
                 }
             };
-            if(getActivity()!=null)
-            getActivity().runOnUiThread(updateUI);
+            if(getActivity()!=null){
+                getActivity().runOnUiThread(updateUI);
+            }
+
         }
     }
 
@@ -268,8 +269,9 @@ public class ClockView extends Fragment {
      * Sets the labels of the time until violation and the stops.
      */
     private void setLabels() {
-        if(spinnerDialog!=null && spinnerDialog.isShowing())
+        if (spinnerDialog != null && spinnerDialog.isShowing()){
             spinnerDialog.dismiss();
+        }
         timeLeft.setText(timeL);
         if (timeLE.equalsIgnoreCase("0")) {
             timeLeftExtended.setVisibility(TextView.GONE);

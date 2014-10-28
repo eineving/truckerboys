@@ -152,7 +152,6 @@ public class ClockModel {
      * @return Boolean, true if the next destinaton is final.
      */
     public boolean isNextDestinationFinal(){
-        System.out.println("Next dest final? " + nextDestinationIsFinal);
         return nextDestinationIsFinal;
     }
 

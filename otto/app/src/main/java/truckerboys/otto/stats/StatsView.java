@@ -175,11 +175,9 @@ public class StatsView extends Fragment implements IPresenter, IEventListener{
      * history list.
      */
     public void clearSessionAdapter() {
-        try{
+        if(sessionAdapter != null){
             sessionAdapter.clear();
             sessionAdapter.notifyDataSetChanged();
-        } catch (NullPointerException e) {
-            System.out.println("An adapter might not have been set");
         }
     }
 

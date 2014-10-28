@@ -407,8 +407,6 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
                     if (item > 1) {
                         mViewPager.setCurrentItem(0);
-                    } else {
-                        // mViewPager.setCurrentItem(item);
                     }
 
                 }

@@ -26,13 +26,11 @@ import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 public class HomePresenter implements IPresenter, IEventListener {
 
     private IRegulationHandler handler;
-    private HomeModel model;
     private HomeView view;
     private ActiveSessionDialogFragment dialog;
     private User user;
 
     public HomePresenter(IRegulationHandler handler, User user) {
-        this.model = new HomeModel();
         this.view = new HomeView();
         this.user = user;
         this.handler = handler;
@@ -62,9 +60,7 @@ public class HomePresenter implements IPresenter, IEventListener {
                                 handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().getMillis());
                         dialog.onAttach(view.getActivity());
 
-
                         dialog.show(view.getActivity().getFragmentManager(), "DriverBreak");
-                        System.out.println("Show dialog");
                     }
                 } catch (CurrentlyNotOnRestException e) { // Else
                 }
@@ -92,17 +88,11 @@ public class HomePresenter implements IPresenter, IEventListener {
     public void performEvent(Event event) {
         // If new route has been clicked in HomeView
         if (event.isType(NewRouteClickedEvent.class)) {
-            System.out.println("New Route Clicked");
             newRouteClicked();
         }
 
         // If user clicks yes, in the "session-is-active"-dialog
         if (event.isType(YesClickedEvent.class)) {
-            System.out.println("Yes Clicked");
-
-            // Should we ends current session ?
-            // User.getInstance().getHistory().getSessions().get(User.getInstance().getHistory().getSessions().size()-1).end();
-
             Intent newRouteIntent = new Intent(view.getActivity(), RouteActivity.class);
             view.getActivity().startActivity(newRouteIntent);
         }

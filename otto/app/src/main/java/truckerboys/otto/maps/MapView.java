@@ -74,8 +74,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private int lastDistractionLevel = 0;
 
     //region Camera Settings
-    public float CAMERA_TILT = 60f;
-    public float CAMERA_ZOOM = 16f; //Default to 16f zoom.
+    public float cameraTilt = 60f;
+    public float cameraZoom = 16f; //Default to 16f zoom.
     private boolean followMarker;
     //endregion
 
@@ -194,9 +194,9 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 @Override
                 public void run() {
                     if (animate) {
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, cameraZoom, cameraTilt, bearing)));
                     } else {
-                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, cameraZoom, cameraTilt, bearing)));
                     }
                 }
             });
@@ -348,13 +348,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             //region Adjust zoom to speed
             if(isFollowingMarker()) {
                 if (newLocation.getSpeed() <= 8.33 /* ca 30km/h */) {
-                    CAMERA_ZOOM = 17f;
+                    cameraZoom = 17f;
                 } else if (newLocation.getSpeed() > 8.3 && newLocation.getSpeed() <= 13.88 /* ca 50km/h */) {
-                    CAMERA_ZOOM = 16.5f;
+                    cameraZoom = 16.5f;
                 } else if (newLocation.getSpeed() > 13.88 && newLocation.getSpeed() <= 19.44/* 70km/h */) {
-                    CAMERA_ZOOM = 14.5f;
+                    cameraZoom = 14.5f;
                 } else if (newLocation.getSpeed() > 19.44) {
-                    CAMERA_ZOOM = 14f;
+                    cameraZoom = 14f;
                 }
             }
             //endregion
@@ -383,7 +383,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        CAMERA_ZOOM = cameraPosition.zoom;
+        cameraZoom = cameraPosition.zoom;
     }
 
     @Override
@@ -429,7 +429,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     CameraUpdateFactory.newCameraPosition(new CameraPosition(
                             LocationHandler.getCurrentLocationAsLatLng(),
                             17f,
-                            CAMERA_TILT,
+                            cameraTilt,
                             LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
                     new GoogleMap.CancelableCallback() {
                         @Override
@@ -494,13 +494,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
-        System.out.println("Level changed in MapView");
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Runnable is ran: " + driverDistractionLevel.getLevel());
                 if(driverDistractionLevel.getLevel() >= 2 && lastDistractionLevel < 2) /* High distraction level */ {
-                    System.out.println("Distractionlevel is now high");
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
 
                     setFollowMarker(true);
@@ -510,7 +507,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     showActiveRouteDialog(false);
                     setAllGestures(false);
                 } else if(driverDistractionLevel.getLevel() < 2 && lastDistractionLevel >= 2) /* Low distraction level */ {
-                    System.out.println("Distractionlevel is now low");
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
 
                     //Make it possible for the driver to exit "Follow Marker Mode"
