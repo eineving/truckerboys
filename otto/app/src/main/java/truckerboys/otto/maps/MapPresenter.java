@@ -11,8 +11,8 @@ import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -46,7 +46,7 @@ public class MapPresenter implements IEventListener, IPresenter {
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
         this.mapModel = new MapModel(tripPlanner);
-        EventBuss.getInstance().subscribe(this, EventType.ROUTE);
+        EventBus.getInstance().subscribe(this, EventType.ROUTE);
         updatePos.run();
     }
 

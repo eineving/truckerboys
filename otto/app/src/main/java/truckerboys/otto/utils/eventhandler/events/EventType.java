@@ -1,4 +1,4 @@
-package truckerboys.otto.utils.eventhandler;
+package truckerboys.otto.utils.eventhandler.events;
 
 /**
  * Created by Simon Petersson on 2014-10-22.

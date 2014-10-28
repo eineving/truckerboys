@@ -18,8 +18,8 @@ import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -67,8 +67,8 @@ public class StatsPresenter implements IPresenter, IEventListener, IVehicleListe
         VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER,VehicleSignalID.TOTAL_VEHICLE_DISTANCE);
 
 
-        EventBuss.getInstance().subscribe(this, EventType.STATISTICS);
-        EventBuss.getInstance().subscribe(view, EventType.STATISTICS);
+        EventBus.getInstance().subscribe(this, EventType.STATISTICS);
+        EventBus.getInstance().subscribe(view, EventType.STATISTICS);
     }
 
     public StatsView getView() {
@@ -262,7 +262,7 @@ public class StatsPresenter implements IPresenter, IEventListener, IVehicleListe
                 // Gets the total distance by fuel and updates the listeners
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
 
-                EventBuss.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
+                EventBus.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
                 statsEditor.putFloat("distanceByFuel", kmPerLiter);
 
                 statsEditor.apply();
@@ -275,7 +275,7 @@ public class StatsPresenter implements IPresenter, IEventListener, IVehicleListe
                 // Gets the total distance and updates the listeners
                 long distance = ((SCSLong) signal.getData()).getLongValue();
 
-                EventBuss.getInstance().newEvent(new TotalDistanceEvent(distance));
+                EventBus.getInstance().newEvent(new TotalDistanceEvent(distance));
 
                 statsEditor.putFloat("distanceTotal", distance);
                 statsEditor.apply();

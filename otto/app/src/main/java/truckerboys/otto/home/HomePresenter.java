@@ -12,8 +12,8 @@ import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.newroute.RouteActivity;
 import truckerboys.otto.planner.IRegulationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.NewRouteClickedEvent;
@@ -35,7 +35,7 @@ public class HomePresenter implements IPresenter, IEventListener {
         this.user = user;
         this.handler = handler;
 
-        EventBuss.getInstance().subscribe(this, EventType.BUTTON_CLICKED);
+        EventBus.getInstance().subscribe(this, EventType.BUTTON_CLICKED);
     }
 
 

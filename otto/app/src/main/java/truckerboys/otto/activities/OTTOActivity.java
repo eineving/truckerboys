@@ -25,8 +25,8 @@ import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
@@ -95,7 +95,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
-        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
+        EventBus.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
      */
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        EventBuss.getInstance().newEvent(new YesClickedEvent());
+        EventBus.getInstance().newEvent(new YesClickedEvent());
     }
 
     @Override

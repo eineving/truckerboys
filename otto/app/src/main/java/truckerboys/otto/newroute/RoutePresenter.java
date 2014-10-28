@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.eventhandler.events.RefreshHistoryEvent;
 
@@ -50,7 +50,7 @@ public class RoutePresenter {
                     if(locations.size() > 0) {
                         Address location = locations.get(0);
                         //Address checkPoint = checkPoints.get(0);
-                        EventBuss.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
+                        EventBus.getInstance().newEvent(new RouteRequestEvent(location, checkpointsArray));
                     }
 
                 } catch (IOException e) {
@@ -72,7 +72,7 @@ public class RoutePresenter {
         String place3 = history.getString("place3", "");
 
 
-        EventBuss.getInstance().newEvent(new RefreshHistoryEvent(place1, place2, place3));
+        EventBus.getInstance().newEvent(new RefreshHistoryEvent(place1, place2, place3));
     }
 
     /**

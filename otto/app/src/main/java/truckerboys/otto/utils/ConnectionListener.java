@@ -11,7 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 
-import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.events.GPSConnectedEvent;
 import truckerboys.otto.utils.eventhandler.events.NetworkConnectedEvent;
 
@@ -65,13 +65,13 @@ public class ConnectionListener extends BroadcastReceiver implements LocationLis
     @Override
     public void onProviderEnabled(String s) {
         //GPS is now conected.
-        EventBuss.getInstance().newEvent(new GPSConnectedEvent());
+        EventBus.getInstance().newEvent(new GPSConnectedEvent());
     }
 
     @Override
     public void onProviderDisabled(String s) {
         //GPS is no longer connected.
-        EventBuss.getInstance().newEvent(new GPSConnectedEvent());
+        EventBus.getInstance().newEvent(new GPSConnectedEvent());
     }
 
     @Override
@@ -81,9 +81,9 @@ public class ConnectionListener extends BroadcastReceiver implements LocationLis
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
             if(networkInfo != null && networkInfo.isConnected()) {
-                EventBuss.getInstance().newEvent(new NetworkConnectedEvent(true));
+                EventBus.getInstance().newEvent(new NetworkConnectedEvent(true));
             } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
-                EventBuss.getInstance().newEvent(new NetworkConnectedEvent(false));
+                EventBus.getInstance().newEvent(new NetworkConnectedEvent(false));
             }
         }
     }

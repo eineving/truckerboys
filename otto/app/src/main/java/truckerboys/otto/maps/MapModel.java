@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
@@ -57,7 +57,7 @@ public class MapModel implements IEventListener {
 
     public MapModel(final TripPlanner tripPlanner) {
         this.tripPlanner = tripPlanner;
-        EventBuss.getInstance().subscribe(this, EventType.GPS_UPDATE, EventType.ROUTE);
+        EventBus.getInstance().subscribe(this, EventType.GPS_UPDATE, EventType.ROUTE);
         //TODO Uncomment
         //updateRouteHandler.post(updateRoute);
     }

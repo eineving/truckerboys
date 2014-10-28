@@ -32,8 +32,8 @@ import java.util.List;
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
@@ -93,7 +93,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
         rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
-        EventBuss.getInstance().subscribe(this, EventType.GPS_UPDATE);
+        EventBus.getInstance().subscribe(this, EventType.GPS_UPDATE);
 
         // Subscribe to DistractionLevelChanged, since we want to change marker when having a high distraction level.
         VehicleInterface.subscribeToDistractionChange(this);

@@ -2,10 +2,10 @@ package truckerboys.otto.utils.eventhandler;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import truckerboys.otto.utils.eventhandler.events.Event;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 
 /**
  * Created by Simon Petersson on 2014-10-02.
@@ -13,25 +13,25 @@ import truckerboys.otto.utils.eventhandler.events.Event;
  * A class that represents an EventBuss, that takes events and sends it out to all subscribers.
  * Making it possible for anyone to react to events that anyone fires.
  */
-public class EventBuss {
-    private static EventBuss eventBuss;
+public class EventBus {
+    private static EventBus eventBus;
 
     // We use a map to map certain listeners to specific events.
     private Map<EventType, LinkedList<IEventListener>> eventListeners = new HashMap<EventType, LinkedList<IEventListener>>();
 
     // We need to make sure that the eventListeners map has an entry with all specific types of event.
 
-    private EventBuss(){ }
+    private EventBus(){ }
 
     /**
      * Return the instance of the EventBuss.
      * @return The instance of EventBuss.
      */
-    public static EventBuss getInstance(){
-        if(eventBuss == null) {
-            eventBuss = new EventBuss();
+    public static EventBus getInstance(){
+        if(eventBus == null) {
+            eventBus = new EventBus();
         }
-        return eventBuss;
+        return eventBus;
     }
 
     /**

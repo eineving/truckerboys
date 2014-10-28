@@ -7,9 +7,8 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.IEventListener;
-import truckerboys.otto.utils.eventhandler.events.Event;
+
+import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
 
@@ -70,7 +69,7 @@ public class SettingsPresenter {
         // Commit the changes
         settingsEditor.apply();
 
-        EventBuss.getInstance().newEvent(new SettingsChangedEvent());
+        EventBus.getInstance().newEvent(new SettingsChangedEvent());
     }
 
 
@@ -81,7 +80,7 @@ public class SettingsPresenter {
     public void soundChanged(boolean sound) {
 
         // Fire an event with new sound mode on/off
-        EventBuss.getInstance().newEvent(new SoundChangedEvent(sound));
+        EventBus.getInstance().newEvent(new SoundChangedEvent(sound));
 
     }
 

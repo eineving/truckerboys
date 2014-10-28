@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import truckerboys.otto.utils.ConnectionListener;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSConnectedEvent;
@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements IEventListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventBuss.getInstance().subscribe(this, EventType.CONNECTION);
+        EventBus.getInstance().subscribe(this, EventType.CONNECTION);
 
         connectionListener = new ConnectionListener(this);
         if(connectionListener.isConnectedToGPS() && connectionListener.isConnectedToNetwork()){
