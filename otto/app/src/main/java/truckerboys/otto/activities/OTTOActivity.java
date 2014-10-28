@@ -155,7 +155,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
-        ;
+
     }
 
     @Override

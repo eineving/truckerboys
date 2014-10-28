@@ -287,14 +287,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (distractionMode) {
-            if (ev.getX() >= mTabStrip.getChildAt(2).getX() - 5) {
-                return true;
-            }
-            return false;
-        } else {
-            return false;
-        }
+        return (distractionMode && (ev.getX() >= mTabStrip.getChildAt(2).getX() - 5));
     }
 
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
@@ -375,7 +368,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
 
         //If the level hasn't passed the threshhold, no need to update anything.
-        if((level > 1 && distractionMode == false)||(level <= 1 && distractionMode == true)){
+        if((level > 1 && !distractionMode)||(level <= 1 && distractionMode)){
             distractionMode = !distractionMode;
 
             final int colour;

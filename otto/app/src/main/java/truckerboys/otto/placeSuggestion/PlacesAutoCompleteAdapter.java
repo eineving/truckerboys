@@ -50,7 +50,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
      */
     @Override
     public Filter getFilter() {
-        Filter filter = new Filter() {
+        return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
 
@@ -90,7 +90,5 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
                 }
             }
         };
-
-        return filter;
     }
 }
