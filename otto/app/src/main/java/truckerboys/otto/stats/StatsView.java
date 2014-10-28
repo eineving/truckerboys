@@ -16,6 +16,7 @@ import android.widget.TextView;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.utils.eventhandler.EventBuss;
@@ -26,8 +27,6 @@ import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.StatsViewStoppedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
-import truckerboys.otto.IView;
-
 
 
 /**
@@ -35,7 +34,7 @@ import truckerboys.otto.IView;
  * Class for displaying statistics for the user.
  */
 
-public class StatsView extends Fragment implements IView, IEventListener{
+public class StatsView extends Fragment implements IPresenter, IEventListener{
 
     private View rootView;
 

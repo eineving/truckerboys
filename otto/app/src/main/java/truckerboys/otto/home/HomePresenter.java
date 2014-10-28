@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment;
 
 import org.joda.time.Duration;
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
@@ -23,7 +23,7 @@ import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
  * Created by Mikael Malmqvist on 2014-09-18.
  * This class handles logic for the HomeView.
  */
-public class HomePresenter implements IView, IEventListener {
+public class HomePresenter implements IPresenter, IEventListener {
 
     private IRegulationHandler handler;
     private HomeModel model;

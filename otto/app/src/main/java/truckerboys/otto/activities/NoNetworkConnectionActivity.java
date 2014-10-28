@@ -1,11 +1,9 @@
-package truckerboys.otto;
+package truckerboys.otto.activities;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.view.View;
-import android.widget.Button;
+
+import truckerboys.otto.R;
 
 /**
  * Created by Simon Petersson on 2014-10-14.

@@ -42,7 +42,7 @@ import com.swedspot.vil.distraction.DriverDistractionLevel;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 
@@ -84,7 +84,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
 
     private TabPagerAdapter pagerAdapter;
-    private List<IView> views = new ArrayList<IView>();
+    private List<IPresenter> views = new ArrayList<IPresenter>();
 
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
@@ -357,7 +357,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
 
-    public void setAdapter(TabPagerAdapter adapter, List<IView> views) {
+    public void setAdapter(TabPagerAdapter adapter, List<IPresenter> views) {
         this.pagerAdapter = adapter;
         this.views.addAll(views);
 

@@ -1,4 +1,4 @@
-package truckerboys.otto;
+package truckerboys.otto.activities;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import truckerboys.otto.R;
 import truckerboys.otto.clock.ClockPresenter;
 import truckerboys.otto.directionsAPI.GoogleDirections;
 import truckerboys.otto.driver.TachographHandler;
@@ -22,6 +23,7 @@ import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.stats.StatsPresenter;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.utils.LocationHandler;
 import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.EventType;
@@ -47,7 +49,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     private TachographHandler tachographHandler;
     private LocationHandler locationHandler;
 
-    private List<IView> presenters = new ArrayList<IView>();
+    private List<IPresenter> presenters = new ArrayList<IPresenter>();
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
 
@@ -129,7 +131,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
         presenters.add(new SettingsView());
     }
 
-    public List<IView> getPresenters() {
+    public List<IPresenter> getPresenters() {
         return presenters;
     }
 

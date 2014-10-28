@@ -14,7 +14,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.User;
@@ -36,7 +36,7 @@ import truckerboys.otto.vehicle.VehicleSignalID;
  * Class for handling most logic for the StatsView showing
  * usefull statistics for the user.
  */
-public class StatsPresenter implements IView, IEventListener, IVehicleListener {
+public class StatsPresenter implements IPresenter, IEventListener, IVehicleListener {
     private StatsModel model;
 
     private StatsView view;

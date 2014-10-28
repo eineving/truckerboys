@@ -1,4 +1,4 @@
-package truckerboys.otto;
+package truckerboys.otto.utils;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

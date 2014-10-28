@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.R;
 import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.EventType;
@@ -19,7 +20,6 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
-import truckerboys.otto.IView;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -31,7 +31,7 @@ import truckerboys.otto.IView;
  * Elm street more than proper java coding.
  */
 
-public class SettingsView extends Fragment implements IView, IEventListener {
+public class SettingsView extends Fragment implements IPresenter, IEventListener {
     private View rootView;
     private Switch soundSwitch;
     private Switch displaySwitch;

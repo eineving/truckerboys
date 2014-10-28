@@ -1,9 +1,10 @@
-package truckerboys.otto;
+package truckerboys.otto.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import truckerboys.otto.utils.ConnectionListener;
 import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;

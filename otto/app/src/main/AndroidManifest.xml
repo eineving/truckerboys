@@ -18,7 +18,7 @@
             android:value="AIzaSyDEzAa31Uxan5k_06udZBkMRkZb1Ju0aSk"/>
 
         <activity
-            android:name=".MainActivity">
+            android:name=".activities.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name=".OTTOActivity"
+            android:name=".activities.OTTOActivity"
             android:screenOrientation="portrait">
         </activity>
 
@@ -37,14 +37,15 @@
         </activity>
 
         <activity
-            android:name=".NoGPSConnectionActivity">
+            android:name=".activities.NoGPSConnectionActivity">
         </activity>
 
         <activity
-            android:name=".NoNetworkConnectionActivity">
+            android:name=".activities.NoNetworkConnectionActivity">
         </activity>
 
-        <receiver android:name=".ConnectionListener">
+        <receiver android:name=".utils.ConnectionListener">
+
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
