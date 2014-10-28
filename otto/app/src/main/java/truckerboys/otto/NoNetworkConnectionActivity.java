@@ -27,17 +27,9 @@ public class NoNetworkConnectionActivity extends Activity{
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onBackPressed() {
+        ; // Do nothing, make sure the user doesn't go back to OTTOActivity
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {}
 
     @Override
     public void finish() {

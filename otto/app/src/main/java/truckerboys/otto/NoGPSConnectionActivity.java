@@ -27,8 +27,8 @@ public class NoGPSConnectionActivity extends Activity{
         //Make singleton of this activity, making it possible to close it from another activity.
         noGPSConnectionActivity = this;
 
+        //Make it possible for the user to easily access the GPS settings.
         turnOnGPS = (Button) findViewById(R.id.activateGPSButton);
-
         turnOnGPS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,18 +39,8 @@ public class NoGPSConnectionActivity extends Activity{
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onBackPressed() {
-
+        ; // Do nothing, make sure the user doesn't go back to OTTOActivity
     }
 
     @Override
