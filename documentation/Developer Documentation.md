@@ -43,6 +43,10 @@ we can update the application in real-time when we change something in our setti
 tab. Which makes for a better user experience.
 
 ##User Inteface
+The app was designed in a gray colour scheme for a clean and non-distracting user experience. 
+The driver/user should not focus his/hers attention on the app while driving, but on the road. 
+This, along the SICS guidelines was a main focus of ours when designing the user interface and by using a gray colour scheme within the app the driver wouldn’t glance at any colourful icons/graphics in his peripheral vision.
+As mentioned we’ve also followed the SICS design guidelines which have given us clear do’s and don’ts regarding the user interface design (e.g. max 30 chars when driving). 
 
 ##External Dependencies
 Since we're developing for Android, we've choosen Google as our main provider for
