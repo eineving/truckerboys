@@ -123,7 +123,7 @@
 
         <TextView
             android:id="@+id/altStopsTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:paddingBottom="10dp"

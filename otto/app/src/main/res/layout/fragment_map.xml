@@ -11,7 +11,7 @@
         android:layout_height="match_parent"/>
 
     <!-- Start Route Dialog -->
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/startRoute_dialog"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -20,7 +20,8 @@
         android:background="@drawable/opacity_grey_gradient"
         android:paddingLeft="10dp"
         android:paddingTop="0dp"
-        android:visibility="invisible" >
+        android:visibility="invisible"
+        android:baselineAligned="false" >
 
         <LinearLayout
             android:orientation="vertical"
@@ -91,7 +92,7 @@
     </LinearLayout>
 
     <!-- Active Route Dialog -->
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/activeRoute_dialog"
         android:orientation="horizontal"
         android:layout_width="fill_parent"

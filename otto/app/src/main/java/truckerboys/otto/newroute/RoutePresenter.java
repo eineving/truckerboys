@@ -93,7 +93,7 @@ public class RoutePresenter {
         editor.putString("place2", place2);
         editor.putString("place3", place3);
 
-        editor.commit();
+        editor.apply();
 
 
     }

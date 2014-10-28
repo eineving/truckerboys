@@ -68,7 +68,7 @@ public class SettingsPresenter {
 
 
         // Commit the changes
-        settingsEditor.commit();
+        settingsEditor.apply();
 
         EventBuss.getInstance().newEvent(new SettingsChangedEvent());
     }

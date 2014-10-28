@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">OTTO</string>
-    <string name="new_activity">New Activity</string>
     <string name="break_title">Break time left</string>
     <string name="driving_title">Time to break</string>
     <string name="recStop_title_final">Destination</string>

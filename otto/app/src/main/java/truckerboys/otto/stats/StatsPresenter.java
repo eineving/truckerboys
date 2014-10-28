@@ -213,7 +213,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         editor.putFloat("fuelTotal", (float)model.getFuelTotal());
         editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
 
-        editor.commit();
+        editor.apply();
     }
 
     @Override
@@ -265,7 +265,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 EventBuss.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
                 statsEditor.putFloat("distanceByFuel", kmPerLiter);
 
-                statsEditor.commit();
+                statsEditor.apply();
 
                 Log.w("SIGNAL", "FUEL");
                 break;
@@ -278,7 +278,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 EventBuss.getInstance().newEvent(new TotalDistanceEvent(distance));
 
                 statsEditor.putFloat("distanceTotal", distance);
-                statsEditor.commit();
+                statsEditor.apply();
 
                 Log.w("SIGNAL", "DISTANCE");
                 break;

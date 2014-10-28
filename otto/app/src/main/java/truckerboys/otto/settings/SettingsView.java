@@ -95,7 +95,7 @@ public class SettingsView extends Fragment implements IView, IEventListener {
             editor.putInt("tankSize", Integer.parseInt(tankSize.getText() + ""));
         }
 
-        editor.commit();
+        editor.apply();
     }
 
 

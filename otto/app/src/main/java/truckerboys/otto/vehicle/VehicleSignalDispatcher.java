@@ -15,7 +15,7 @@ import java.util.HashMap;
  */
 class VehicleSignalDispatcher implements AutomotiveListener {
 
-    /// A hashmap that maps a list of subscribers to a Signal ID.
+    // A hashmap that maps a list of subscribers to a Signal ID.
     private final HashMap<Integer, ArrayList<IVehicleListener>> subs = new HashMap<Integer, ArrayList<IVehicleListener>>();
 
 
