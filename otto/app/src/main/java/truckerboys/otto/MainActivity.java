@@ -54,7 +54,13 @@ public class MainActivity extends Activity implements IEventListener{
      * Checks what activity should be started 
      */
     private void launchNextActivity(){
-        if(connectionListener.isConnectedToNetwork() && connectionListener.isConnectedToGPS() && currentActivity.getClass().equals(OTTOActivity.class)){
+        System.out.println("Launch next activity:");
+        System.out.println("GPS: " + connectionListener.isConnectedToGPS());
+        System.out.println("Network: " + connectionListener.isConnectedToNetwork());
+        System.out.println("currentActivity: " + currentActivity);
+
+        System.out.println(OTTOActivity.class);
+        if(connectionListener.isConnectedToNetwork() && connectionListener.isConnectedToGPS() && currentActivity != OTTOActivity.class){
             if(NoGPSConnectionActivity.getNoGPSConnectionActivity() != null) {
                 NoGPSConnectionActivity.getNoGPSConnectionActivity().finish();
             }
@@ -62,9 +68,9 @@ public class MainActivity extends Activity implements IEventListener{
                 NoNetworkConnectionActivity.getNoNetworkConnectionActivity().finish();
             }
             launchOTTOActivity();
-        } else if (!connectionListener.isConnectedToGPS() && currentActivity.getClass().equals(NoGPSConnectionActivity.class)) {
+        } else if (!connectionListener.isConnectedToGPS() && currentActivity != NoGPSConnectionActivity.class) {
             launchNoGPSConnectionActivity();
-        } else if (!connectionListener.isConnectedToNetwork() && currentActivity.getClass().equals(NoNetworkConnectionActivity.class)) {
+        } else if (!connectionListener.isConnectedToNetwork() && currentActivity != NoNetworkConnectionActivity.class) {
             launchNoNetworkConnectionActivity();
         }
     }
@@ -73,6 +79,7 @@ public class MainActivity extends Activity implements IEventListener{
      * Simple method for launching the NoConnectionActivity.
      */
     private void launchNoGPSConnectionActivity(){
+        currentActivity = NoGPSConnectionActivity.class;
         Intent noGPSConnectionIntent = new Intent(this, NoGPSConnectionActivity.class);
         startActivity(noGPSConnectionIntent);
     }
@@ -81,7 +88,7 @@ public class MainActivity extends Activity implements IEventListener{
      * Simple method for launching the NoConnectionActivity.
      */
     private void launchNoNetworkConnectionActivity(){
-        System.out.println("No Network");
+        currentActivity = NoNetworkConnectionActivity.class;
         Intent noNetworkConnectionIntent = new Intent(this, NoNetworkConnectionActivity.class);
         startActivity(noNetworkConnectionIntent);
     }
