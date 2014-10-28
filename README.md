@@ -1,5 +1,5 @@
 # OTTO: Onroad Time Tracking Optimizer
-<center><img src="https://github.com/eineving/truckerboys/blob/develop/documentation/images/OTTOLogo.jpg" alt="Logo" height="300px"/></center>
+<div style="text-align: center"><img src="https://github.com/eineving/truckerboys/blob/develop/documentation/images/OTTOLogo.jpg" alt="Logo" height="300px"/></div>
 
 
 #### Trucker Boys Project for DAT255 @ Chalmers University of Technology Fall 2014
