@@ -56,7 +56,7 @@ public class EventBuss {
      * @param event The event that is pushed out to all subscribers
      */
     public void newEvent(Event event){
-        if(event != null){ //Make sure someone doesn't try to execute an invalid event.
+        if(event != null && this.eventListeners.get(event.getEventType()) != null){ //Make sure someone doesn't try to execute an invalid event.
             for(IEventListener eventListener : this.eventListeners.get(event.getEventType())){
                 //Send out event to all subscribers
                 eventListener.performEvent(event);

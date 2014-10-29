@@ -12,6 +12,7 @@ import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.GooglePlaces;
+import truckerboys.otto.utils.eventhandler.EventBuss;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
@@ -55,17 +56,42 @@ public class TripPlannerTest extends TestCase {
 
     @Test
     public void testUpdateRoute() throws Exception {
-        fail("Test not implemented");
+        ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+        checkpoints.add(malmo);
+        checkpoints.add(stockholm);
+        tripPlanner.setNewRoute(currentLocation, kiruna, checkpoints);
+        activeRoute = tripPlanner.getRoute();
+        Duration firstETA = activeRoute.getEta();
+
+        //E6 south of Kungsbacka
+        tripPlanner.updateRoute(new MapLocation(new LatLng(57.5539342,12.061378)));
+
+        assertTrue(tripPlanner.getRoute().getEta().isShorterThan(firstETA));
+
     }
 
     @Test
     public void testGetRoute() throws Exception {
-        fail("Test not implemented");
+        ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+        checkpoints.add(malmo);
+        checkpoints.add(stockholm);
+        tripPlanner.setNewRoute(currentLocation, kiruna, checkpoints);
+        assertNotNull(tripPlanner.getRoute());
     }
 
     @Test
     public void testSetChoosenStop() throws Exception {
-        fail("Test not implemented");
+        ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+        checkpoints.add(malmo);
+        checkpoints.add(stockholm);
+        tripPlanner.setNewRoute(currentLocation, kiruna, checkpoints);
+        activeRoute = tripPlanner.getRoute();
+
+        if(activeRoute.getAlternativeStops().size() > 0) {
+            RouteLocation chosen = activeRoute.getAlternativeStops().get(0);
+            tripPlanner.setChoosenStop(chosen);
+            assertTrue(tripPlanner.getRoute().getRecommendedStop().equalCoordinates(chosen));
+        }
     }
 
     @Test
@@ -93,12 +119,21 @@ public class TripPlannerTest extends TestCase {
         tripPlanner.setNewRoute(currentLocation, malmo, null);
         activeRoute=tripPlanner.getRoute();
 
-        assertTrue(activeRoute.getRecommendedStop().equalCoordinates(malmo));
         assertTrue(activeRoute.getEta().isEqual(activeRoute.getCheckpoints().get(0).getEta()));
     }
 
     @Test
     public void testPassedCheckpoint() throws Exception{
-        fail("Test not implemented");
+        ArrayList<MapLocation> checkpoints = new ArrayList<MapLocation>();
+        checkpoints.add(malmo);
+        checkpoints.add(stockholm);
+        tripPlanner.setNewRoute(currentLocation, kiruna, checkpoints);
+        activeRoute = tripPlanner.getRoute();
+
+        tripPlanner.passedCheckpoint(malmo);
+
+        for(MapLocation temp : tripPlanner.getRoute().getCheckpoints()){
+            assertFalse(temp.equalCoordinates(malmo));
+        }
     }
 }
