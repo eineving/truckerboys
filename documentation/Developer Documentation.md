@@ -74,6 +74,10 @@ that the driver should feel comfortable aswell, taking into consideration that
 it's more comfortable to drive 2.5 hours, take a break and drive another 2.5h
 instead of doing 4hours, take a break and do 1 more hour.
 
+<img src="https://github.com/eineving/truckerboys/blob/develop/documentation/images/Flowchart_tripplanner" title="Structure UML" />
+
+<i>Rough flowchart of how the locations are analyzed.</i>
+
 ####VehicleFacade
 This is the facade that we built to reduce the couplings to the vehicle API.
 Basically what it does is give us access to any signals that we'd like to
