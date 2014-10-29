@@ -101,3 +101,8 @@ replaces the 'Date' and 'Time' classes in Java 7.
 It has good test coverage and adding to that it is Open Source, which is always
 a nice addition to make sure you have full control.
 
+#####JARs instead of SDK
+We decided to use the supported JARs supplied for us instead of the SDK, which would have made us flash the ROM onto all the devices on which we wanted to test the app.
+
+#####Android Studio
+We furthermore used Android Studio as our main IDE instead of the Eclipse. This choice came natural for us because of the superior support for the Android platform which Android Studio offers (e.g. the gui-editor).
