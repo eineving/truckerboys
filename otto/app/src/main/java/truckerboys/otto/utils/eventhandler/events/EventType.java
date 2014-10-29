@@ -8,5 +8,5 @@ package truckerboys.otto.utils.eventhandler.events;
  * type of events. Making it faster to send all events.
  */
 public enum EventType {
-    CONNECTION, BUTTON_CLICKED, STATISTICS, SETTINGS, CLOCK, ROUTE, GPS_UPDATE
+    CONNECTION, BUTTON_CLICKED, STATISTICS, SETTINGS, CLOCK, ROUTE, GPS_UPDATE, TEST
 }
