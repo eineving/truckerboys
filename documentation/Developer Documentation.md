@@ -48,6 +48,11 @@ The driver/user should not focus his/hers attention on the app while driving, bu
 This, along the SICS guidelines was a main focus of ours when designing the user interface and by using a gray colour scheme within the app the driver wouldn’t glance at any colourful icons/graphics in his peripheral vision.
 As mentioned we’ve also followed the SICS design guidelines which have given us clear do’s and don’ts regarding the user interface design (e.g. max 30 chars when driving). 
 
+##Safety Features
+In the Settings tab we’ve chosen to implement support for muting the system sound, as well as keeping the screen awake at all time. 
+This impoves safety a great deal in a manner that the driver wont have to close the app, enter Androids system settings and navigating to the desired setting. Instead it’s as easy as swiping to OTTO’s settings tab and switching on or off. 
+To make this as intuitive a task a possible we’ve chosen to use intuitive switch components, natively found in the Android system.
+
 ##External Dependencies
 Since we're developing for Android, we've choosen Google as our main provider for
 external APIs. This is mainly because users of Android are already very
