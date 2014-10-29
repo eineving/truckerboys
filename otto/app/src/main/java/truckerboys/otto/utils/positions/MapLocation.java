@@ -32,6 +32,9 @@ public class MapLocation extends Location{
      * @return True if distanceTo rhs is less than 5 meters.
      */
     public boolean equalCoordinates(MapLocation rhs) {
+        if(rhs == null){
+            return false;
+        }
         return distanceTo(rhs) < 10;
     }
     
