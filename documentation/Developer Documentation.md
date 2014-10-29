@@ -60,6 +60,10 @@ This class is based on the interface IRegulationHandler, which makes for an easy
 process if you want to swap the application to using the US Regulations instead
 for example.
 
+The class is devided in samler methods. Each method only takes care of one specific 
+case with the regulations and trust that the other methods provides correct information
+when needed. This makes the code easier to grasp and more maintainable.. 
+
 The base for the current EU Regulation calculations can be found [here](https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf).
 
 ####TripPlanner
