@@ -27,7 +27,6 @@ public class HomePresenter implements IPresenter, IEventListener {
 
     private IRegulationHandler handler;
     private HomeView view;
-    private ActiveSessionDialogFragment dialog;
     private User user;
 
     public HomePresenter(IRegulationHandler handler, User user) {
@@ -56,7 +55,7 @@ public class HomePresenter implements IPresenter, IEventListener {
                     if(handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().isLongerThan(Duration.ZERO)){
 
                         // Sends time left on break
-                        dialog = new ActiveSessionDialogFragment().newInstance(
+                        ActiveSessionDialogFragment dialog = new ActiveSessionDialogFragment().newInstance(
                                 handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().getMillis());
                         dialog.onAttach(view.getActivity());
 

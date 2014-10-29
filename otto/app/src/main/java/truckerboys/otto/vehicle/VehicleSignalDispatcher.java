@@ -31,7 +31,7 @@ class VehicleSignalDispatcher implements AutomotiveListener {
         }
         if (!subs.get(id).contains(listener)) {
             subs.get(id).add(listener);
-            Log.w("SIGNAL", "Added listener to signal: " + id);
+            //Log.w("SIGNAL", "Added listener to signal: " + id);
         }
     }
 
@@ -70,7 +70,7 @@ class VehicleSignalDispatcher implements AutomotiveListener {
      */
     @Override
     public void receive(AutomotiveSignal signal) {
-        Log.w("SIGNAL" , "SIGNAL RECEIVED " + signal.getSignalId());
+        //Log.w("SIGNAL" , "SIGNAL RECEIVED " + signal.getSignalId());
         for (IVehicleListener listener : subs.get(signal.getSignalId())) {
             listener.receive(signal);
         }
@@ -79,11 +79,11 @@ class VehicleSignalDispatcher implements AutomotiveListener {
 
     @Override
     public void timeout(int i) {
-        Log.w("SIGNAL" , "SIGNAL TIMEOUT");
+        //Log.w("SIGNAL" , "SIGNAL TIMEOUT");
     }
 
     @Override
     public void notAllowed(int i) {
-        Log.w("SIGNAL" , "SIGNAL NOT ALLOWED");
+        //Log.w("SIGNAL" , "SIGNAL NOT ALLOWED");
     }
 }

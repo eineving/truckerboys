@@ -4,8 +4,6 @@ import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.joda.time.Duration;
-
 /**
  * Created by Daniel on 2014-09-18.
  */

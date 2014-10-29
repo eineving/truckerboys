@@ -1,9 +1,7 @@
 package truckerboys.otto.settings;
 
 import android.os.Bundle;
-import android.preference.*;
-
-import truckerboys.otto.R;
+import android.preference.PreferenceFragment;
 
 
 /**

@@ -5,17 +5,6 @@ import com.google.android.gms.maps.model.LatLng;
 import junit.framework.TestCase;
 
 import org.joda.time.Duration;
-
-import truckerboys.otto.directionsAPI.GoogleDirections;
-import truckerboys.otto.directionsAPI.Route;
-import truckerboys.otto.driver.Session;
-import truckerboys.otto.driver.SessionType;
-import truckerboys.otto.driver.User;
-import truckerboys.otto.placesAPI.GooglePlaces;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.positions.MapLocation;
-import truckerboys.otto.utils.positions.RouteLocation;
-
 import org.joda.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +14,16 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+
+import truckerboys.otto.directionsAPI.GoogleDirections;
+import truckerboys.otto.driver.Session;
+import truckerboys.otto.driver.SessionType;
+import truckerboys.otto.driver.User;
+import truckerboys.otto.placesAPI.GooglePlaces;
+import truckerboys.otto.utils.positions.MapLocation;
+import truckerboys.otto.utils.positions.RouteLocation;
+
+
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)

@@ -12,6 +12,11 @@ public abstract class Event {
         this.eventType = eventType;
     }
 
+    /**
+     * Used to compare diffferent subtypes of event.
+     * @param event
+     * @return
+     */
     public boolean isType(Class<? extends Event> event){
         if(event.isInstance(this)){
             return true;

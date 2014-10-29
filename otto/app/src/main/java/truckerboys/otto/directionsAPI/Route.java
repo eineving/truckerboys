@@ -6,7 +6,6 @@ import org.joda.time.Duration;
 
 import java.util.ArrayList;
 
-import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 

@@ -24,6 +24,7 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
@@ -52,7 +53,7 @@ public class ClockView extends Fragment {
 
     RouteLocation recStop, firstAltStop, secAltStop, thirdAltStop, nextDestination;
 
-    ArrayList<RouteLocation> altStops = new ArrayList<RouteLocation>();
+    List<RouteLocation> altStops = new ArrayList<RouteLocation>();
 
     Boolean variablesSet = false, nextDestinationIsFinal;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
@@ -210,7 +211,7 @@ public class ClockView extends Fragment {
      *
      * @param altStops The list of the alternative stops
      */
-    public void setAltStops(ArrayList<RouteLocation> altStops) {
+    public void setAltStops(List<RouteLocation> altStops) {
         this.altStops = altStops;
         if(altStops!=null){
             Iterator it = altStops.iterator();

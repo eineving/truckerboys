@@ -29,10 +29,7 @@ public class LocationHandler implements GooglePlayServicesClient.OnConnectionFai
 
     private static LocationClient locationClient;
 
-    private Context context;
-
     public LocationHandler(Context context){
-        this.context = context;
         locationClient = new LocationClient(context, this, this);
         locationClient.connect();
     }

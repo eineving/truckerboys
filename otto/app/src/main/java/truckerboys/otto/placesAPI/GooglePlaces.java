@@ -24,10 +24,8 @@ public class GooglePlaces implements IPlaces {
             return GooglePlacesJSONDecoder.getRouteLocations(response);
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
             throw new NoConnectionException(e.getMessage());
         } catch (ExecutionException e) {
-            e.printStackTrace();
             throw new NoConnectionException(e.getMessage());
         }
     }

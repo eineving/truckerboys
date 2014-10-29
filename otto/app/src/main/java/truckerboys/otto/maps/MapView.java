@@ -48,8 +48,6 @@ import truckerboys.otto.vehicle.VehicleInterface;
  */
 public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener, IDistractionListener {
 
-    private View rootView;
-
     // Objects that identify everything that is visible on the map.
     private GoogleMap googleMap;
     private Marker positionMarker;
@@ -90,7 +88,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        rootView = inflater.inflate(R.layout.fragment_map, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
         EventBus.getInstance().subscribe(this, EventType.GPS_UPDATE);
