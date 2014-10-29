@@ -280,7 +280,8 @@ public class SessionHistory {
                         //If not, it's a reduced one, check if that's valid. Since we can only have 3 per week.
                         if (getNumberOfReducedDailyRestsThisWeek() < 3) {
                             return new Instant(session.getEndTime());
-                        } else if (true) /* It might be a split daily rest */ {
+                        } else { /* It might be a split daily rest */
+
 
                             //If there's a rest longer than 3h before the one just found and occurs on the same day
                             //the one just found is a normal rest.
@@ -294,8 +295,7 @@ public class SessionHistory {
                                     return new Instant(session.getEndTime());
                                 }
                             }
-
-                        } else /* It's not valid, check for the last valid one */ {
+                            /* It's not valid, check for the last valid one */
 
                             Session temp_session;
                             int validReducedBreakIn = getNumberOfReducedDailyRestsThisWeek() - 3;
@@ -340,6 +340,7 @@ public class SessionHistory {
      * @return the end time of the last break longer than specified.
      * @throws NoValidBreakFound
      */
+
     public Instant getEndTimeOfRestLongerThan(Duration duration) throws NoValidBreakFound {
         for (Session session : sessions) {
             if (session.getSessionType() == SessionType.RESTING && !session.getDuration().isShorterThan(duration)) {
