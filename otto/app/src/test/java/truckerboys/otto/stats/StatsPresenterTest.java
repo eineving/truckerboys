@@ -134,26 +134,4 @@ public class StatsPresenterTest extends TestCase{
 
         assertTrue(same);
     }
-
-    @Test
-    public void testRestorePreferences() {
-
-        // Sets dummy stats
-        float distanceByFuel = 55;
-        float distanceTotal = 45;
-        float fuelTotal = 35;
-        int violaions = 25;
-
-        setDummyStats(distanceByFuel, distanceTotal, fuelTotal, violaions);
-
-        // Runs method to be tested
-        statsPresenter.restorePreferences(Robolectric.application.getSharedPreferences(STATS, 0));
-
-
-        // Compares values
-        assertTrue(model.getDistanceByFuel() == distanceByFuel
-                && model.getDistanceTotal() == distanceTotal
-                && model.getFuelTotal() == fuelTotal
-                && model.getViolations() == violaions);
-    }
 }
