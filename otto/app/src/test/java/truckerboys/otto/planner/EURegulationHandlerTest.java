@@ -110,28 +110,27 @@ public class EURegulationHandlerTest extends TestCase {
         //Drive for 10h two days in the same week
         s = new SessionHistory();
         s.addSession(new Session(SessionType.DRIVING, new Instant(0), new Instant(0).plus(Duration.standardHours(10))));
-        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(0)) &&
-                handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(s.getNumberOfExtendedDaysThisWeek() == 1);
 
         s.addSession(new Session(SessionType.RESTING, new Instant(1).plus(Duration.standardHours(10)), new Instant(1).plus(Duration.standardHours(21))));
-        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(9)) &&
-                handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(1)));
+        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(9)));
+        assertTrue(handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(1)));
 
         s.addSession(new Session(SessionType.DRIVING, new Instant(2).plus(Duration.standardHours(21)), new Instant(2).plus(Duration.standardHours(31))));
-        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(0)) &&
-                handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(s.getNumberOfExtendedDaysThisWeek() == 2);
 
         s.addSession(new Session(SessionType.RESTING, new Instant(3).plus(Duration.standardHours(31)), new Instant(3).plus(Duration.standardHours(42))));
-        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(9)) &&
-                handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(0)));
+        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(9)));
+        assertTrue(handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(0)));
 
         //Take a weekly rest
         s.addSession(new Session(SessionType.RESTING, new Instant(4).plus(Duration.standardHours(42)), new Instant(4).plus(Duration.standardHours(92))));
-        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(9)) &&
-                handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(1)));
-
-
-
+        assertTrue(handler.getThisDayTL(s).getTimeLeft().isEqual(Duration.standardHours(9)));
+        assertTrue(handler.getThisDayTL(s).getExtendedTimeLeft().isEqual(Duration.standardHours(1)));
     }
 
     @Test

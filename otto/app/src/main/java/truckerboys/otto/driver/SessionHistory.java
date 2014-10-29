@@ -173,7 +173,7 @@ public class SessionHistory {
 
         for (Session session : sessions) {
             //If 'session' is in this week (since "if after LAST weeks end", we're in this week.)
-            if (latestWeeklyBreak.isBefore(session.getStartTime())) {
+            if (!latestWeeklyBreak.isAfter(session.getStartTime())) {
 
                 //If session was a driving-session
                 if (session.getSessionType() == SessionType.DRIVING) {
@@ -186,8 +186,8 @@ public class SessionHistory {
                         breakBetweenExtendedDays = true;
                     }
                 }
-                if (dailyTime.isLongerThan(STANDARD_DAY_SESSION) && breakBetweenExtendedDays) {
 
+                if (dailyTime.isLongerThan(STANDARD_DAY_SESSION) && breakBetweenExtendedDays) {
                     numberOfExtendedDays++;
                     breakBetweenExtendedDays = false;
                 }
