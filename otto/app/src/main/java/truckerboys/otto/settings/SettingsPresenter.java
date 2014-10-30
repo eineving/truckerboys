@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.support.v4.app.Fragment;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import truckerboys.otto.driver.User;
@@ -75,15 +76,21 @@ public class SettingsPresenter implements IPresenter, IEventListener {
      */
     public void restorePreferences() {
 
-            boolean displayAlive = view.getActivity().getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
-            int ringerMode = ((AudioManager) view.getActivity().getSystemService(Context.AUDIO_SERVICE)).getRingerMode();
+        boolean displayAlive = view.getActivity().getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
+        int ringerMode = ((AudioManager) view.getActivity().getSystemService(Context.AUDIO_SERVICE)).getRingerMode();
 
-            // If ringerMode is set on Normal (1) set sound as true
-            boolean sound = (ringerMode == AudioManager.RINGER_MODE_NORMAL);
+        // If ringerMode is set on Normal (1) set sound as true
+        boolean sound = (ringerMode == AudioManager.RINGER_MODE_NORMAL);
 
-            setSettings(displayAlive);
+        // Sets tank size in view, defaults to 330 L
+        ((EditText)view.getTankSize()).setText("" + view.getActivity().getSharedPreferences(SETTINGS, 0).getInt("tankSize", 330));
 
-            view.update(sound, isDisplayActive());
+        // Sets tank size in model, defaults to 330 L
+        model.setTankSize(view.getActivity().getSharedPreferences(SETTINGS, 0).getInt("tankSize", 330));
+
+        setSettings(displayAlive);
+
+        view.update(sound, isDisplayActive());
 
     }
 

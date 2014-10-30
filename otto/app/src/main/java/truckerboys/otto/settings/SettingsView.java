@@ -96,7 +96,7 @@ public class SettingsView extends Fragment {
         SharedPreferences settings = getActivity().getSharedPreferences(SETTINGS, 0);
 
         // Reads stored tank size from shared preferences
-        tankSize.setText("" + settings.getInt("tankSize", 330));
+        // tankSize.setText("" + settings.getInt("tankSize", 330));
 
         // Restores preferences for settings in presenter
         EventBus.getInstance().newEvent(new RestoreSettingsEvent());
@@ -104,6 +104,8 @@ public class SettingsView extends Fragment {
         return rootView;
 
     }
+
+
 
     /**
      * Pause method for the view.
