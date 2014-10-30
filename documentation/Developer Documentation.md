@@ -137,7 +137,7 @@ API that Google Maps use on a standard Android phone.) and our overall impressio
 is that it generally estimates very good routes to get from one point to another.
 
 #####Google Places
-Motivate why.
+Google Places is the API that we use to get interestings locations along our route and information about these locations. We have chosen this API mostly because that we use other Google APIs and it makes the subscriptions easier to handle.
 
 #####Joda Time
 The base of our application is keeping track of time, and therefore we need to
