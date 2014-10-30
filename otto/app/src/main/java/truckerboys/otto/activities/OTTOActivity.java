@@ -1,6 +1,7 @@
 package truckerboys.otto.activities;
 
 import android.app.DialogFragment;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -21,6 +22,7 @@ import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.planner.EURegulationHandler;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
+import truckerboys.otto.settings.SettingsPresenter;
 import truckerboys.otto.settings.SettingsView;
 import truckerboys.otto.stats.StatsPresenter;
 import truckerboys.otto.utils.IPresenter;
@@ -60,6 +62,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     private static OTTOActivity ottoActivity;
 
     public static final String SETTINGS = "Settings_file";
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,9 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
         ottoActivity = this;
 
         initiateOTTO();
+
+        settings = getSharedPreferences(SETTINGS, 0);
+
         createPresenters();
 
         //Create standard view with a ViewPager and corresponding tabs.
@@ -93,7 +99,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
         slidingTabLayout.setViewPager(viewPager);
 
         // Turns display properties (alive on/off) based on saved settings file
-        if (getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true)) {
+        if (settings.getBoolean("displayAlive", true)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -132,7 +138,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
         presenters.add(new StatsPresenter(user));
 
-        presenters.add(new SettingsView(fuelTank));
+        presenters.add(new SettingsPresenter(fuelTank, user));
     }
 
     public List<IPresenter> getPresenters() {
