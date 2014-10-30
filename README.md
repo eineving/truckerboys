@@ -13,6 +13,9 @@ Instructions and requirements on building and installning the application.
 * An Android Device
 * Internet Connection
 
+<i>Please also note that this application has been developed for the Nexus 5 with
+an Android version of 4.4.4</i>
+
 ### Building
 The project uses gradle and there is a gradle file in the ~/otto/directory that
 can be used for compiling the project. Place yourself in the ~/otto/directory
