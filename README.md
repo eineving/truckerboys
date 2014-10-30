@@ -51,6 +51,5 @@ clicking on it. <i>Simple.</i>
 <a href="https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria" target="_blank">SICS</a>
 
 ## Relevant Topics
-
 <a href="https://www.transportstyrelsen.se/Global/Publikationer/Vag/Yrkestrafik/kor_vilotider_utg10_low.pdf" target="_blank">EU Truck Regulations</a> <br />
 <a href="http://antonioleiva.com/mvp-android/" target="_blank">MVP-pattern for Android</a>
