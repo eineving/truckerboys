@@ -45,4 +45,12 @@ public class FuelTankInfo implements IVehicleListener {
         }
         Log.w("FUEL", "Mileage :"  + getMileage());
     }
+
+    public int getFuelTankVolume() {
+        return fuelTankVolume;
+    }
+
+    public void setFuelTankVolume(int fuelTankVolume) {
+        this.fuelTankVolume = fuelTankVolume;
+    }
 }

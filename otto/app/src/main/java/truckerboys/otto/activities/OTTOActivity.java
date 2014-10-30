@@ -34,6 +34,7 @@ import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
 import truckerboys.otto.utils.tabs.SlidingTabLayout;
 import truckerboys.otto.utils.tabs.TabPagerAdapter;
+import truckerboys.otto.vehicle.FuelTankInfo;
 
 /**
  * The root class of the program.
@@ -52,6 +53,9 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     private List<IPresenter> presenters = new ArrayList<IPresenter>();
     private ViewPager viewPager;
     private TabPagerAdapter pagerAdapter;
+
+    // Default value for FuelTank-size is 330 liters. That is a tanksize specified by Volvo.
+    private FuelTankInfo fuelTank = new FuelTankInfo(330);
 
     private static OTTOActivity ottoActivity;
 
@@ -110,7 +114,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
     private void initiateOTTO(){
         regulationHandler = new EURegulationHandler();
         user = new User(this);
-        tripPlanner = new TripPlanner(regulationHandler, new GoogleDirections(), new GooglePlaces(), user);
+        tripPlanner = new TripPlanner(regulationHandler, new GoogleDirections(), new GooglePlaces(), user, fuelTank);
 
         tachographHandler = new TachographHandler(user);
         locationHandler = new LocationHandler(this);
@@ -128,7 +132,7 @@ public class OTTOActivity extends FragmentActivity implements IEventListener, Ac
 
         presenters.add(new StatsPresenter(user));
 
-        presenters.add(new SettingsView());
+        presenters.add(new SettingsView(fuelTank));
     }
 
     public List<IPresenter> getPresenters() {

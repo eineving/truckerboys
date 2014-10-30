@@ -11,6 +11,7 @@ import android.widget.Switch;
 import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
+import truckerboys.otto.vehicle.FuelTankInfo;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -21,8 +22,8 @@ public class SettingsPresenter {
 
     private SharedPreferences settings;
 
-    public SettingsPresenter(SharedPreferences settings){
-        this.model = new SettingsModel();
+    public SettingsPresenter(SharedPreferences settings, FuelTankInfo fuelTank){
+        this.model = new SettingsModel(fuelTank);
         this.settings = settings;
     }
 

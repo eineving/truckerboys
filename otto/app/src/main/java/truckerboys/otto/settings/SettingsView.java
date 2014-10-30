@@ -20,6 +20,7 @@ import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
+import truckerboys.otto.vehicle.FuelTankInfo;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
@@ -37,10 +38,13 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
     private Switch displaySwitch;
     private SettingsPresenter presenter;
     private EditText tankSize;
+    private FuelTankInfo fuelTank;
 
     public static final String SETTINGS = "Settings_file";
 
-    public SettingsView(){ }
+    public SettingsView(FuelTankInfo fuelTank) {
+        this.fuelTank = fuelTank;
+    }
 
 
     @Override
@@ -49,7 +53,7 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
 
         EventBus.getInstance().subscribe(this, EventType.SETTINGS);
 
-        presenter = new SettingsPresenter(getActivity().getSharedPreferences(SETTINGS, 0));
+        presenter = new SettingsPresenter(getActivity().getSharedPreferences(SETTINGS, 0), fuelTank);
 
         // Creates switches from the fragment
         soundSwitch = (Switch) rootView.findViewById(R.id.soundSwitch);
@@ -67,14 +71,14 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
         // Restores preferences for settings in presenter
         presenter.restorePreferences();
 
-        int ringerMode = ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).getRingerMode();
+        int ringerMode = ((AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE)).getRingerMode();
 
         // If ringerMode is set on Normal (1) set sound as true
         boolean sound = (ringerMode == AudioManager.RINGER_MODE_NORMAL);
 
 
         // Sets switch as checked if sound is on
-        if(soundSwitch != null) {
+        if (soundSwitch != null) {
 
             soundSwitch.setChecked(sound);
         }
@@ -91,7 +95,7 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
         // Stores the tankSize when on pause
         SharedPreferences.Editor editor = getActivity().getSharedPreferences(SETTINGS, 0).edit();
 
-        if(tankSize.getText().toString().length() > 0) {
+        if (tankSize.getText().toString().length() > 0) {
             editor.putInt("tankSize", Integer.parseInt(tankSize.getText() + ""));
         }
 
@@ -101,7 +105,8 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
 
     /**
      * Update the switches with settings loaded from shared preference file
-     * @param sound on/off
+     *
+     * @param sound        on/off
      * @param displayAlive on/off
      */
     public void update(boolean sound, boolean displayAlive) {
@@ -112,7 +117,7 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
     }
 
     @Override
-    public Fragment getFragment(){
+    public Fragment getFragment() {
         return this;
     }
 
@@ -124,26 +129,26 @@ public class SettingsView extends Fragment implements IPresenter, IEventListener
     @Override
     public void performEvent(Event event) {
 
-        if(getActivity() != null) {
-            if(event.isType(SoundChangedEvent.class)) {
+        if (getActivity() != null) {
+            if (event.isType(SoundChangedEvent.class)) {
 
 
                 // Checks if sound is on or off and sets systems sound based on this
-                if (((SoundChangedEvent)event).getSound()) {
-                    ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                if (((SoundChangedEvent) event).getSound()) {
+                    ((AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 } else {
-                    ((AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    ((AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE)).setRingerMode(AudioManager.RINGER_MODE_SILENT);
                 }
 
             }
 
-            if(event.isType(SettingsChangedEvent.class)) {
+            if (event.isType(SettingsChangedEvent.class)) {
 
                 // Loads settings file
                 SharedPreferences settings = getActivity().getSharedPreferences(SETTINGS, 0);
 
                 // Keeps display alive or not based on settings
-                if(settings.getBoolean("displayAlive", true)) {
+                if (settings.getBoolean("displayAlive", true)) {
                     getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
                 } else {

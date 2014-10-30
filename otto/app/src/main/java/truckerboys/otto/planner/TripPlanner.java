@@ -44,14 +44,15 @@ public class
 
     private MapLocation currentLocation;
 
-    // Default value for FuelTtnk-size is 330 liters. That is a tanksize specified by Volvo.
-    private FuelTankInfo fuelTank = new FuelTankInfo(330);
+    private FuelTankInfo fuelTank;
 
-    public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider, IPlaces placesProvider, User user) {
+    public TripPlanner(IRegulationHandler regulationHandler, IDirections directionsProvider,
+                       IPlaces placesProvider, User user, FuelTankInfo fuelTank) {
         this.regulationHandler = regulationHandler;
         this.directionsProvider = directionsProvider;
         this.placesProvider = placesProvider;
         this.user = user;
+        this.fuelTank = fuelTank;
     }
 
     /**
@@ -239,20 +240,6 @@ public class
             } else {
                 displayedRecommended = optimalRoute.getFinalDestination();
             }
-        }
-
-        //TODO delete these
-        int index = 0;
-        Log.w("NbrOfAlternative", alternativeLocations.size() + "");
-        for (RouteLocation temp : alternativeLocations) {
-            Log.w("AlternativeName " + index, "" + temp.getName());
-            Log.w("AlternativeAddress " + index, "" + temp.getAddress());
-            try {
-                Log.w("AlternativeETA " + index, "" + temp.getEta().toString());
-            } catch (Exception e) {
-                Log.w("AlternativeETA " + index, e.toString());
-            }
-            index++;
         }
         return new PlannedRoute(optimalRoute, displayedRecommended, alternativeLocations);
     }
