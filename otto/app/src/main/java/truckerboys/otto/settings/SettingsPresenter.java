@@ -36,8 +36,7 @@ public class SettingsPresenter implements IPresenter, IEventListener {
 
         EventBus.getInstance().subscribe(this, EventType.SETTINGS);
 
-        this.view = new SettingsView(fuelTank);
-
+        this.view = new SettingsView();
         this.model = new SettingsModel(fuelTank);
 
     }

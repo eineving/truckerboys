@@ -36,14 +36,6 @@ public class SettingsView extends Fragment {
 
     public static final String SETTINGS = "Settings_file";
 
-    public SettingsView() {
-
-    }
-
-    public SettingsView(FuelTankInfo fuelTank) {
-        this.fuelTank = fuelTank;
-    }
-
     public View getTankSize() {
         return tankSize;
     }

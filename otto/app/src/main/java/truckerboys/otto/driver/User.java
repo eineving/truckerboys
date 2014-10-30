@@ -30,15 +30,22 @@ public class User {
                 history.addSession(s);
             }
         }
-        if(history.getSessions().size() == 0){
-            Instant i = new Instant();
-            history.addSession(new Session(SessionType.RESTING, i.minus(Duration.standardMinutes(45)),new Instant()));
-            history.addSession(new Session(SessionType.DRIVING, i.minus(Duration.standardMinutes(225)),i.minus(Duration.standardMinutes(45))));
-            history.addSession(new Session(SessionType.WORKING, i.minus(Duration.standardMinutes(285)),i.minus(Duration.standardMinutes(225))));
-            history.addSession(new Session(SessionType.RESTING, i.minus(Duration.standardMinutes(1000)),i.minus(Duration.standardMinutes(285))));
-            history.addSession(new Session(SessionType.DRIVING, i.minus(Duration.standardMinutes(1187)),i.minus(Duration.standardMinutes(1000))));
-            Log.w("HISTORY", "ADDED DUMMY HISTORY");
-        }
+
+        /**
+         * Uncomment this if you want to preview how driving history is shown in the statistics view,
+         * this checks if there is no history, and if so is the case it adds Dummy history. It
+         * will therefor don't destroy any functionality even if uncommented. Simply confuse
+         * the user if he/she starts it for the first time and havn't drove anything yet.
+         */
+//        if(history.getSessions().size() == 0){
+//            Instant i = new Instant();
+//            history.addSession(new Session(SessionType.RESTING, i.minus(Duration.standardMinutes(45)),new Instant()));
+//            history.addSession(new Session(SessionType.DRIVING, i.minus(Duration.standardMinutes(225)),i.minus(Duration.standardMinutes(45))));
+//            history.addSession(new Session(SessionType.WORKING, i.minus(Duration.standardMinutes(285)),i.minus(Duration.standardMinutes(225))));
+//            history.addSession(new Session(SessionType.RESTING, i.minus(Duration.standardMinutes(1000)),i.minus(Duration.standardMinutes(285))));
+//            history.addSession(new Session(SessionType.DRIVING, i.minus(Duration.standardMinutes(1187)),i.minus(Duration.standardMinutes(1000))));
+//            Log.w("HISTORY", "ADDED DUMMY HISTORY");
+//        }
 
         if(history.getSessions().size() > 0 && history.getSessions().get(0).isActive()){
             currentSession = history.getSessions().get(0);

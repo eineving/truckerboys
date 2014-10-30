@@ -22,7 +22,7 @@ import truckerboys.otto.driver.User;
 import truckerboys.otto.placesAPI.GooglePlaces;
 import truckerboys.otto.utils.positions.MapLocation;
 import truckerboys.otto.utils.positions.RouteLocation;
-
+import truckerboys.otto.vehicle.FuelTankInfo;
 
 
 @Config(emulateSdk = 18)
@@ -45,7 +45,7 @@ public class TripPlannerTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        tripPlanner = new TripPlanner(euRegulationHandler, new GoogleDirections(), new GooglePlaces(), user);
+        tripPlanner = new TripPlanner(euRegulationHandler, new GoogleDirections(), new GooglePlaces(), user, new FuelTankInfo(330));
 
         Session session = new Session(SessionType.WORKING, Instant.now());
         session.end();
