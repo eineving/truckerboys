@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textColor="@color/textLight"
                 android:layout_marginTop="-20dp"
                 android:text="New Route"/>
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textColor="@color/textLight"
                 android:layout_marginTop="-20dp"
                 android:text="Maps"/>
@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textColor="@color/textLight"
                 android:layout_marginTop="-20dp"
                 android:text="Clock"/>
@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textColor="@color/textLight"
                 android:layout_marginTop="-20dp"
                 android:text="Statistics"/>
@@ -159,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textColor="@color/textLight"
                 android:layout_marginTop="-20dp"
                 android:text="Settings"/>

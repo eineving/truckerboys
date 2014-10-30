@@ -4,12 +4,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.TripPlanner;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -19,7 +19,7 @@ import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
  * Created by Mikael Malmqvist on 2014-09-18.
  * The presenter class of the clock that acts as a bridge between the view and model.
  */
-public class ClockPresenter  implements IView, IEventListener {
+public class ClockPresenter  implements IPresenter, IEventListener {
     private ClockModel model;
     private ClockView view;
 
@@ -31,7 +31,7 @@ public class ClockPresenter  implements IView, IEventListener {
         view = new ClockView();
         view.setOnBreak(model.isOnBreak());
 
-        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
+        EventBus.getInstance().subscribe(this, EventType.ROUTE, EventType.CLOCK);
 
         updateHandler = new Handler(Looper.getMainLooper());
         update = new Runnable(){

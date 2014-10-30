@@ -16,9 +16,10 @@ import android.widget.TextView;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.R;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -26,8 +27,6 @@ import truckerboys.otto.utils.eventhandler.events.RestorePreferencesEvent;
 import truckerboys.otto.utils.eventhandler.events.StatsViewStoppedEvent;
 import truckerboys.otto.utils.eventhandler.events.TimeDrivenEvent;
 import truckerboys.otto.utils.eventhandler.events.TotalDistanceEvent;
-import truckerboys.otto.IView;
-
 
 
 /**
@@ -35,7 +34,7 @@ import truckerboys.otto.IView;
  * Class for displaying statistics for the user.
  */
 
-public class StatsView extends Fragment implements IView, IEventListener{
+public class StatsView extends Fragment implements IPresenter, IEventListener{
 
     private View rootView;
 
@@ -80,7 +79,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         // Restores preferences for settings in presenter
-        EventBuss.getInstance().newEvent(new RestorePreferencesEvent());
+        EventBus.getInstance().newEvent(new RestorePreferencesEvent());
 
         return rootView;
     }
@@ -134,7 +133,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
 
 
         //EventTruck.getInstance().newEvent(new TimeDrivenEvent(durationToday.getStandardMinutes()/60, durationTotal.getStandardMinutes()/60));
-        EventBuss.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
+        EventBus.getInstance().newEvent(new TimeDrivenEvent(timeDrivenToday, timeDrivenTotal));
     }
 
     /**
@@ -146,7 +145,7 @@ public class StatsView extends Fragment implements IView, IEventListener{
         super.onStop();
 
         // Notifies the presenter that the view has stopped
-        EventBuss.getInstance().newEvent(new StatsViewStoppedEvent());
+        EventBus.getInstance().newEvent(new StatsViewStoppedEvent());
 
     }
 
@@ -176,11 +175,9 @@ public class StatsView extends Fragment implements IView, IEventListener{
      * history list.
      */
     public void clearSessionAdapter() {
-        try{
+        if(sessionAdapter != null){
             sessionAdapter.clear();
             sessionAdapter.notifyDataSetChanged();
-        } catch (NullPointerException e) {
-            System.out.println("An adapter might not have been set");
         }
     }
 

@@ -49,14 +49,16 @@ public class GoogleDirectionsJSONDecoder {
 
             //Combines all the legs to one common array
             for (LinkedTreeMap<String, Object> route : routes) {
-                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
+                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs")) {
                     allLegs.add(leg);
+                }
             }
 
             //Combines all steps to one common array
             for (LinkedTreeMap<String, Object> leg : allLegs) {
-                for (LinkedTreeMap<String, Object> step : (ArrayList<LinkedTreeMap<String, Object>>) leg.get("steps"))
+                for (LinkedTreeMap<String, Object> step : (ArrayList<LinkedTreeMap<String, Object>>) leg.get("steps")) {
                     allSteps.add(step);
+                }
             }
 
             //Creating ETA and distance
@@ -167,8 +169,9 @@ public class GoogleDirectionsJSONDecoder {
 
             //Combines all the legs to one common array
             for (LinkedTreeMap<String, Object> route : routes) {
-                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs"))
+                for (LinkedTreeMap<String, Object> leg : (ArrayList<LinkedTreeMap<String, Object>>) route.get("legs")) {
                     allLegs.add(leg);
+                }
             }
 
             //Creating ETA

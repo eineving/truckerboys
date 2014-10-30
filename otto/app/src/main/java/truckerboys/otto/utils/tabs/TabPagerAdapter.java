@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 
 /**
  * Created by Simon Petersson on 2014-09-18.
@@ -19,10 +19,10 @@ import truckerboys.otto.IView;
 public class TabPagerAdapter extends FragmentPagerAdapter {
 
     //List with all views that are needed in the "main" view. (The one with tabs.)
-    private List<IView> views = new ArrayList<IView>();
+    private List<IPresenter> views = new ArrayList<IPresenter>();
 
 
-    public TabPagerAdapter(FragmentManager fragmentManager, List<IView> views) {
+    public TabPagerAdapter(FragmentManager fragmentManager, List<IPresenter> views) {
         super(fragmentManager);
 
         this.views.addAll(views);
@@ -30,12 +30,12 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     }
 
 
-    public void removeItem(IView item){
+    public void removeItem(IPresenter item){
         views.remove(item);
         notifyDataSetChanged();
     }
 
-    public void addItem(IView item){
+    public void addItem(IPresenter item){
         views.add(item);
         notifyDataSetChanged();
     }

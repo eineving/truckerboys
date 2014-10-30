@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 import truckerboys.otto.R;
 import truckerboys.otto.placeSuggestion.PlacesAutoCompleteAdapter;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
@@ -130,7 +130,7 @@ public class RouteActivity extends Activity implements IEventListener {
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.fragment_new_route);
-        EventBuss.getInstance().subscribe(this, EventType.ROUTE, EventType.STATISTICS);
+        EventBus.getInstance().subscribe(this, EventType.ROUTE, EventType.STATISTICS);
         coder = new Geocoder(this);
         history = getSharedPreferences(HISTORY, 0);
         routePresenter = new RoutePresenter();

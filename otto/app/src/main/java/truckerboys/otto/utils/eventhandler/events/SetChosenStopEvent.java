@@ -1,6 +1,5 @@
 package truckerboys.otto.utils.eventhandler.events;
 
-import truckerboys.otto.utils.eventhandler.EventType;
 import truckerboys.otto.utils.positions.RouteLocation;
 
 /**

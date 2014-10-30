@@ -10,10 +10,11 @@ import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.SessionType;
 
-/**Class which handles all the Regulations regarding driving times in the EU.
+/**
+ * Class which handles all the Regulations regarding driving times in the EU.
  * All answers will be based on the history represented by SessionHistory
  * and all answers will be based on the current time, non of the methods will return
- * the same value twice id called repeatedly.
+ * the same value twice if called repeatedly.
  * Created by Daniel on 2014-09-17.
  */
 public class EURegulationHandler implements IRegulationHandler {
@@ -68,7 +69,7 @@ public class EURegulationHandler implements IRegulationHandler {
                     //check that last15 is after last45
                     if (last15.isAfter(last45)) {
                         //Check that last15 is before last30
-                        if(last15.isBefore(last30)){
+                        if (last15.isBefore(last30)) {
                             //Valid split rest found!
                             //Calculate from last30
                             activeTimeSinceLastSessionRest = history.getActiveTimeSince(last30);
@@ -111,59 +112,41 @@ public class EURegulationHandler implements IRegulationHandler {
             //Check maximum TL today before you have to take a break, so that you will
             //have time to finish your break before the 24h time limit runs out.
             if (history.getNumberOfReducedDailyRestsThisWeek() < 3) {
-                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(REDUCED_DAILY_REST);
+                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1).minus(REDUCED_DAILY_REST));
             } else {
-                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1)).minus(STANDARD_DAILY_REST);
+                maxTimeMarker = history.getLatestDailyRestEndTime().plus(Duration.standardDays(1).minus(STANDARD_DAILY_REST));
             }
         } catch (NoValidBreakFound e) {
-            maxTimeMarker = Instant.now().plus(Duration.standardHours(24));
+            maxTimeMarker = new Instant().plus(Duration.standardHours(24));
 
         }
 
+
         Duration timeSinceDailyBreak = history.getActiveTimeSinceLastDailyBreak();
         Duration TL;
-        Duration extendedTL = new Duration(ZERO_DURATION);
+        Duration extendedTL = Duration.ZERO;
         Duration TLThisWeek = new Duration(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
 
         TL = MAX_DAY_LENGTH.minus(timeSinceDailyBreak);
-
-        //Avoid negative timeLeft
-        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
+        TL = (TL.isShorterThan(Duration.ZERO) ? Duration.ZERO : TL);
 
         //Cap week
         TL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : TL);
 
-        //Check that the TL wont breach the 24h limit
-        if (new Instant().plus(TL).isAfter(maxTimeMarker)) {
-            TL = new Duration(new Instant(), maxTimeMarker);
-        }
 
         //The same thing as above but do it as the max day is 10 hours and calculate the difference.
-        if (history.getNumberOfExtendedDaysThisWeek() < 3) {
+        if (history.getNumberOfExtendedDaysThisWeek() < 2) {
             //If you are allowed to take an extended day.
 
             extendedTL = MAX_DAY_LENGTH_EXTENDED.minus(timeSinceDailyBreak);
-            extendedTL = (TL.isLongerThan(TLThisWeek) ? TLThisWeek : extendedTL);
+            extendedTL = (extendedTL.isLongerThan(TLThisWeek) ? TLThisWeek : extendedTL);
 
             //Calculate the difference of the TL and the extendedTL which will be the next extended time.
             extendedTL = extendedTL.minus(TL);
 
-            //Avoid negative extendedTL
-            extendedTL = (extendedTL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : extendedTL);
-
-            //Check that the TL + extendedTL wont breach the 24h limit
-            if (new Instant().plus(TL).plus(extendedTL).isAfter(maxTimeMarker)) {
-                Duration timeUntilMarker = new Duration(new Instant(), maxTimeMarker);
-                if (timeUntilMarker.isShorterThan(TL)) {
-                    TL = timeUntilMarker;
-                    extendedTL = Duration.ZERO;
-                } else {
-                    extendedTL = timeUntilMarker.minus(TL);
-                }
-            }
         }
 
-        return (TL.isLongerThan(ZERO_DURATION) ? new TimeLeft(TL, extendedTL) : new TimeLeft(ZERO_DURATION, ZERO_DURATION));
+        return (new TimeLeft(TL, extendedTL));
     }
 
 
@@ -191,13 +174,7 @@ public class EURegulationHandler implements IRegulationHandler {
 
     @Override
     public TimeLeft getThisTwoWeekTL(SessionHistory history) {
-        Duration TL = MAX_TWOWEEK_LENGTH.minus(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft()));
-
-        //Cap week mx time
-        TL = (TL.isShorterThan(MAX_WEEKLY_LENGTH) ? TL : MAX_WEEKLY_LENGTH);
-
-        //Avoid negative timeLeft
-        TL = (TL.isShorterThan(ZERO_DURATION) ? ZERO_DURATION : TL);
+        Duration TL = MAX_TWOWEEK_LENGTH.minus(MAX_WEEKLY_LENGTH.minus(getThisWeekTL(history).getTimeLeft().plus(getThisWeekTL(history).getExtendedTimeLeft())));
 
         return new TimeLeft(TL, ZERO_DURATION);
 

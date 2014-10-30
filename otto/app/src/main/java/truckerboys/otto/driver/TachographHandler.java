@@ -25,15 +25,12 @@ public class TachographHandler implements IVehicleListener {
         switch(state){
             case 2:
                 user.startNewSession(SessionType.WORKING);
-                System.out.println("Working");
                 break;
             case 3:
                 user.startNewSession(SessionType.DRIVING);
-                System.out.println("DRIVING");
                 break;
             default:
                 user.startNewSession(SessionType.RESTING);
-                System.out.println("RESTING");
                 break;
         }
     }

@@ -11,7 +11,8 @@
         android:layout_gravity="center_horizontal"
         android:src="@android:drawable/stat_notify_error"
         android:tint="#ffdbdbdb"
-        android:layout_marginTop="150dp" />
+        android:layout_marginTop="150dp"
+        android:contentDescription="No Connection" />
 
     <TextView
         android:layout_width="300dp"
@@ -20,7 +21,6 @@
         android:text="No connection could be made to the internet."
         android:id="@+id/noNetworkConnectionDescription"
         android:textColor="@color/textLight"
-        android:autoText="false"
         android:layout_gravity="center_horizontal"
         android:gravity="center" />
 

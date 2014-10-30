@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="basicblue_color">#5677fc</color>
-    <color name="cleargreen_color">#259b24</color>
     <color name="warningyellow_color">#ffeb3b</color>
     <color name="violationred_color">#e51c23</color>
     <color name="background_color">#eeeeee</color>

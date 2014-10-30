@@ -6,14 +6,14 @@ import android.support.v4.app.Fragment;
 
 import org.joda.time.Duration;
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
 import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.newroute.RouteActivity;
 import truckerboys.otto.planner.IRegulationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.NewRouteClickedEvent;
@@ -23,21 +23,18 @@ import truckerboys.otto.utils.eventhandler.events.YesClickedEvent;
  * Created by Mikael Malmqvist on 2014-09-18.
  * This class handles logic for the HomeView.
  */
-public class HomePresenter implements IView, IEventListener {
+public class HomePresenter implements IPresenter, IEventListener {
 
     private IRegulationHandler handler;
-    private HomeModel model;
     private HomeView view;
-    private ActiveSessionDialogFragment dialog;
     private User user;
 
     public HomePresenter(IRegulationHandler handler, User user) {
-        this.model = new HomeModel();
         this.view = new HomeView();
         this.user = user;
         this.handler = handler;
 
-        EventBuss.getInstance().subscribe(this, EventType.BUTTON_CLICKED);
+        EventBus.getInstance().subscribe(this, EventType.BUTTON_CLICKED);
     }
 
 
@@ -58,13 +55,11 @@ public class HomePresenter implements IView, IEventListener {
                     if(handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().isLongerThan(Duration.ZERO)){
 
                         // Sends time left on break
-                        dialog = new ActiveSessionDialogFragment().newInstance(
+                        ActiveSessionDialogFragment dialog = new ActiveSessionDialogFragment().newInstance(
                                 handler.getTimeLeftOnBreak(user.getHistory()).getTimeLeft().getMillis());
                         dialog.onAttach(view.getActivity());
 
-
                         dialog.show(view.getActivity().getFragmentManager(), "DriverBreak");
-                        System.out.println("Show dialog");
                     }
                 } catch (CurrentlyNotOnRestException e) { // Else
                 }
@@ -92,17 +87,11 @@ public class HomePresenter implements IView, IEventListener {
     public void performEvent(Event event) {
         // If new route has been clicked in HomeView
         if (event.isType(NewRouteClickedEvent.class)) {
-            System.out.println("New Route Clicked");
             newRouteClicked();
         }
 
         // If user clicks yes, in the "session-is-active"-dialog
         if (event.isType(YesClickedEvent.class)) {
-            System.out.println("Yes Clicked");
-
-            // Should we ends current session ?
-            // User.getInstance().getHistory().getSessions().get(User.getInstance().getHistory().getSessions().size()-1).end();
-
             Intent newRouteIntent = new Intent(view.getActivity(), RouteActivity.class);
             view.getActivity().startActivity(newRouteIntent);
         }

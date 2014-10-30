@@ -5,8 +5,6 @@ import android.location.Address;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.utils.eventhandler.EventType;
-
 /**
  * Created by Mikael Malmqvist on 2014-10-03.
  */

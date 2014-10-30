@@ -7,15 +7,15 @@ import android.support.v4.app.Fragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.planner.TripPlanner;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.ChangedRouteEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.IView;
 import truckerboys.otto.utils.eventhandler.events.RouteRequestEvent;
 import truckerboys.otto.utils.exceptions.NoActiveRouteException;
 import truckerboys.otto.utils.positions.RouteLocation;
@@ -25,7 +25,7 @@ import truckerboys.otto.utils.positions.RouteLocation;
  *
  * Handles communication between MapView and MapModel.
  */
-public class MapPresenter implements IEventListener, IView {
+public class MapPresenter implements IEventListener, IPresenter {
     private MapModel mapModel;
     private MapView mapView;
 
@@ -46,7 +46,7 @@ public class MapPresenter implements IEventListener, IView {
     public MapPresenter(TripPlanner tripPlanner){
         this.mapView = new MapView();
         this.mapModel = new MapModel(tripPlanner);
-        EventBuss.getInstance().subscribe(this, EventType.ROUTE);
+        EventBus.getInstance().subscribe(this, EventType.ROUTE);
         updatePos.run();
     }
 

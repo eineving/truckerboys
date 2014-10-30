@@ -1,59 +1,44 @@
 package truckerboys.otto.settings;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.CompoundButton;
+import android.media.AudioManager;
+import android.support.v4.app.Fragment;
 import android.widget.EditText;
-import android.widget.Switch;
-import truckerboys.otto.utils.eventhandler.EventBuss;
+import android.widget.TextView;
+
+import truckerboys.otto.driver.User;
+import truckerboys.otto.utils.IPresenter;
+import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.IEventListener;
+import truckerboys.otto.utils.eventhandler.events.DisplayChangedEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
-import truckerboys.otto.utils.eventhandler.events.SettingsChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.EventType;
+import truckerboys.otto.utils.eventhandler.events.RestoreSettingsEvent;
 import truckerboys.otto.utils.eventhandler.events.SoundChangedEvent;
+import truckerboys.otto.utils.eventhandler.events.TankChangedEvent;
+import truckerboys.otto.vehicle.FuelTankInfo;
 
 /**
  * Created by Mikael Malmqvist on 2014-09-18.
  * Presenter handling logic between settingsView and settingsModel
  */
-public class SettingsPresenter {
+public class SettingsPresenter implements IPresenter, IEventListener {
     private SettingsModel model;
+    private SettingsView view;
+    private User user;
 
-    private SharedPreferences settings;
+    public static final String SETTINGS = "Settings_file";
 
-    public SettingsPresenter(SharedPreferences settings){
-        this.model = new SettingsModel();
-        this.settings = settings;
-    }
+    public SettingsPresenter(FuelTankInfo fuelTank, User user){
+        this.user = user;
 
-    public void setListeners(Switch sound, Switch display, final EditText tankSize) {
+        EventBus.getInstance().subscribe(this, EventType.SETTINGS);
 
-        sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                soundChanged(b);
-            }
-        });
+        this.view = new SettingsView();
+        this.model = new SettingsModel(fuelTank);
 
-        display.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                displayChanged(b);
-            }
-        });
-
-        tankSize.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                //TODO update model
-                if(!tankSize.getText().toString().equals("") && tankSize.getText() != null) {
-                    model.setTankSize(Integer.parseInt(tankSize.getText() + ""));
-                }
-
-                return false;
-            }
-        });
     }
 
     /**
@@ -62,15 +47,15 @@ public class SettingsPresenter {
      */
     public void displayChanged(boolean b) {
         // Writes preferences to the settings and stats file
-        SharedPreferences.Editor settingsEditor = settings.edit();
+        SharedPreferences.Editor settingsEditor = view.getActivity().getSharedPreferences(SETTINGS, 0).edit();
 
         settingsEditor.putBoolean("displayAlive", b);
 
 
         // Commit the changes
-        settingsEditor.commit();
+        settingsEditor.apply();
 
-        EventBuss.getInstance().newEvent(new SettingsChangedEvent());
+        view.settingsChanged();
     }
 
 
@@ -80,8 +65,7 @@ public class SettingsPresenter {
      */
     public void soundChanged(boolean sound) {
 
-        // Fire an event with new sound mode on/off
-        EventBuss.getInstance().newEvent(new SoundChangedEvent(sound));
+        view.soundChanged(sound);
 
     }
 
@@ -91,9 +75,22 @@ public class SettingsPresenter {
      */
     public void restorePreferences() {
 
-        boolean displayAlive = settings.getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
+        boolean displayAlive = view.getActivity().getSharedPreferences(SETTINGS, 0).getBoolean("displayAlive", true); // true is the value to be returned if no "displayAlive"-value exists
+        int ringerMode = ((AudioManager) view.getActivity().getSystemService(Context.AUDIO_SERVICE)).getRingerMode();
+
+        // If ringerMode is set on Normal (1) set sound as true
+        boolean sound = (ringerMode == AudioManager.RINGER_MODE_NORMAL);
+
+        // Sets tank size in view, defaults to 330 L
+        ((EditText)view.getTankSize()).setText("" + view.getActivity().getSharedPreferences(SETTINGS, 0).getInt("tankSize", 330));
+
+        // Sets tank size in model, defaults to 330 L
+        model.setTankSize(view.getActivity().getSharedPreferences(SETTINGS, 0).getInt("tankSize", 330));
 
         setSettings(displayAlive);
+
+        view.update(sound, isDisplayActive());
+
     }
 
     /**
@@ -111,5 +108,36 @@ public class SettingsPresenter {
 
     public SettingsModel getModel() {
         return model;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return view;
+    }
+
+    @Override
+    public String getName() {
+        return "Settings";
+    }
+
+    @Override
+    public void performEvent(Event event) {
+
+        if(event.isType(RestoreSettingsEvent.class)) {
+            restorePreferences();
+        }
+
+        if(event.isType(TankChangedEvent.class)) {
+            model.setTankSize(Integer.parseInt(((TextView)view.getTankSize()).getText() + ""));
+        }
+
+        if(event.isType(DisplayChangedEvent.class)) {
+            displayChanged(((DisplayChangedEvent) event).getDisplayAlive());
+        }
+
+        if(event.isType(SoundChangedEvent.class)) {
+            soundChanged(((SoundChangedEvent) event).getSound());
+        }
+
     }
 }

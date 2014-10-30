@@ -14,12 +14,12 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.driver.Session;
 import truckerboys.otto.driver.SessionHistory;
 import truckerboys.otto.driver.User;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.DistanceByFuelEvent;
 import truckerboys.otto.utils.eventhandler.events.Event;
@@ -36,7 +36,7 @@ import truckerboys.otto.vehicle.VehicleSignalID;
  * Class for handling most logic for the StatsView showing
  * usefull statistics for the user.
  */
-public class StatsPresenter implements IView, IEventListener, IVehicleListener {
+public class StatsPresenter implements IPresenter, IEventListener, IVehicleListener {
     private StatsModel model;
 
     private StatsView view;
@@ -67,8 +67,8 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         VehicleInterface.subscribe(this, VehicleSignalID.KM_PER_LITER,VehicleSignalID.TOTAL_VEHICLE_DISTANCE);
 
 
-        EventBuss.getInstance().subscribe(this, EventType.STATISTICS);
-        EventBuss.getInstance().subscribe(view, EventType.STATISTICS);
+        EventBus.getInstance().subscribe(this, EventType.STATISTICS);
+        EventBus.getInstance().subscribe(view, EventType.STATISTICS);
     }
 
     public StatsView getView() {
@@ -213,7 +213,7 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
         editor.putFloat("fuelTotal", (float)model.getFuelTotal());
         editor.putFloat("distanceByFuel", (float)model.getDistanceByFuel());
 
-        editor.commit();
+        editor.apply();
     }
 
     @Override
@@ -262,10 +262,10 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 // Gets the total distance by fuel and updates the listeners
                 Float kmPerLiter = ((SCSFloat) signal.getData()).getFloatValue();
 
-                EventBuss.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
+                EventBus.getInstance().newEvent(new DistanceByFuelEvent(Math.floor(kmPerLiter * 100)/100));
                 statsEditor.putFloat("distanceByFuel", kmPerLiter);
 
-                statsEditor.commit();
+                statsEditor.apply();
 
                 Log.w("SIGNAL", "FUEL");
                 break;
@@ -275,10 +275,10 @@ public class StatsPresenter implements IView, IEventListener, IVehicleListener {
                 // Gets the total distance and updates the listeners
                 long distance = ((SCSLong) signal.getData()).getLongValue();
 
-                EventBuss.getInstance().newEvent(new TotalDistanceEvent(distance));
+                EventBus.getInstance().newEvent(new TotalDistanceEvent(distance));
 
                 statsEditor.putFloat("distanceTotal", distance);
-                statsEditor.commit();
+                statsEditor.apply();
 
                 Log.w("SIGNAL", "DISTANCE");
                 break;

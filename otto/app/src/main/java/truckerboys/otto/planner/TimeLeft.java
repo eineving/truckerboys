@@ -15,7 +15,7 @@ public class TimeLeft {
             this.timeLeft = timeLeft;
         }
 
-        if(supplementTime.isShorterThan(Duration.ZERO)){
+        if(!supplementTime.isLongerThan(Duration.ZERO)){
             this.extendedTime = Duration.ZERO;
         } else {
             this.extendedTime = supplementTime;

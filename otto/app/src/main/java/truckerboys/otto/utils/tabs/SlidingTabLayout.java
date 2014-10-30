@@ -42,7 +42,7 @@ import com.swedspot.vil.distraction.DriverDistractionLevel;
 import java.util.ArrayList;
 import java.util.List;
 
-import truckerboys.otto.IView;
+import truckerboys.otto.utils.IPresenter;
 import truckerboys.otto.vehicle.IDistractionListener;
 import truckerboys.otto.vehicle.VehicleInterface;
 
@@ -84,7 +84,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
 
     private TabPagerAdapter pagerAdapter;
-    private List<IView> views = new ArrayList<IView>();
+    private List<IPresenter> views = new ArrayList<IPresenter>();
 
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
@@ -287,14 +287,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (distractionMode) {
-            if (ev.getX() >= mTabStrip.getChildAt(2).getX() - 5) {
-                return true;
-            }
-            return false;
-        } else {
-            return false;
-        }
+        return (distractionMode && (ev.getX() >= mTabStrip.getChildAt(2).getX() - 5));
     }
 
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
@@ -357,7 +350,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
     }
 
 
-    public void setAdapter(TabPagerAdapter adapter, List<IView> views) {
+    public void setAdapter(TabPagerAdapter adapter, List<IPresenter> views) {
         this.pagerAdapter = adapter;
         this.views.addAll(views);
 
@@ -375,7 +368,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
 
         //If the level hasn't passed the threshhold, no need to update anything.
-        if((level > 1 && distractionMode == false)||(level <= 1 && distractionMode == true)){
+        if((level > 1 && !distractionMode)||(level <= 1 && distractionMode)){
             distractionMode = !distractionMode;
 
             final int colour;
@@ -407,8 +400,6 @@ public class SlidingTabLayout extends HorizontalScrollView implements IDistracti
 
                     if (item > 1) {
                         mViewPager.setCurrentItem(0);
-                    } else {
-                        // mViewPager.setCurrentItem(item);
                     }
 
                 }

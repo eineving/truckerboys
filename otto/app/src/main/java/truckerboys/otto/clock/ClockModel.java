@@ -1,12 +1,10 @@
 package truckerboys.otto.clock;
 
-import org.joda.time.Duration;
-
 import java.util.ArrayList;
+import java.util.List;
 
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.driver.CurrentlyNotOnRestException;
-import truckerboys.otto.driver.SessionType;
 import truckerboys.otto.driver.User;
 import truckerboys.otto.planner.IRegulationHandler;
 import truckerboys.otto.planner.PlannedRoute;
@@ -32,7 +30,7 @@ public class ClockModel {
     private PlannedRoute route;
     private boolean isOnBreak, nextDestinationIsFinal;
 
-    private ArrayList<RouteLocation> altStops;
+    private List<RouteLocation> altStops;
 
     public ClockModel(TripPlanner tripPlanner, IRegulationHandler regulationHandler, User user) {
 
@@ -90,7 +88,7 @@ public class ClockModel {
      * Returns the alternative stops
      * @return A list of the alternative stops
      */
-    public ArrayList<RouteLocation> getAltStops(){
+    public List<RouteLocation> getAltStops(){
         return altStops;
     }
 
@@ -152,7 +150,6 @@ public class ClockModel {
      * @return Boolean, true if the next destinaton is final.
      */
     public boolean isNextDestinationFinal(){
-        System.out.println("Next dest final? " + nextDestinationIsFinal);
         return nextDestinationIsFinal;
     }
 

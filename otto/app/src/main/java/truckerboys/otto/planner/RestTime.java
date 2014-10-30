@@ -1,7 +1,5 @@
 package truckerboys.otto.planner;
 
-import org.joda.time.Duration;
-
 /**
  * Created by Simon Petersson on 2014-10-08.
  *

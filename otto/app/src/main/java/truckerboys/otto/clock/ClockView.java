@@ -24,10 +24,11 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import truckerboys.otto.R;
 import truckerboys.otto.planner.TimeLeft;
-import truckerboys.otto.utils.eventhandler.EventBuss;
+import truckerboys.otto.utils.eventhandler.EventBus;
 import truckerboys.otto.utils.eventhandler.events.SetChosenStopEvent;
 import truckerboys.otto.utils.positions.RouteLocation;
 
@@ -52,7 +53,7 @@ public class ClockView extends Fragment {
 
     RouteLocation recStop, firstAltStop, secAltStop, thirdAltStop, nextDestination;
 
-    ArrayList<RouteLocation> altStops = new ArrayList<RouteLocation>();
+    List<RouteLocation> altStops = new ArrayList<RouteLocation>();
 
     Boolean variablesSet = false, nextDestinationIsFinal;
     String timeL, timeLE, timeLEPrefix = "Extended time: ";
@@ -112,17 +113,17 @@ public class ClockView extends Fragment {
                 if (tag.equalsIgnoreCase("firstAltStop")) {
                     viewSwitcher.showPrevious();
                     startSpinner();
-                    EventBuss.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
+                    EventBus.getInstance().newEvent(new SetChosenStopEvent(firstAltStop));
                 }
                 if (tag.equalsIgnoreCase("secAltStop")) {
                     viewSwitcher.showPrevious();
                     startSpinner();
-                    EventBuss.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
+                    EventBus.getInstance().newEvent(new SetChosenStopEvent(secAltStop));
                 }
                 if(tag.equalsIgnoreCase("thirdAltStop")){
                     viewSwitcher.showPrevious();
                     startSpinner();
-                    EventBuss.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
+                    EventBus.getInstance().newEvent(new SetChosenStopEvent(thirdAltStop));
                 }
             }
         };
@@ -210,7 +211,7 @@ public class ClockView extends Fragment {
      *
      * @param altStops The list of the alternative stops
      */
-    public void setAltStops(ArrayList<RouteLocation> altStops) {
+    public void setAltStops(List<RouteLocation> altStops) {
         this.altStops = altStops;
         if(altStops!=null){
             Iterator it = altStops.iterator();
@@ -252,15 +253,16 @@ public class ClockView extends Fragment {
      * Updates the UI
      */
     public void updateUI() {
-
         if (variablesSet) {
             Runnable updateUI = new Runnable() {
                 public void run() {
                     setLabels();
                 }
             };
-            if(getActivity()!=null)
-            getActivity().runOnUiThread(updateUI);
+            if(getActivity()!=null){
+                getActivity().runOnUiThread(updateUI);
+            }
+
         }
     }
 
@@ -268,8 +270,9 @@ public class ClockView extends Fragment {
      * Sets the labels of the time until violation and the stops.
      */
     private void setLabels() {
-        if(spinnerDialog!=null && spinnerDialog.isShowing())
+        if (spinnerDialog != null && spinnerDialog.isShowing()){
             spinnerDialog.dismiss();
+        }
         timeLeft.setText(timeL);
         if (timeLE.equalsIgnoreCase("0")) {
             timeLeftExtended.setVisibility(TextView.GONE);

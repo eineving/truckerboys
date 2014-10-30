@@ -32,8 +32,8 @@ import java.util.List;
 import truckerboys.otto.R;
 import truckerboys.otto.directionsAPI.Route;
 import truckerboys.otto.utils.LocationHandler;
-import truckerboys.otto.utils.eventhandler.EventBuss;
-import truckerboys.otto.utils.eventhandler.EventType;
+import truckerboys.otto.utils.eventhandler.EventBus;
+import truckerboys.otto.utils.eventhandler.events.EventType;
 import truckerboys.otto.utils.eventhandler.IEventListener;
 import truckerboys.otto.utils.eventhandler.events.Event;
 import truckerboys.otto.utils.eventhandler.events.GPSUpdateEvent;
@@ -47,8 +47,6 @@ import truckerboys.otto.vehicle.VehicleInterface;
  * Created by Mikael Malmqvist on 2014-09-18.
  */
 public class MapView extends Fragment implements IEventListener, GoogleMap.OnCameraChangeListener, IDistractionListener {
-
-    private View rootView;
 
     // Objects that identify everything that is visible on the map.
     private GoogleMap googleMap;
@@ -74,8 +72,8 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
     private int lastDistractionLevel = 0;
 
     //region Camera Settings
-    public float CAMERA_TILT = 60f;
-    public float CAMERA_ZOOM = 16f; //Default to 16f zoom.
+    public float cameraTilt = 60f;
+    public float cameraZoom = 16f; //Default to 16f zoom.
     private boolean followMarker;
     //endregion
 
@@ -90,10 +88,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        rootView = inflater.inflate(R.layout.fragment_map, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Subscribe to EventTruck, since we want to listen for GPS Updates.
-        EventBuss.getInstance().subscribe(this, EventType.GPS_UPDATE);
+        EventBus.getInstance().subscribe(this, EventType.GPS_UPDATE);
 
         // Subscribe to DistractionLevelChanged, since we want to change marker when having a high distraction level.
         VehicleInterface.subscribeToDistractionChange(this);
@@ -194,9 +192,9 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                 @Override
                 public void run() {
                     if (animate) {
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, cameraZoom, cameraTilt, bearing)));
                     } else {
-                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, CAMERA_ZOOM, CAMERA_TILT, bearing)));
+                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(location, cameraZoom, cameraTilt, bearing)));
                     }
                 }
             });
@@ -348,13 +346,13 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
             //region Adjust zoom to speed
             if(isFollowingMarker()) {
                 if (newLocation.getSpeed() <= 8.33 /* ca 30km/h */) {
-                    CAMERA_ZOOM = 17f;
+                    cameraZoom = 17f;
                 } else if (newLocation.getSpeed() > 8.3 && newLocation.getSpeed() <= 13.88 /* ca 50km/h */) {
-                    CAMERA_ZOOM = 16.5f;
+                    cameraZoom = 16.5f;
                 } else if (newLocation.getSpeed() > 13.88 && newLocation.getSpeed() <= 19.44/* 70km/h */) {
-                    CAMERA_ZOOM = 14.5f;
+                    cameraZoom = 14.5f;
                 } else if (newLocation.getSpeed() > 19.44) {
-                    CAMERA_ZOOM = 14f;
+                    cameraZoom = 14f;
                 }
             }
             //endregion
@@ -383,7 +381,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        CAMERA_ZOOM = cameraPosition.zoom;
+        cameraZoom = cameraPosition.zoom;
     }
 
     @Override
@@ -429,7 +427,7 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     CameraUpdateFactory.newCameraPosition(new CameraPosition(
                             LocationHandler.getCurrentLocationAsLatLng(),
                             17f,
-                            CAMERA_TILT,
+                            cameraTilt,
                             LocationHandler.getCurrentLocationAsMapLocation().getBearing())),
                     new GoogleMap.CancelableCallback() {
                         @Override
@@ -494,13 +492,10 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
 
     @Override
     public void distractionLevelChanged(final DriverDistractionLevel driverDistractionLevel) {
-        System.out.println("Level changed in MapView");
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Runnable is ran: " + driverDistractionLevel.getLevel());
                 if(driverDistractionLevel.getLevel() >= 2 && lastDistractionLevel < 2) /* High distraction level */ {
-                    System.out.println("Distractionlevel is now high");
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_red));
 
                     setFollowMarker(true);
@@ -510,7 +505,6 @@ public class MapView extends Fragment implements IEventListener, GoogleMap.OnCam
                     showActiveRouteDialog(false);
                     setAllGestures(false);
                 } else if(driverDistractionLevel.getLevel() < 2 && lastDistractionLevel >= 2) /* Low distraction level */ {
-                    System.out.println("Distractionlevel is now low");
                     positionMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.position_arrow_blue));
 
                     //Make it possible for the driver to exit "Follow Marker Mode"

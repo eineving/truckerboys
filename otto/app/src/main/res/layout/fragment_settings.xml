@@ -12,7 +12,7 @@
     <TextView
         android:id="@+id/settingsTitle"
         android:textColor="@color/textLighter"
-        android:textSize="14dp"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
     <TextView
         android:id="@+id/muteText"
         android:textColor="@color/textLight"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/divider0"
@@ -72,7 +72,7 @@
     <TextView
         android:id="@+id/displayText"
         android:textColor="@color/textLight"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -93,8 +93,9 @@
 
     <TextView
         android:id="@+id/tankText"
+        android:labelFor="@+id/tankEditText"
         android:textColor="@color/textLight"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -108,7 +109,7 @@
     <TextView
         android:id="@+id/fuelUnit"
         android:textColor="@color/textLight"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -130,50 +131,7 @@
         android:gravity="center" 
         android:inputType="number"
         android:textColor="@color/textLight"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
-    <!--<View
-        android:id="@+id/divider2"
-        android:layout_marginTop="10dp"
-        android:layout_width="fill_parent"
-        android:layout_below="@+id/displaySwitch"
-        android:layout_height="1dp"
-        android:background="@color/textLightest"/>
-
-    <TextView
-        android:id="@+id/unitText"
-        android:textColor="@color/textLight"
-        android:textSize="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="System of measurement"
-        android:layout_below="@+id/divider2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:id="@+id/currentUnit"
-        android:textColor="@color/textLightest"
-        android:textSize="14dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:text="Metric"
-        android:clickable="true"
-        android:layout_below="@+id/unitText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Switch
-        android:id="@+id/unitSwitch"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/divider2"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />-->
-
 </RelativeLayout>

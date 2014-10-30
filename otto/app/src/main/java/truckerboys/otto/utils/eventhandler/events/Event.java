@@ -1,7 +1,5 @@
 package truckerboys.otto.utils.eventhandler.events;
 
-import truckerboys.otto.utils.eventhandler.EventType;
-
 /**
  * Created by Simon Petersson on 2014-10-02.
  *
@@ -14,6 +12,11 @@ public abstract class Event {
         this.eventType = eventType;
     }
 
+    /**
+     * Used to compare diffferent subtypes of event.
+     * @param event
+     * @return
+     */
     public boolean isType(Class<? extends Event> event){
         if(event.isInstance(this)){
             return true;
