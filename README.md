@@ -47,8 +47,6 @@ clicking on it. <i>Simple.</i>
 
 <a href="https://developer.lindholmen.se/redmine/projects/aga" target="_blank">AGA Home</a><br />
 <a href="https://se-div-c3s-1.ce.chalmers.se:7001/index.cgi" target="_blank">HMI and SDK Guidelines</a><br />
-<strong>Username:</strong> student_dat255ht14<br />
-<strong>Password:</strong> jaglovarattvaraduktig
 
 ##### Project criterias:
 <a href="https://github.com/morganericsson/DAT255/wiki/SICS's-app-assessment-criteria" target="_blank">SICS</a>
